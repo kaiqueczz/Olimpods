@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crie sua Conta — Olimpo Pods</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="auth.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+
+<body>
+    <div class="auth-page">
+        <canvas class="wavy-canvas" id="wavyCanvas"></canvas>
+
+        <div class="auth-container">
+            <div class="auth-header">
+                <a href="index.html" class="auth-logo-link">
+                    <img src="assets/logo-ignite.png" alt="Olimpo Pods Logo" class="auth-logo rotating-logo">
+                </a>
+                <h1 class="auth-title gradual-spacing" data-text="Crie sua Conta">Crie sua Conta</h1>
+                <p class="auth-subtitle">Cadastre-se para receber atualizações por e-mail.</p>
+            </div>
+
+            <div class="auth-card glow-card">
+                <form class="auth-form" id="signupForm">
+                    <div class="form-group">
+                        <label class="form-label" for="fullname">Nome Completo</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="fullname" class="auth-input" placeholder="Digite seu nome" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="email">E-mail</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="email" class="auth-input" placeholder="seu@email.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Senha</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" class="auth-input" placeholder="Crie uma senha"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="confirm_password">Confirme a Senha</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="confirm_password" class="auth-input" placeholder="Repita a senha"
+                                required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-auth">Cadastrar</button>
+                </form>
+            </div>
+
+            <div class="auth-footer">
+                Já tem uma conta? <a href="login.html">Faça login</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Prevention for demo purposes
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const pass = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm_password').value;
+
+            if (pass !== confirm) {
+                alert('As senhas não coincidem!');
+                return;
+            }
+            // Simulated registration
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userEmail', document.getElementById('email').value);
+            localStorage.setItem('userName', document.getElementById('fullname').value);
+
+            // Redirect with success message
+            window.location.href = 'index.html?signup=success';
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Pedido — Ignite Olimpo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="checkout.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        .order-details-main {
+            padding: 100px 0;
+            background: radial-gradient(circle at top right, rgba(255, 11, 85, 0.05), transparent 400px);
+        }
+
+        .order-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 40px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .order-meta h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .order-meta p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .status-pill-large {
+            padding: 12px 24px;
+            background: rgba(255, 11, 85, 0.1);
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            border-radius: 50px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 30px;
+        }
+
+        .details-card {
+            background: rgba(15, 15, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card-h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-h3 svg {
+            color: var(--accent-primary);
+        }
+
+        .item-row {
+            display: flex;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            align-items: center;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-img-box {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .item-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .item-info-box {
+            flex: 1;
+        }
+
+        .item-info-box h4 {
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .item-info-box p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .item-price-box {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .info-group {
+            margin-bottom: 20px;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .info-value {
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .back-btn:hover {
+            color: var(--accent-primary);
+        }
+
+        @media (max-width: 992px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="checkout-page">
+
+    <header class="checkout-header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="assets/logo-ignite.png" alt="Olimpo Pods Logo">
+            </a>
+            <div class="checkout-trust-badges">
+                <a href="index.html" class="back-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    Voltar para a Loja
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="order-details-main">
+        <div class="container">
+            <div id="order-content">
+                <!-- Data populated here -->
+                <div style="text-align: center; padding: 100px 0;">
+                    <p>Carregando detalhes do pedido...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="checkout-mini-footer">
+        <div class="container" style="text-align: center;">
+            <p>&copy; 2026 Olimpo Pods. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const orderId = params.get('id');
+            const orders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+            const order = orders.find(o => o.id == orderId);
+
+            if (!order) {
+                document.getElementById('order-content').innerHTML = `
+                    <div class="details-card" style="text-align: center; padding: 100px 20px;">
+                        <h2 style="color: #fff; margin-bottom: 10px;">Pedido não encontrado</h2>
+                        <p style="color: #888; margin-bottom: 30px;">O pedido #${orderId} não foi localizado em seu histórico.</p>
+                        <a href="index.html" class="status-pill-large" style="text-decoration: none; display: inline-block;">Voltar para Início</a>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = `
+                <div class="order-header-flex">
+                    <div class="order-meta">
+                        <h1>Pedido #${order.id}</h1>
+                        <p>Realizado em ${order.date}</p>
+                    </div>
+                    <div class="status-pill-large">
+                        ${order.status || 'Aguardando Pagamento'}
+                    </div>
+                </div>
+
+                <div class="details-grid">
+                    <div class="details-left">
+                        <div class="details-card">
+                            <h3 class="card-h3">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                                Itens do Pedido
+                            </h3>
+                            <div class="items-list">
+                                ${order.items.map(item => {
+                let imgSrc = item.image || 'assets/logo-ignite.png';
+                if (imgSrc && !imgSrc.includes('/') && !imgSrc.startsWith('http')) {
+                    imgSrc = 'Images Pods/' + imgSrc;
+                }
+                return `
+                                        <div class="item-row">
+                                            <div class="item-img-box">
+                                                <img src="${imgSrc}" alt="${item.name}" onerror="this.src='assets/logo-ignite.png'">
+                                            </div>
+                                            <div class="item-info-box">
+                                                <h4>${item.name}</h4>
+                                                <p>Sabor: ${item.flavor || 'N/A'}</p>
+                                                <p>Quantidade: ${item.qty}</p>
+                                            </div>
+                                            <div class="item-price-box">
+                                                R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}
+                                            </div>
+                                        </div>
+                                    `;
+            }).join('')}
+                            </div>
+                        </div>
+
+                        <div class="details-card">
+                            <h3 class="card-h3">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                Dados de Entrega
+                            </h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="info-group">
+                                    <span class="info-label">Destinatário</span>
+                                    <span class="info-value">${order.customer?.name || 'Cliente'}</span>
+                                </div>
+                                <div class="info-group">
+                                    <span class="info-label">Telefone</span>
+                                    <span class="info-value">${order.customer?.phone || '---'}</span>
+                                </div>
+                            </div>
+                            <div class="info-group">
+                                <span class="info-label">Endereço</span>
+                                <span class="info-value">
+                                    ${order.shipping?.address || '---'}, ${order.shipping?.number || 'S/N'}
+                                    <br>${order.shipping?.complement ? order.shipping.complement + '<br>' : ''}
+                                    ${order.shipping?.neighborhood || '---'} — ${order.shipping?.city || '---'}/${order.shipping?.state || '--'}
+                                </span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="info-group">
+                                    <span class="info-label">CEP</span>
+                                    <span class="info-value">${order.shipping?.cep || '---'}</span>
+                                </div>
+                                <div class="info-group">
+                                    <span class="info-label">Forma de Envio</span>
+                                    <span class="info-value">${order.shipping?.method || 'PAC'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="details-right">
+                        <div class="details-card">
+                            <h3 class="card-h3">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                Resumo Financeiro
+                            </h3>
+                            <div class="summary-totals" style="padding: 0;">
+                                <div class="total-line">
+                                    <span>Subtotal</span>
+                                    <span>R$ ${(order.subtotal || order.total).toFixed(2).replace('.', ',')}</span>
+                                </div>
+                                <div class="total-line">
+                                    <span>Frete</span>
+                                    <span style="color: ${order.shipping?.cost === 0 ? '#00ff88' : ''}">${order.shipping?.cost === 0 ? 'Grátis' : 'R$ ' + (order.shipping?.cost || 0).toFixed(2).replace('.', ',')}</span>
+                                </div>
+                                <div class="total-divider"></div>
+                                <div class="total-line main" style="margin-bottom: 0;">
+                                    <span>Total do Pedido</span>
+                                    <span class="final-price">R$ ${order.total.toFixed(2).replace('.', ',')}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="details-card">
+                            <h3 class="card-h3">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                Logística
+                            </h3>
+                            <div class="info-group">
+                                <span class="info-label">Agência de Processamento</span>
+                                <span class="info-value">${order.agency || 'Agência Principal'}</span>
+                            </div>
+                            <div class="info-group">
+                                <span class="info-label">Método de Pagamento</span>
+                                <span class="info-value">PIX — Aprovação Instantânea</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('order-content').innerHTML = html;
+        });
+    </script>
+</body>
+
+</html>

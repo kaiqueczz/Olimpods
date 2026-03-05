@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout — Ignite Olimpo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="checkout.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="checkout-page">
+
+    <!-- Header Simplificado -->
+    <header class="checkout-header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="assets/logo-ignite.png" alt="Olimpo Pods Logo">
+            </a>
+            <div class="checkout-trust-badges">
+                <div class="badge">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    <span>Compra Segura</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="checkout-main" id="checkout-wrapper">
+        <div class="container checkout-grid">
+
+            <!-- Coluna Esquerda: Formulários -->
+            <section class="checkout-forms">
+
+                <!-- Cadastro -->
+                <div class="checkout-card glow-card" id="contact-step">
+                    <h2 class="card-title">
+                        <span class="step-num">1</span>
+                        Cadastro
+                    </h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="email">E-mail*</label>
+                            <input type="email" id="email" placeholder="seu@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Nome completo*</label>
+                            <input type="text" id="name" placeholder="Como no seu RG" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="password">Criar Senha*</label>
+                                <input type="password" id="password" placeholder="Mínimo 6 caracteres" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password">Confirmar Senha*</label>
+                                <input type="password" id="confirm-password" placeholder="Repita a senha" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">Celular*</label>
+                                <input type="tel" id="phone" placeholder="(00) 00000-0000" maxlength="15" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cpf">CPF*</label>
+                                <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entrega Inteligente -->
+                <div class="checkout-card glow-card" id="shipping-step">
+                    <h2 class="card-title">
+                        <span class="step-num">2</span>
+                        Entrega Inteligente
+                    </h2>
+                    <p class="card-subtitle">Insira o CEP para calcularmos o frete e coletar os dados de entrega.</p>
+
+                    <div class="form-grid">
+                        <div class="form-group cep-group">
+                            <label for="cep">CEP*</label>
+                            <div class="cep-input-wrapper">
+                                <input type="text" id="cep" placeholder="00000-000" maxlength="9" required>
+                                <span class="cep-loading"></span>
+                            </div>
+                        </div>
+
+                        <div class="address-details hidden" id="address-fields">
+                            <div class="form-row">
+                                <div class="form-group grow">
+                                    <label for="address">Endereço*</label>
+                                    <input type="text" id="address" placeholder="Rua, Avenida..." required>
+                                </div>
+                                <div class="form-group small">
+                                    <label for="number">Número*</label>
+                                    <input type="text" id="number" placeholder="123" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="complement">Complemento</label>
+                                <input type="text" id="complement" placeholder="Apto, Bloco, Sala...">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="neighborhood">Bairro*</label>
+                                    <input type="text" id="neighborhood" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="city">Cidade*</label>
+                                    <input type="text" id="city" readonly tabindex="-1" required>
+                                </div>
+                                <div class="form-group x-small">
+                                    <label for="state">UF*</label>
+                                    <input type="text" id="state" maxlength="2" readonly tabindex="-1" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagamento -->
+                <div class="checkout-card glow-card" id="payment-step">
+                    <h2 class="card-title">
+                        <span class="step-num">3</span>
+                        Pagamento
+                    </h2>
+
+                    <div class="payment-methods">
+                        <label class="payment-option active">
+                            <input type="radio" name="payment" value="pix" checked>
+                            <div class="payment-info">
+                                <span class="payment-label">PIX</span>
+                                <span class="payment-desc">Aprovação instantânea</span>
+                            </div>
+                            <div class="payment-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                                </svg>
+                            </div>
+                        </label>
+
+
+                    </div>
+
+                    <button type="button" class="btn-checkout-submit" id="submit-purchase">
+                        Finalizar Compra
+                    </button>
+
+                    <div id="pix-modal" class="payment-modal">
+                        <div class="modal-content">
+                            <button type="button" class="close-modal" id="close-modal">&times;</button>
+                            <div id="modal-loader" class="modal-loader">
+                                <div class="spinner"></div>
+                                <p>Gerando seu PIX...</p>
+                            </div>
+                            <div id="modal-ready" class="modal-ready hidden">
+                                <div class="payment-status-header">
+                                    <h3 id="payment-status-title">Aguardando Pagamento</h3>
+                                    <div class="payment-timer" id="pix-countdown">10:00</div>
+                                </div>
+                                <div id="pix-payment-details">
+                                    <p class="modal-subtitle">Escaneie o QR Code abaixo ou copie o código</p>
+
+                                    <div class="qr-container">
+                                        <img id="pix-qr" src="" alt="QR Code PIX">
+                                    </div>
+
+                                    <div class="pix-copy-box">
+                                        <label>Código PIX (Copia e Cola)</label>
+                                        <div class="copy-input-group">
+                                            <input type="text" id="pix-code" readonly>
+                                            <button type="button" id="btn-copy-pix">Copiar</button>
+                                        </div>
+                                    </div>
+
+                                    <button type="button" id="btn-simulate-pay"
+                                        class="btn-simulation-only hidden">Simular Pagamento (Teste Local)</button>
+                                </div>
+
+                                <div class="modal-footer-info">
+                                    <p>O pedido será processado assim que o pagamento for confirmado.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="terms-text">
+                        Ao finalizar você concorda com nossos <a href="#">Termos de Uso</a>.
+                    </p>
+                </div>
+
+            </section>
+
+            <!-- Coluna Direita: Resumo -->
+            <aside class="checkout-summary">
+                <div class="summary-card glow-card">
+                    <h3 class="summary-title">Resumo do Pedido</h3>
+                    <p id="free-shipping-notice"
+                        style="font-size: 0.75rem; font-weight: 300; font-style: italic; color: #888; margin: -15px 0 15px 0;">
+                        A partir de 2 peças seu frete é grátis</p>
+
+                    <div class="cart-items" id="summary-items">
+                        <!-- Items will be injected here via JS -->
+                    </div>
+
+                    <div class="coupon-box">
+                        <input type="text" placeholder="Cupom de desconto">
+                        <button>Aplicar</button>
+                    </div>
+
+                    <div class="summary-totals">
+                        <div class="total-line">
+                            <span>Subtotal</span>
+                            <span id="summary-subtotal">R$ 0,00</span>
+                        </div>
+                        <div class="total-line">
+                            <span>Entrega</span>
+                            <span class="shipping-value">Calculando...</span>
+                        </div>
+                        <div class="total-divider"></div>
+                        <div class="total-line main">
+                            <span>Total</span>
+                            <span id="summary-total" class="final-price">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+    <footer class="checkout-mini-footer">
+        <div class="container" style="text-align: center;">
+            <p>&copy; 2026 Olimpo Pods. Todos os direitos reservados.</p>
+            <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">R Vinte e Cinco de Março 1015, loja 1 - Centro
+            </p>
+        </div>
+    </footer>
+
+    <!-- ==================== PRIZE WHEEL MODAL ==================== -->
+    <div class="gift-modal-overlay" id="wheelModal">
+        <div class="gift-modal-card">
+            <button class="close-gift-modal" id="closeWheelModal">&times;</button>
+            <div class="gift-icon-header">🎡</div>
+            <h2>Roleta de Prêmios</h2>
+            <p>Parabéns pelo seu pedido! Gire a roleta e descubra seu prêmio para a próxima compra.</p>
+
+            <div class="wheel-container">
+                <div class="wheel-pointer"></div>
+                <div class="wheel-main" id="prizeWheel"></div>
+            </div>
+
+            <button class="btn-spin" id="spinBtn">Girar Roleta</button>
+            <div id="prizeResult" style="margin-top: 20px; font-weight: 800; color: #00ff88; font-size: 1.2rem;"></div>
+            <p class="disclaimer-italics">Os prêmios só podem ser resgatados na próxima compra.</p>
+        </div>
+    </div>
+
+    <script src="checkout.js"></script>
+</body>
+
+</html>

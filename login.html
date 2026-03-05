@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesse sua Conta — Olimpo Pods</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="auth.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+
+<body>
+    <div class="auth-page">
+        <canvas class="wavy-canvas" id="wavyCanvas"></canvas>
+
+        <div class="auth-container">
+            <div class="auth-header">
+                <a href="index.html" class="auth-logo-link">
+                    <img src="assets/logo-ignite.png" alt="Olimpo Pods Logo" class="auth-logo rotating-logo">
+                </a>
+                <h1 class="auth-title gradual-spacing" data-text="Acesse sua Conta">Acesse sua Conta</h1>
+                <p class="auth-subtitle">Entre para acompanhar seus pedidos e receber ofertas.</p>
+            </div>
+
+            <div class="auth-card glow-card">
+                <form class="auth-form" id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label" for="email">E-mail</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="email" class="auth-input" placeholder="seu@email.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Senha</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" class="auth-input" placeholder="********" required>
+                            <button type="button" class="password-toggle" aria-label="Mostrar/Ocultar Senha">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-helpers">
+                        <a href="#" class="auth-link">Esqueci sua senha?</a>
+                    </div>
+
+                    <button type="submit" class="btn-auth">Entrar</button>
+                </form>
+            </div>
+
+            <div class="auth-footer">
+                Não possui uma conta? <a href="signup.html">Cadastre-se aqui</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Specific logic for password toggle
+        document.querySelector('.password-toggle').addEventListener('click', function () {
+            const input = document.getElementById('password');
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+        });
+
+        // Prevention for demo purposes
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            // Simulated login
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userEmail', email);
+
+            // Redirect with success message
+            window.location.href = 'index.html?login=success';
+        });
+    </script>
+</body>
+
+</html>

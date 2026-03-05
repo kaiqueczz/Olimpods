@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produto — Olimpo Pods</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Specific styles for product page */
+        .product-detail-section {
+            padding: 140px 0 80px;
+        }
+
+        .breadcrumb {
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb a:hover {
+            color: var(--accent-primary);
+        }
+
+        .product-grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        .product-visuals {
+            position: sticky;
+            top: 120px;
+        }
+
+        .main-image-box {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            position: relative;
+        }
+
+        .product-info-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .p-brand {
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .p-name {
+            font-size: 3rem;
+            font-family: var(--font-display);
+            line-height: 1.1;
+        }
+
+        .p-price {
+            font-size: 2.5rem;
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+
+        .p-option-label {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .p-selector-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: #111118;
+        }
+
+        .p-selector {
+            width: 100%;
+            padding: 15px 45px 15px 15px;
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            border-radius: inherit;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s var(--ease-smooth);
+            appearance: none;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+        }
+
+        .p-selector-wrapper::after {
+            content: '';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            border-right: 2px solid var(--text-secondary);
+            border-bottom: 2px solid var(--text-secondary);
+            transform: translateY(-70%) rotate(45deg);
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+
+        .p-selector:focus {
+            border-color: var(--accent-primary);
+        }
+
+        .p-selector-wrapper:focus-within::after {
+            border-color: var(--accent-primary);
+        }
+
+        .p-status-box {
+            background: rgba(255, 11, 85, 0.1);
+            border: 1px solid rgba(255, 11, 85, 0.2);
+            padding: 15px;
+            border-radius: var(--radius-md);
+            color: var(--accent-primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .p-status-text {
+            color: var(--accent-primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .p-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .action-buttons-group {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .btn-buy-now {
+            flex: 1.5;
+            background: linear-gradient(135deg, var(--accent-primary), #FF0B55);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            height: 54px;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 15px rgba(255, 11, 85, 0.3);
+        }
+
+        .btn-buy-now:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 11, 85, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .btn-add-cart {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            height: 54px;
+            font-size: 0.85rem;
+        }
+
+        .btn-add-cart:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            width: fit-content;
+        }
+
+        .q-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .q-btn:hover {
+            background: var(--bg-glass-hover);
+        }
+
+        .q-val {
+            width: 40px;
+            text-align: center;
+            font-weight: 600;
+            border-left: 1px solid var(--border-subtle);
+            border-right: 1px solid var(--border-subtle);
+        }
+
+        .btn-buy {
+            flex: 1;
+            background: var(--accent-primary);
+            color: white;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s var(--ease-smooth);
+            box-shadow: 0 10px 30px rgba(255, 11, 85, 0.2);
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-add-cart {
+            flex: 1;
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s var(--ease-smooth);
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-buy:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(255, 11, 85, 0.3);
+        }
+
+        .btn-add-cart:hover {
+            background: var(--bg-glass-hover);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .shipping-box {
+            margin-top: 20px;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 30px;
+        }
+
+        .shipping-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .shipping-input {
+            flex: 1;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 15px;
+            color: var(--text-primary);
+        }
+
+        .btn-shipping {
+            padding: 0 25px;
+            border: 1px solid var(--text-secondary);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-shipping:hover {
+            background: white;
+            color: black;
+        }
+
+        .shipping-results {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+        }
+
+        .shipping-results.active {
+            max-height: 400px;
+            padding: 20px;
+            opacity: 1;
+            margin-bottom: 20px;
+        }
+
+        .shipping-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .shipping-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.3s;
+        }
+
+        .shipping-option:last-child {
+            border-bottom: none;
+        }
+
+        .shipping-option:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .opt-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .opt-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .opt-days {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .opt-price {
+            font-weight: 800;
+            color: var(--accent-primary);
+            font-size: 1rem;
+        }
+
+        .opt-price.free {
+            color: #00ff88;
+        }
+
+        @media (max-width: 992px) {
+            .product-grid-layout {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .product-visuals {
+                position: static;
+            }
+
+            .p-name {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ==================== TOP BANNER ==================== -->
+    <div class="top-banner">
+        <div class="banner-track">
+            <span>🚀 ENVIAMOS PARA TODO O BRASIL — FRETE GRÁTIS PARA PEDIDOS NO ATACADO 🚀</span>
+            <span>🚀 ENVIAMOS PARA TODO O BRASIL — FRETE GRÁTIS PARA PEDIDOS NO ATACADO 🚀</span>
+            <span>🚀 ENVIAMOS PARA TODO O BRASIL — FRETE GRÁTIS PARA PEDIDOS NO ATACADO 🚀</span>
+            <span>🚀 ENVIAMOS PARA TODO O BRASIL — FRETE GRÁTIS PARA PEDIDOS NO ATACADO 🚀</span>
+        </div>
+    </div>
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="header" id="header">
+        <div class="header-inner">
+            <!-- Search Bar -->
+            <div class="search-wrapper">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input type="text" class="search-bar" id="searchBar" placeholder="Buscar produtos..."
+                    aria-label="Buscar produtos">
+            </div>
+
+            <a href="index.html" class="logo">
+                <img src="assets/logo-ignite.png" alt="Olimpo Pods Logo" class="rotating-logo">
+            </a>
+
+            <!-- Mobile Toggle -->
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <!-- Account -->
+                <a href="login.html" class="action-btn" id="accountBtn" aria-label="Minha Conta" title="Minha Conta">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                </a>
+
+                <!-- Orders -->
+                <button class="action-btn" id="ordersBtn" aria-label="Meus Pedidos" title="Meus Pedidos">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                </button>
+
+                <!-- Cart -->
+                <button class="action-btn" id="cartBtn" aria-label="Carrinho" title="Meu Carrinho">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1" />
+                        <circle cx="20" cy="21" r="1" />
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                    </svg>
+                    <span class="badge" id="cartBadge">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="product-detail-section">
+        <div class="container" id="productContent">
+            <!-- Content will be populated by JS -->
+            <div class="loading-state">Carregando produto...</div>
+        </div>
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer-section" id="contato">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Institucional</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html#nossa-historia">Sobre nós</a></li>
+                        <li><a href="#" id="giftLinkFooter">Brindes disponíveis</a></li>
+                        <li><a href="privacy-policy.html">Política de Privacidade</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Sua Conta</h3>
+                    <ul class="footer-links">
+                        <li><a href="login.html">Login / Cadastro</a></li>
+                        <li><a href="#" id="ordersLinkFooter">Meus Pedidos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Ajuda</h3>
+                    <ul class="footer-links">
+                        <li><a href="faq.html">Dúvidas Frequentes</a></li>
+                        <li><a href="tracking.html">Acompanhar Pedido</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Atendimento</h3>
+                    <div class="contact-info">
+                        <p>Olimpopods22@gmail.com</p>
+                        <div class="social-links-footer">
+                            <a href="#" class="social-icon" title="Instagram">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                                </svg>
+                            </a>
+                            <a href="#" class="social-icon" title="WhatsApp">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
+                                    </path>
+                                </svg>
+                            </a>
+                            <a href="#" class="social-icon" title="Telegram">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-extra-col">
+                    <div class="newsletter-box">
+                        <h4>Junte-se a nós</h4>
+                        <form class="newsletter-form">
+                            <input type="email" placeholder="Seu e-mail aqui" required>
+                            <button type="submit">OK</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-baseline">
+                <p>&copy; 2026 Olimpo Pods. Todos os direitos reservados. CNPJ 57.220.134/0001-35</p>
+                <p class="address-baseline">R Vinte e Cinco de Março 1020, loja 1 - Centro</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== CART SIDEBAR ==================== -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h2>Seu Carrinho</h2>
+            <button class="btn-close-cart" id="closeCart" aria-label="Fechar Carrinho">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="minimum-progress-container">
+            <div class="progress-info">
+                <span id="progressText">Faltam <b>10</b> itens para o mínimo</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="cart-items-list" id="sidebarCartItems">
+            <!-- Dynamic Items -->
+            <div class="empty-cart-msg">Seu carrinho está vazio.</div>
+        </div>
+
+        <div class="cart-footer">
+            <div class="cart-total-line">
+                <span>Subtotal</span>
+                <span class="total-val" id="sidebarTotal">R$ 0,00</span>
+            </div>
+            <a href="checkout.html" class="btn-checkout disabled" id="sidebarCheckoutBtn">Finalizar Compra</a>
+        </div>
+    </div>
+
+    <!-- ==================== ORDERS SIDEBAR ==================== -->
+    <div class="orders-sidebar" id="ordersSidebar">
+        <div class="cart-header">
+            <h2>Meus Pedidos</h2>
+            <button class="btn-close-cart" id="closeOrders" aria-label="Fechar Pedidos">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="orders-content" id="ordersContent">
+            <div class="auth-required-msg">
+                <p>Você precisa estar logado para ver seus pedidos.</p>
+                <a href="login.html" class="btn-auth-redirect">Acessar Minha Conta</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadProduct() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+
+            if (!productId) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const fallbackProducts = [
+                { "id": "ignite-v300-30000", "brand": "ignite", "name": "IGNITE V300 30.000 New Edition", "price": "98.00", "image": "Images Pods/Ignite_v300-removebg-preview.png" },
+                { "id": "ignite-v250-25000", "brand": "ignite", "name": "IGNITE V250 25.000 Edition", "price": "90.00", "image": "Images Pods/Ignite_v250-removebg-preview.png" },
+                { "id": "ignite-v55-5500", "brand": "ignite", "name": "IGNITE V55 5.500 SLIM EDITION", "price": "65.00", "image": "Images Pods/Ignite_v55-removebg-preview.png" },
+                { "id": "ignite-v155-15500", "brand": "ignite", "name": "IGNITE V155 15.500 ULTRA SLIM", "price": "85.00", "image": "Images Pods/Ignite_V155-removebg-preview.png" },
+                { "id": "ignite-v400-mix", "brand": "ignite", "name": "IGNITE V400 MIX 40.000 Edition", "price": "110.00", "image": "Images Pods/Ignite_v400_mix-removebg-preview.png" },
+                { "id": "ignite-v400-ice", "brand": "ignite", "name": "IGNITE V400 Ice 40.000 Edition", "price": "110.00", "image": "Images Pods/Ignite_v400_ice-removebg-preview.png" },
+                { "id": "ignite-v80-new", "brand": "ignite", "name": "IGNITE V80 NEW 8.000 Edition", "price": "78.00", "image": "Images Pods/Ignite_v80-removebg-preview.png" },
+                { "id": "ignite-v120-pro", "brand": "ignite", "name": "IGNITE V120 PRO 12.000 Edition", "price": "79.99", "image": "Images Pods/Ignite_v120_pro-removebg-preview.png" },
+                { "id": "ignite-v150-pro", "brand": "ignite", "name": "IGNITE V150 PRO 15.000 Edition", "price": "76.00", "image": "Images Pods/Ignite_v150_pro-removebg-preview.png" },
+                { "id": "ignite-v50-5000", "brand": "ignite", "name": "IGNITE V50 5.000 New Edition", "price": "64.00", "image": "Images Pods/Ignite_v50-removebg-preview.png" },
+                { "id": "oxbar-35000-edition", "brand": "oxbar", "name": "OXBAR 35.000 EDITION", "price": "83.00", "image": "Images Pods/oxbar-35k-removebg-preview.png" },
+                { "id": "oxbar-9500-new", "brand": "oxbar", "name": "OXBAR 9500 NEW EDITION", "price": "65.00", "image": "Images Pods/oxbar_9500-removebg-preview.png" },
+                { "id": "oxbar-g-prime-25000", "brand": "oxbar", "name": "OXBAR G PRIME 25.000 EDITION", "price": "56.00", "image": "Images Pods/Oxbar_G_Prime-removebg-preview.png" },
+                { "id": "oxbar-30000-edition", "brand": "oxbar", "name": "OXBAR 30.000 EDITION", "price": "78.00", "image": "Images Pods/oxbar_30k-removebg-preview.png" },
+                { "id": "blacksheep-30000-2em1", "brand": "blacksheep", "name": "BLACKSHEEP 30.000 | 2 EM 1 EDITION", "price": "94.00", "image": "Images Pods/Elfbar_30k-removebg-preview-2.png" },
+                { "id": "blacksheep-20000-2em1", "brand": "blacksheep", "name": "BLACKSHEEP 20.000 | 2 EM 1 EDITION", "price": "87.00", "image": "Images Pods/blacksheep_20k-removebg-preview.png" },
+                { "id": "lostmary-35000-edition", "brand": "lostmary", "name": "LOST MARY 35.000 EDITION", "price": "83.00", "image": "Images Pods/Lost_35k-removebg-preview.png" },
+                { "id": "lostmary-20000-edition", "brand": "lostmary", "name": "LOST MARY 20.000 EDITION", "price": "80.00", "image": "Images Pods/Lost_20k-removebg-preview.png" },
+                { "id": "adjust-40000-edition", "brand": "adjust", "name": "ADJUST 40.000 Edition", "price": "80.00", "image": "Images Pods/adjust_40k-removebg-preview.png" },
+                { "id": "elfbar-40000-edition", "brand": "elfbar", "name": "ELFBAR 40.000 Edition", "price": "100.00", "image": "Images Pods/Elfbar_40k_ice_king-removebg-preview.png" },
+                { "id": "elfbar-30000-edition", "brand": "elfbar", "name": "ELFBAR 30.000 EDITION", "price": "86.00", "image": "Images Pods/Elfbar_30k_TE30K-removebg-preview.png" },
+                { "id": "nikbar-40000-edition", "brand": "nikbar", "name": "NIKBAR 40.000 EDITION", "price": "85.00", "available": false, "image": "Images Pods/Nikbar_40k-removebg-preview.png" }
+            ];
+
+            try {
+                let product;
+                try {
+                    const response = await fetch('products.json');
+                    if (!response.ok) throw new Error();
+                    const products = await response.json();
+                    product = products.find(p => p.id === productId);
+                } catch (e) {
+                    console.warn('Usando fallback no detalhe (local test).');
+                    product = fallbackProducts.find(p => p.id === productId);
+                }
+
+                if (!product) {
+                    document.getElementById('productContent').innerHTML = '<h2>Produto não encontrado</h2>';
+                    return;
+                }
+
+                renderProduct(product);
+            } catch (err) {
+                console.error('Erro ao carregar produto:', err);
+            }
+        }
+
+        function renderProduct(product) {
+            const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
+            const basePrice = parseFloat(product.price);
+            const finalPrice = saleType === 'retail' ? basePrice * 1.4 : basePrice;
+
+            const content = `
+                <div class="breadcrumb">
+                  <a href="index.html">Página Inicial</a> / 
+                  <a href="index.html#produtos">${product.brand.charAt(0).toUpperCase() + product.brand.slice(1)}</a> / 
+                  <span>${product.name}</span>
+                </div>
+
+                <div class="product-grid-layout">
+                  <!-- Visuals -->
+                  <div class="product-visuals">
+                    <div class="main-image-box">
+                        <img src="${product.image || 'assets/logo-ignite.png'}" alt="${product.name}" class="product-img-real" id="mainImg">
+                    </div>
+                  </div>
+
+                  <!-- Info -->
+                  <div class="product-info-column">
+                    <div class="p-brand" id="prodBrand">${product.brand}</div>
+                    <h1 class="p-name" id="prodName">${product.name}</h1>
+                    <div class="p-price" id="prodPrice">R$ ${finalPrice.toFixed(2).replace('.', ',')}</div>
+
+                    <div class="p-options">
+                      <label class="p-option-label">Sabores</label>
+                      <div class="p-selector-wrapper glow-card">
+                        <select class="p-selector" id="flavorSelector">
+                          <option value="">Selecionar...</option>
+                          ${(product.flavors || []).map(f => `<option value="${f}">${f}</option>`).join('')}
+                        </select>
+                      </div>
+                      ${saleType === 'retail' ? '<p style="font-size: 0.8rem; font-weight: 300; font-style: italic; color: #888; margin-top: 8px;">A partir de 2 peças seu frete é grátis</p>' : ''}
+                    </div>
+
+                    ${product.available === false ? `
+                    <div class="p-status-box">
+                      Produto indisponível.
+                    </div>
+                    ` : `
+                    <div class="p-status-text">
+                      Produto disponível.
+                    </div>
+                    `}
+
+                      <div class="p-actions">
+                        <div class="quantity-control">
+                          <button class="q-btn" onclick="updateQty(-1)">-</button>
+                          <div class="q-val" id="qtyVal">1</div>
+                          <button class="q-btn" onclick="updateQty(1)">+</button>
+                        </div>
+                        <div class="action-buttons-group">
+                          <button class="btn-buy-now" onclick="buyNow('${product.id}', '${product.name}', '${product.price}', '${product.image || ''}')">Comprar Agora</button>
+                          <button class="btn-add-cart" onclick="addToCart('${product.id}', '${product.name}', '${product.price}', '${product.image || ''}', false)">Adicionar ao Carrinho</button>
+                        </div>
+                      </div>
+
+                    <div class="shipping-box">
+                      <label class="p-option-label">Simular Frete</label>
+                      <div class="shipping-input-group">
+                        <input type="text" class="shipping-input" id="shippingInput" placeholder="Ex.: 00000-000" maxlength="9">
+                        <button class="btn-shipping" onclick="simulateShipping()">OK</button>
+                      </div>
+                      <div id="shipping-results" class="shipping-results">
+                         <!-- Results injected here -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            `;
+            document.getElementById('productContent').innerHTML = content;
+
+            // Re-apply mask to shipping input
+            const sInput = document.getElementById('shippingInput');
+            if (sInput) {
+                sInput.addEventListener('input', (e) => {
+                    let val = e.target.value.replace(/\D/g, "");
+                    let masked = "";
+                    let i = 0;
+                    const pattern = "00000-000";
+                    for (let char of pattern) {
+                        if (i >= val.length) break;
+                        if (char === "0") {
+                            masked += val[i];
+                            i++;
+                        } else {
+                            masked += char;
+                        }
+                    }
+                    e.target.value = masked;
+                });
+            }
+
+            if (window.updateCartBadge) window.updateCartBadge();
+        }
+
+        function simulateShipping() {
+            const cep = document.getElementById('shippingInput').value.replace(/\D/g, "");
+            const resultsBox = document.getElementById('shipping-results');
+
+            if (cep.length !== 8) {
+                alert("Por favor, insira um CEP válido.");
+                return;
+            }
+
+            const qty = parseInt(document.getElementById('qtyVal').textContent);
+            const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
+
+            const isWholesale = saleType === 'wholesale';
+            const isFreePac = (saleType === 'retail' && qty >= 2) || isWholesale;
+            const isFreeSedex = isWholesale; // Wholesale has free SEDEX too
+
+            // Simulated prices based on CEP prefix
+            const prefix = parseInt(cep[0]);
+            let basePac = 18.00;
+            let baseSedex = 28.00;
+
+            if (prefix >= 7) { basePac += 15; baseSedex += 25; }
+            else if (prefix >= 4) { basePac += 7; baseSedex += 12; }
+
+            const pacPrice = isFreePac ? "Grátis" : `R$ ${basePac.toFixed(2).replace('.', ',')}`;
+            const sedexPrice = isFreeSedex ? "Grátis" : `R$ ${baseSedex.toFixed(2).replace('.', ',')}`;
+
+            resultsBox.innerHTML = `
+                <span class="shipping-title">Estas são as opções de frete para a sua região:</span>
+                <div class="shipping-option">
+                    <div class="opt-meta">
+                        <span class="opt-name">PAC</span>
+                        <span class="opt-days">Até ${prefix + 5} dias úteis</span>
+                    </div>
+                    <span class="opt-price ${isFreePac ? 'free' : ''}">${pacPrice}</span>
+                </div>
+                <div class="shipping-option">
+                    <div class="opt-meta">
+                        <span class="opt-name">SEDEX</span>
+                        <span class="opt-days">Até ${Math.max(1, prefix)} dias úteis</span>
+                    </div>
+                    <span class="opt-price ${isFreeSedex ? 'free' : ''}">${sedexPrice}</span>
+                </div>
+            `;
+
+            resultsBox.classList.add('active');
+        }
+
+        function updateQty(delta) {
+            const qtyVal = document.getElementById('qtyVal');
+            let current = parseInt(qtyVal.textContent);
+            current = Math.max(1, current + delta);
+            qtyVal.textContent = current;
+        }
+
+        function buyNow(id, name, price, image) {
+            // Add to cart first
+            if (window.addToCart) {
+                const wasAdded = window.addToCart(id, name, price, image, false);
+                // Redirect immediately ONLY if product was successfully added (validation passed)
+                if (wasAdded) {
+                    setTimeout(() => {
+                        window.location.href = 'checkout.html';
+                    }, 300);
+                }
+            }
+        }
+
+        function addToCart(id, name, price, image, redirect = false) {
+            const qty = parseInt(document.getElementById('qtyVal').textContent);
+            const flavorSelector = document.getElementById('flavorSelector');
+            const flavor = flavorSelector?.value || '';
+
+            if (!flavor) {
+                alert('Por favor, selecione um sabor antes de adicionar ao carrinho.');
+                flavorSelector?.focus();
+                return false;
+            }
+
+            // use global window.cart
+            if (!window.cart) window.cart = JSON.parse(localStorage.getItem('ignite_cart')) || [];
+
+            const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
+            const basePrice = parseFloat(price);
+            const finalPrice = saleType === 'retail' ? (basePrice * 1.4).toFixed(2) : basePrice.toFixed(2);
+
+            const existing = window.cart.find(item => item.id === id && item.flavor === flavor);
+            if (existing) {
+                existing.quantity += qty;
+                existing.price = finalPrice; // Update to ensure correct price type
+            } else {
+                window.cart.push({ id, name, price: finalPrice, image, quantity: qty, flavor: flavor });
+            }
+
+            if (window.updateCartUI) {
+                window.updateCartUI();
+                window.toggleCartSidebar(true);
+            } else {
+                localStorage.setItem('ignite_cart', JSON.stringify(window.cart));
+                window.location.href = 'checkout.html';
+            }
+            return true;
+        }
+
+        loadProduct();
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>
