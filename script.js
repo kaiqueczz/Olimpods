@@ -905,6 +905,7 @@ document.addEventListener('DOMContentLoaded', () => {
       card.className = `product-card glow-card animate-in`;
       card.dataset.category = p.brand;
       card.style.animationDelay = `${(index % 4) * 0.1}s`;
+      if (index === 0) card.classList.add('active'); // First card active by default on mobile
 
       card.innerHTML = `
         <div class="product-image">
@@ -949,6 +950,84 @@ document.addEventListener('DOMContentLoaded', () => {
 
       productsGrid.appendChild(card);
     });
+
+    // Re-init carousel on mobile after rendering
+    if (window.innerWidth <= 768) {
+      initProductCarousel();
+    }
+  }
+
+  // =========================================
+  // 5.5 Product Carousel Logic (Mobile)
+  // =========================================
+  function initProductCarousel() {
+    const container = document.querySelector('.products-carousel-viewport');
+    const track = document.querySelector('.products-grid');
+    if (!container || !track || window.innerWidth > 768) return;
+
+    const slides = Array.from(track.children);
+    if (slides.length === 0) return;
+
+    let currentIndex = 0;
+    let currentTranslate = 0;
+    let isDragging = false;
+    let startX = 0;
+
+    const updateSlideStyles = () => {
+      slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === currentIndex);
+      });
+    };
+
+    const setPositionByIndex = () => {
+      const containerWidth = container.offsetWidth;
+      const slideWidth = slides[0].offsetWidth;
+      const gap = 16;
+
+      // Center the active slide
+      const offsetToCenter = (containerWidth / 2) - (slideWidth / 2);
+      const accumulatedOffset = currentIndex * (slideWidth + gap);
+
+      currentTranslate = offsetToCenter - accumulatedOffset;
+
+      track.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+      track.style.transform = `translateX(${currentTranslate}px)`;
+      updateSlideStyles();
+    };
+
+    // Swipe Listeners
+    container.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+      track.style.transition = 'none';
+    }, { passive: true });
+
+    container.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const currentX = e.touches[0].clientX;
+      const diff = currentX - startX;
+      // Basic free scroll feel during drag (optional)
+      // track.style.transform = `translateX(${currentTranslate + diff}px)`;
+    }, { passive: true });
+
+    container.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const endX = e.changedTouches[0].clientX;
+      const diff = startX - endX;
+      const threshold = 50;
+
+      if (diff > threshold && currentIndex < slides.length - 1) {
+        currentIndex++;
+      } else if (diff < -threshold && currentIndex > 0) {
+        currentIndex--;
+      }
+
+      setPositionByIndex();
+    }, { passive: true });
+
+    // Initial position
+    setTimeout(setPositionByIndex, 50);
   }
 
   tabBtns.forEach(btn => {
