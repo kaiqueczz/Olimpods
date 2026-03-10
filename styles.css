@@ -98,6 +98,9 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
 }
 
 body {
@@ -106,6 +109,8 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   overflow-x: hidden;
+  width: 100%;
+  position: relative;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -591,7 +596,9 @@ input {
 
 .gradual-spacing .gs-word {
   display: inline-flex;
-  white-space: nowrap;
+  white-space: normal;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 
@@ -979,22 +986,25 @@ input {
 
 .testimonials-section {
   overflow-x: hidden;
-  /* Handle the track offset here instead of the container */
   position: relative;
   width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 /* removed container active grabbing cursor */
 
 .carousel-track {
   display: flex;
-  align-items: center;
+  align-items: stretch;
+  /* Igualar altura dos cards */
   gap: 40px;
   transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-  transform-style: preserve-3d;
   width: max-content;
-  padding: 0 50vw;
-  /* Add padding to allow first and last cards to center */
+  padding: 0;
+  /* Removido o padding pois centralizamos via JS agora */
+  touch-action: pan-y;
+  /* Captura swipes horizontais e permite scroll vertical */
 }
 
 .testimonial-card {
@@ -1004,21 +1014,21 @@ input {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
-  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-  opacity: 0.3;
-  filter: blur(8px);
-  transform: scale(0.85) rotateY(15deg);
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0.5;
+  transform: scale(0.9);
   user-select: none;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
 .testimonial-card.active {
   opacity: 1;
-  filter: blur(0);
-  transform: scale(1.1) rotateY(0) translateY(-10px);
+  transform: scale(1) translateY(-10px);
   z-index: 10;
   border-color: var(--accent-primary);
-  box-shadow: 0 30px 100px rgba(255, 11, 85, 0.15);
+  box-shadow: 0 20px 60px rgba(255, 11, 85, 0.1);
   pointer-events: auto;
 }
 
@@ -1043,6 +1053,8 @@ input {
   line-height: 1.7;
   margin-bottom: 24px;
   font-style: italic;
+  flex-grow: 1;
+  /* Faz o texto ocupar o espaço disponível para alinhar o autor no rodapé */
 }
 
 .testimonial-author {
@@ -1907,80 +1919,87 @@ input {
   }
 
   .header-inner {
+    display: flex;
     flex-wrap: wrap;
-    padding: 12px 16px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+  }
+
+  .logo {
+    height: 40px;
+    order: 1;
+    justify-content: flex-start;
+  }
+
+  .logo img {
+    height: 100%;
+    width: auto;
+    filter: drop-shadow(0 0 8px var(--accent-glow));
+  }
+
+  .header-actions {
+    order: 2;
+    gap: 10px;
+    margin-left: auto;
+  }
+
+  .action-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .action-btn svg {
+    width: 16px;
+    height: 16px;
   }
 
   .mobile-toggle {
     display: flex;
     order: 3;
-  }
-
-  .nav-menu {
-    display: none;
-    flex-direction: column;
-    width: 100%;
-    order: 10;
-    padding: 16px 0;
-    border-top: 1px solid var(--border-subtle);
-    margin-top: 12px;
-  }
-
-  .nav-menu.open {
-    display: flex;
-  }
-
-  .nav-link {
-    padding: 14px 12px;
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .dropdown-menu {
-    position: static;
-    transform: none;
-    width: 100%;
-    max-height: 0;
-    overflow: hidden;
-    opacity: 1;
-    visibility: visible;
-    pointer-events: all;
-    transition: max-height 0.4s var(--ease-smooth), padding 0.4s;
-    box-shadow: none;
-    background: rgba(20, 20, 30, 0.6);
-    margin-top: 4px;
-    padding: 0 8px;
-  }
-
-  .nav-item.active .dropdown-menu {
-    max-height: 500px;
-    padding: 8px;
-    transform: none;
+    padding: 4px;
+    margin-left: 4px;
   }
 
   .search-wrapper {
-    order: 5;
-    max-width: 100%;
-    flex: unset;
+    order: 4;
     width: 100%;
+    max-width: 100%;
     margin-top: 8px;
   }
 
-  .header-actions {
-    order: 2;
+  .search-bar {
+    padding: 8px 12px 8px 36px;
+    font-size: 0.85rem;
   }
 
-  .logo {
-    font-size: 1.4rem;
+  .search-icon {
+    left: 10px;
+    width: 16px;
+    height: 16px;
   }
 
   .hero {
-    min-height: 70vh;
-    padding: 60px 16px;
+    min-height: 50vh;
+    padding: 40px 16px;
   }
 
   .hero h1 {
-    font-size: 2.2rem;
+    font-size: 1.5rem;
+    /* Fit in one line */
+    letter-spacing: -1px;
+    line-height: 1.2;
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+  }
+
+  .gs-char {
+    --gs-size: 1.5rem;
+    /* Matches hero h1 for single line */
   }
 
   .hero-description {
@@ -2071,6 +2090,41 @@ input {
 
   .track-order-input {
     flex-direction: column;
+  }
+
+  /* Testimonials Mobile */
+  .carousel-container {
+    padding: 60px 0 100px;
+    overflow: hidden;
+    /* Lock the side-dragging */
+    width: 100%;
+    perspective: none;
+    /* Simplify for mobile performance */
+  }
+
+  .carousel-track {
+    gap: 24px;
+    transition: transform 0.5s var(--ease-smooth);
+  }
+
+  .testimonial-card {
+    flex: 0 0 calc(100vw - 64px);
+    padding: 24px 20px;
+    margin: 0;
+    min-height: auto;
+  }
+
+  .testimonial-text {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .author-info h4 {
+    font-size: 0.9rem;
+  }
+
+  .author-info span {
+    font-size: 0.75rem;
   }
 }
 
@@ -2958,6 +3012,22 @@ input {
   letter-spacing: 2px;
   color: var(--accent-primary);
   --gs-size: 3.5rem;
+}
+
+@media (max-width: 768px) {
+  .institutional-header h1 {
+    font-size: 2.2rem;
+    --gs-size: 2.2rem;
+    letter-spacing: 1px;
+  }
+
+  .institutional-header p {
+    font-size: 1rem;
+  }
+
+  .institutional-content {
+    padding: 30px 20px;
+  }
 }
 
 .institutional-header h1.gradual-spacing {

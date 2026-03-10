@@ -97,6 +97,38 @@ body.checkout-page {
         grid-template-columns: 1fr;
         gap: 30px;
     }
+
+    .summary-card {
+        position: static;
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .checkout-header .logo img {
+        height: 40px;
+    }
+
+    .checkout-card {
+        padding: 24px 20px;
+    }
+
+    .form-row {
+        display: flex;
+        /* Override grid if necessary */
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+    }
+
+    .checkout-mini-footer .container {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
 }
 
 /* Cards */

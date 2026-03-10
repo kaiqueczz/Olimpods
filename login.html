@@ -69,16 +69,32 @@
             input.setAttribute('type', type);
         });
 
-        // Prevention for demo purposes
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
-            // Simulated login
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userEmail', email);
+            const password = document.getElementById('password').value;
 
-            // Redirect with success message
-            window.location.href = 'index.html?login=success';
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userEmail', result.user.email);
+                    localStorage.setItem('userName', result.user.name);
+                    window.location.href = 'index.html?login=success';
+                } else {
+                    alert(result.message);
+                }
+            } catch (err) {
+                alert('Erro ao conectar com o servidor.');
+            }
         });
     </script>
 </body>

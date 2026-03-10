@@ -86,47 +86,74 @@
             position: relative;
             width: 100%;
             border-radius: var(--radius-md);
-            overflow: hidden;
             background: #111118;
+            cursor: pointer;
         }
 
-        .p-selector {
-            width: 100%;
+        /* Custom Flavor Selector */
+        .custom-select-trigger {
             padding: 15px 45px 15px 15px;
-            background: transparent;
             border: 1px solid var(--border-subtle);
             border-radius: inherit;
             color: var(--text-primary);
             font-size: 1rem;
-            outline: none;
-            transition: all 0.3s var(--ease-smooth);
-            appearance: none;
-            cursor: pointer;
-            position: relative;
-            z-index: 2;
-        }
-
-        .p-selector-wrapper::after {
-            content: '';
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 10px;
-            height: 10px;
-            border-right: 2px solid var(--text-secondary);
-            border-bottom: 2px solid var(--text-secondary);
-            transform: translateY(-70%) rotate(45deg);
-            pointer-events: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             transition: all 0.3s;
         }
 
-        .p-selector:focus {
+        .custom-select-trigger:hover {
             border-color: var(--accent-primary);
         }
 
-        .p-selector-wrapper:focus-within::after {
-            border-color: var(--accent-primary);
+        .custom-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #111118;
+            border: 1px solid var(--accent-primary);
+            border-top: none;
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+            z-index: 100;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .custom-options.show {
+            display: block;
+        }
+
+        .custom-option {
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .custom-option:last-child {
+            border-bottom: none;
+        }
+
+        .custom-option:hover {
+            background: rgba(255, 11, 85, 0.1);
+        }
+
+        .flavor-name {
+            font-weight: 500;
+        }
+
+        .flavor-desc {
+            font-size: 0.8rem;
+            font-style: italic;
+            opacity: 0.5;
+            margin-left: 15px;
+            text-align: right;
         }
 
         .p-status-box {
@@ -393,7 +420,25 @@
             }
 
             .p-name {
-                font-size: 2.2rem;
+                font-size: 1.8rem;
+                /* Smaller for mobile */
+            }
+
+            .breadcrumb {
+                font-size: 0.8rem;
+                margin-top: 10px;
+            }
+
+            .action-buttons-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn-buy-now,
+            .btn-add-cart {
+                width: 100%;
+                flex: none;
+                height: 50px;
             }
         }
     </style>
@@ -401,15 +446,7 @@
 
 <body>
 
-    <!-- ==================== TOP BANNER ==================== -->
-    <div class="top-banner">
-        <div class="banner-track">
-            <span>🚀 ENVIAMOS PARA TODO O BRASIL — FRETE GRÁTIS PARA PEDIDOS NO ATACADO 🚀</span>
-            <span>🚀 ENVIAMOS PARA TODO O BRASIL — FRETE GRÁTIS PARA PEDIDOS NO ATACADO 🚀</span>
-            <span>🚀 ENVIAMOS PARA TODO O BRASIL — FRETE GRÁTIS PARA PEDIDOS NO ATACADO 🚀</span>
-            <span>🚀 ENVIAMOS PARA TODO O BRASIL — FRETE GRÁTIS PARA PEDIDOS NO ATACADO 🚀</span>
-        </div>
-    </div>
+
 
     <!-- ==================== HEADER ==================== -->
     <header class="header" id="header">
@@ -623,12 +660,12 @@
             }
 
             const fallbackProducts = [
-                { "id": "ignite-v300-30000", "brand": "ignite", "name": "IGNITE V300 30.000 New Edition", "price": "98.00", "image": "Images Pods/Ignite_v300-removebg-preview.png" },
+                { "id": "ignite-v300-30000", "brand": "ignite", "name": "IGNITE V300 30.000 New Edition", "price": "98.00", "image": "Images Pods/Ignite_v250-removebg-preview.png" },
                 { "id": "ignite-v250-25000", "brand": "ignite", "name": "IGNITE V250 25.000 Edition", "price": "90.00", "image": "Images Pods/Ignite_v250-removebg-preview.png" },
-                { "id": "ignite-v55-5500", "brand": "ignite", "name": "IGNITE V55 5.500 SLIM EDITION", "price": "65.00", "image": "Images Pods/Ignite_v55-removebg-preview.png" },
-                { "id": "ignite-v155-15500", "brand": "ignite", "name": "IGNITE V155 15.500 ULTRA SLIM", "price": "85.00", "image": "Images Pods/Ignite_V155-removebg-preview.png" },
+                { "id": "ignite-v55-5500", "brand": "ignite", "name": "IGNITE V55 5.500 SLIM EDITION", "price": "65.00", "image": "Images Pods/Ignite_v50-removebg-preview.png" },
+                { "id": "ignite-v155-15500", "brand": "ignite", "name": "IGNITE V155 15.500 ULTRA SLIM", "price": "85.00", "image": "Images Pods/Ignite_v150_pro-removebg-preview.png" },
                 { "id": "ignite-v400-mix", "brand": "ignite", "name": "IGNITE V400 MIX 40.000 Edition", "price": "110.00", "image": "Images Pods/Ignite_v400_mix-removebg-preview.png" },
-                { "id": "ignite-v400-ice", "brand": "ignite", "name": "IGNITE V400 Ice 40.000 Edition", "price": "110.00", "image": "Images Pods/Ignite_v400_ice-removebg-preview.png" },
+                { "id": "ignite-v400-ice", "brand": "ignite", "name": "IGNITE V400 Ice 40.000 Edition", "price": "110.00", "image": "Images Pods/Ignite_v400_mix-removebg-preview.png" },
                 { "id": "ignite-v80-new", "brand": "ignite", "name": "IGNITE V80 NEW 8.000 Edition", "price": "78.00", "image": "Images Pods/Ignite_v80-removebg-preview.png" },
                 { "id": "ignite-v120-pro", "brand": "ignite", "name": "IGNITE V120 PRO 12.000 Edition", "price": "79.99", "image": "Images Pods/Ignite_v120_pro-removebg-preview.png" },
                 { "id": "ignite-v150-pro", "brand": "ignite", "name": "IGNITE V150 PRO 15.000 Edition", "price": "76.00", "image": "Images Pods/Ignite_v150_pro-removebg-preview.png" },
@@ -642,6 +679,8 @@
                 { "id": "lostmary-35000-edition", "brand": "lostmary", "name": "LOST MARY 35.000 EDITION", "price": "83.00", "image": "Images Pods/Lost_35k-removebg-preview.png" },
                 { "id": "lostmary-20000-edition", "brand": "lostmary", "name": "LOST MARY 20.000 EDITION", "price": "80.00", "image": "Images Pods/Lost_20k-removebg-preview.png" },
                 { "id": "adjust-40000-edition", "brand": "adjust", "name": "ADJUST 40.000 Edition", "price": "80.00", "image": "Images Pods/adjust_40k-removebg-preview.png" },
+                { "id": "elfbar-summer-40000", "brand": "elfbar", "name": "Elfbar Summer edition 40.000", "price": "100.00", "retail_price": "165.00", "image": "Images Pods/elfbar-summer-40k.png", "flavors": ["Passion Flash – maracujá + laranja (estilo raspadinha)", "Hawaiian Slush – morango + laranja", "Wild Berry Slush – mix de frutas silvestres", "Green Apple Slush – maçã verde gelada", "Triple Berry – frutas vermelhas", "Cola Slush – raspadinha de cola", "Peach Blue Slush – pêssego + blueberry", "Strawberry Spark – morango cítrico", "Black Mint – menta com amora", "Neon Twist – mix de balas frutadas"] },
+                { "id": "elfbar-23000-edition", "brand": "elfbar", "name": "ELFBAR 23.000 EDITION", "price": "97.00", "retail_price": "125.00", "image": "Images Pods/elfbar-23k.png", "flavors": ["Blue Razz Lemonade", "Strawberry Banana", "Watermelon Ice", "Kiwi Passionfruit Guava", "Mango", "Peach Ice", "Strawberry Ice", "Cola", "Pineapple Peach Mango", "Pink Lemonade"] },
                 { "id": "elfbar-40000-edition", "brand": "elfbar", "name": "ELFBAR 40.000 Edition", "price": "100.00", "image": "Images Pods/Elfbar_40k_ice_king-removebg-preview.png" },
                 { "id": "elfbar-30000-edition", "brand": "elfbar", "name": "ELFBAR 30.000 EDITION", "price": "86.00", "image": "Images Pods/Elfbar_30k_TE30K-removebg-preview.png" },
                 { "id": "nikbar-40000-edition", "brand": "nikbar", "name": "NIKBAR 40.000 EDITION", "price": "85.00", "available": false, "image": "Images Pods/Nikbar_40k-removebg-preview.png" }
@@ -673,7 +712,14 @@
         function renderProduct(product) {
             const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
             const basePrice = parseFloat(product.price);
-            const finalPrice = saleType === 'retail' ? basePrice * 1.4 : basePrice;
+
+            // Usa retail_price se existir no JSON, senão calcula 1.4x
+            let finalPrice;
+            if (saleType === 'retail') {
+                finalPrice = product.retail_price ? parseFloat(product.retail_price) : basePrice * 1.4;
+            } else {
+                finalPrice = basePrice;
+            }
 
             const content = `
                 <div class="breadcrumb">
@@ -698,11 +744,24 @@
 
                     <div class="p-options">
                       <label class="p-option-label">Sabores</label>
-                      <div class="p-selector-wrapper glow-card">
-                        <select class="p-selector" id="flavorSelector">
-                          <option value="">Selecionar...</option>
-                          ${(product.flavors || []).map(f => `<option value="${f}">${f}</option>`).join('')}
-                        </select>
+                      <div class="p-selector-wrapper glow-card" id="customFlavorSelect">
+                        <div class="custom-select-trigger" id="selectTrigger">
+                            <span id="selectedValue">Selecionar...</span>
+                        </div>
+                        <div class="custom-options" id="selectOptions">
+                           ${(product.flavors || []).map(f => {
+                const parts = f.split(' – ');
+                const name = parts[0];
+                const desc = parts[1] ? ` – ${parts[1]}` : '';
+                return `
+                                 <div class="custom-option" data-value="${f}">
+                                   <span class="flavor-name">${name}</span>
+                                   ${desc ? `<span class="flavor-desc">${desc}</span>` : ''}
+                                 </div>
+                               `;
+            }).join('')}
+                        </div>
+                        <input type="hidden" id="flavorValue" value="">
                       </div>
                       ${saleType === 'retail' ? '<p style="font-size: 0.8rem; font-weight: 300; font-style: italic; color: #888; margin-top: 8px;">A partir de 2 peças seu frete é grátis</p>' : ''}
                     </div>
@@ -724,8 +783,8 @@
                           <button class="q-btn" onclick="updateQty(1)">+</button>
                         </div>
                         <div class="action-buttons-group">
-                          <button class="btn-buy-now" onclick="buyNow('${product.id}', '${product.name}', '${product.price}', '${product.image || ''}')">Comprar Agora</button>
-                          <button class="btn-add-cart" onclick="addToCart('${product.id}', '${product.name}', '${product.price}', '${product.image || ''}', false)">Adicionar ao Carrinho</button>
+                          <button class="btn-buy-now" onclick="handleBuyNow('${product.id}', '${product.name}', '${finalPrice}', '${product.image || ''}')">Comprar Agora</button>
+                          <button class="btn-add-cart" onclick="addToCart('${product.id}', '${product.name}', '${finalPrice}', '${product.image || ''}', false)">Adicionar ao Carrinho</button>
                         </div>
                       </div>
 
@@ -743,6 +802,31 @@
                 </div>
             `;
             document.getElementById('productContent').innerHTML = content;
+
+            // Script para o seletor customizado
+            const trigger = document.getElementById('selectTrigger');
+            const options = document.getElementById('selectOptions');
+            const hiddenInput = document.getElementById('flavorValue');
+            const displayValue = document.getElementById('selectedValue');
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                options.classList.toggle('show');
+            });
+
+            document.querySelectorAll('.custom-option').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    const val = opt.getAttribute('data-value');
+                    const name = opt.querySelector('.flavor-name').textContent;
+                    displayValue.textContent = name;
+                    hiddenInput.value = val;
+                    options.classList.remove('show');
+                });
+            });
+
+            document.addEventListener('click', () => {
+                options.classList.remove('show');
+            });
 
             // Re-apply mask to shipping input
             const sInput = document.getElementById('shippingInput');
@@ -823,41 +907,33 @@
             qtyVal.textContent = current;
         }
 
-        function buyNow(id, name, price, image) {
-            // Add to cart first
-            if (window.addToCart) {
-                const wasAdded = window.addToCart(id, name, price, image, false);
-                // Redirect immediately ONLY if product was successfully added (validation passed)
-                if (wasAdded) {
-                    setTimeout(() => {
-                        window.location.href = 'checkout.html';
-                    }, 300);
-                }
+        function handleBuyNow(id, name, price, image) {
+            if (addToCart(id, name, price, image, false)) {
+                setTimeout(() => {
+                    window.location.href = 'checkout.html';
+                }, 300);
             }
         }
 
         function addToCart(id, name, price, image, redirect = false) {
             const qty = parseInt(document.getElementById('qtyVal').textContent);
-            const flavorSelector = document.getElementById('flavorSelector');
-            const flavor = flavorSelector?.value || '';
+            const flavorValue = document.getElementById('flavorValue');
+            const flavor = flavorValue ? flavorValue.value : '';
 
             if (!flavor) {
                 alert('Por favor, selecione um sabor antes de adicionar ao carrinho.');
-                flavorSelector?.focus();
                 return false;
             }
 
             // use global window.cart
             if (!window.cart) window.cart = JSON.parse(localStorage.getItem('ignite_cart')) || [];
 
-            const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
-            const basePrice = parseFloat(price);
-            const finalPrice = saleType === 'retail' ? (basePrice * 1.4).toFixed(2) : basePrice.toFixed(2);
+            const finalPrice = parseFloat(price).toFixed(2);
 
             const existing = window.cart.find(item => item.id === id && item.flavor === flavor);
             if (existing) {
                 existing.quantity += qty;
-                existing.price = finalPrice; // Update to ensure correct price type
+                existing.price = finalPrice;
             } else {
                 window.cart.push({ id, name, price: finalPrice, image, quantity: qty, flavor: flavor });
             }

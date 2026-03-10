@@ -3,8 +3,9 @@
         "id": "ignite-v300-30000",
         "brand": "ignite",
         "name": "IGNITE V300 30.000 New Edition",
-        "price": "98.00",
-        "image": "Images Pods/Ignite_v300-removebg-preview.png",
+        "price": "111.00",
+        "retail_price": "149.00",
+        "image": "Images Pods/Ignite_v250-removebg-preview.png",
         "retail_available": false,
         "flavors": [
             "Blueberry Ice",
@@ -20,7 +21,8 @@
         "id": "ignite-v250-25000",
         "brand": "ignite",
         "name": "IGNITE V250 25.000 Edition",
-        "price": "90.00",
+        "price": "103.00",
+        "retail_price": "138.00",
         "image": "Images Pods/Ignite_v250-removebg-preview.png",
         "retail_available": false,
         "flavors": [
@@ -35,8 +37,9 @@
         "id": "ignite-v55-5500",
         "brand": "ignite",
         "name": "IGNITE V55 5.500 SLIM EDITION",
-        "price": "65.00",
-        "image": "Images Pods/Ignite_v55-removebg-preview.png",
+        "price": "73.00",
+        "retail_price": "98.00",
+        "image": "Images Pods/Ignite_v50-removebg-preview.png",
         "retail_available": false,
         "flavors": [
             "Blueberry Ice",
@@ -50,8 +53,9 @@
         "id": "ignite-v155-15500",
         "brand": "ignite",
         "name": "IGNITE V155 15.500 ULTRA SLIM",
-        "price": "85.00",
-        "image": "Images Pods/Ignite_V155-removebg-preview.png",
+        "price": "94.00",
+        "retail_price": "126.00",
+        "image": "Images Pods/Ignite_v150_pro-removebg-preview.png",
         "retail_available": true,
         "flavors": [
             "Blueberry Ice",
@@ -67,7 +71,8 @@
         "id": "ignite-v400-mix",
         "brand": "ignite",
         "name": "IGNITE V400 MIX 40.000 Edition",
-        "price": "110.00",
+        "price": "126.00",
+        "retail_price": "170.00",
         "image": "Images Pods/Ignite_v400_mix-removebg-preview.png",
         "retail_available": false,
         "flavors": [
@@ -81,8 +86,9 @@
         "id": "ignite-v400-ice",
         "brand": "ignite",
         "name": "IGNITE V400 Ice 40.000 Edition",
-        "price": "110.00",
-        "image": "Images Pods/Ignite_v400_ice-removebg-preview.png",
+        "price": "117.00",
+        "retail_price": "158.00",
+        "image": "Images Pods/Ignite_v400_mix-removebg-preview.png",
         "retail_available": false,
         "flavors": [
             "Mango Ice",
@@ -95,7 +101,8 @@
         "id": "ignite-v80-new",
         "brand": "ignite",
         "name": "IGNITE V80 NEW 8.000 Edition",
-        "price": "78.00",
+        "price": "85.00",
+        "retail_price": "114.00",
         "image": "Images Pods/Ignite_v80-removebg-preview.png",
         "retail_available": true,
         "flavors": [
@@ -112,7 +119,8 @@
         "id": "ignite-v120-pro",
         "brand": "ignite",
         "name": "IGNITE V120 PRO 12.000 Edition",
-        "price": "79.99",
+        "price": "83.00",
+        "retail_price": "112.00",
         "image": "Images Pods/Ignite_v120_pro-removebg-preview.png",
         "retail_available": false,
         "flavors": [
@@ -127,7 +135,8 @@
         "id": "ignite-v150-pro",
         "brand": "ignite",
         "name": "IGNITE V150 PRO 15.000 Edition",
-        "price": "76.00",
+        "price": "82.00",
+        "retail_price": "110.00",
         "image": "Images Pods/Ignite_v150_pro-removebg-preview.png",
         "retail_available": true,
         "flavors": [
@@ -144,7 +153,8 @@
         "id": "ignite-v50-5000",
         "brand": "ignite",
         "name": "IGNITE V50 5.000 New Edition",
-        "price": "64.00",
+        "price": "69.00",
+        "retail_price": "93.00",
         "image": "Images Pods/Ignite_v50-removebg-preview.png",
         "retail_available": true,
         "flavors": [
@@ -159,7 +169,8 @@
         "id": "oxbar-35000-edition",
         "brand": "oxbar",
         "name": "OXBAR 35.000 EDITION",
-        "price": "83.00",
+        "price": "88.00",
+        "retail_price": "119.00",
         "image": "Images Pods/oxbar-35k-removebg-preview.png",
         "retail_available": false,
         "flavors": [
@@ -177,7 +188,8 @@
         "id": "oxbar-9500-new",
         "brand": "oxbar",
         "name": "OXBAR 9500 NEW EDITION",
-        "price": "65.00",
+        "price": "66.00",
+        "retail_price": "89.00",
         "image": "Images Pods/oxbar_9500-removebg-preview.png",
         "retail_available": false,
         "flavors": [
@@ -195,7 +207,8 @@
         "id": "oxbar-g-prime-25000",
         "brand": "oxbar",
         "name": "OXBAR G PRIME 25.000 EDITION",
-        "price": "56.00",
+        "price": "55.00",
+        "retail_price": "74.00",
         "image": "Images Pods/Oxbar_G_Prime-removebg-preview.png",
         "retail_available": true,
         "flavors": [
@@ -213,7 +226,8 @@
         "id": "oxbar-30000-edition",
         "brand": "oxbar",
         "name": "OXBAR 30.000 EDITION",
-        "price": "78.00",
+        "price": "81.00",
+        "retail_price": "109.00",
         "image": "Images Pods/oxbar_30k-removebg-preview.png",
         "retail_available": false,
         "flavors": [
@@ -231,7 +245,8 @@
         "id": "blacksheep-30000-2em1",
         "brand": "blacksheep",
         "name": "BLACKSHEEP 30.000 | 2 EM 1 EDITION",
-        "price": "94.00",
+        "price": "109.00",
+        "retail_price": "147.00",
         "image": "Images Pods/Elfbar_30k-removebg-preview-2.png",
         "retail_available": false,
         "flavors": [
@@ -249,7 +264,8 @@
         "id": "blacksheep-20000-2em1",
         "brand": "blacksheep",
         "name": "BLACKSHEEP 20.000 | 2 EM 1 EDITION",
-        "price": "87.00",
+        "price": "95.00",
+        "retail_price": "128.00",
         "image": "Images Pods/blacksheep_20k-removebg-preview.png",
         "retail_available": false,
         "flavors": [
@@ -267,7 +283,8 @@
         "id": "lostmary-35000-edition",
         "brand": "lostmary",
         "name": "LOST MARY 35.000 EDITION",
-        "price": "83.00",
+        "price": "91.00",
+        "retail_price": "123.00",
         "image": "Images Pods/Lost_35k-removebg-preview.png",
         "retail_available": false,
         "flavors": [
@@ -285,7 +302,8 @@
         "id": "lostmary-20000-edition",
         "brand": "lostmary",
         "name": "LOST MARY 20.000 EDITION",
-        "price": "80.00",
+        "price": "87.00",
+        "retail_price": "117.00",
         "image": "Images Pods/Lost_20k-removebg-preview.png",
         "retail_available": true,
         "flavors": [
@@ -303,7 +321,8 @@
         "id": "adjust-40000-edition",
         "brand": "adjust",
         "name": "ADJUST 40.000 Edition",
-        "price": "80.00",
+        "price": "91.00",
+        "retail_price": "123.00",
         "image": "Images Pods/adjust_40k-removebg-preview.png",
         "retail_available": false
     },
@@ -311,7 +330,8 @@
         "id": "elfbar-40000-edition",
         "brand": "elfbar",
         "name": "ELFBAR 40.000 Edition",
-        "price": "100.00",
+        "price": "111.00",
+        "retail_price": "149.00",
         "image": "Images Pods/Elfbar_40k_ice_king-removebg-preview.png",
         "retail_available": false,
         "flavors": [
@@ -331,7 +351,8 @@
         "id": "elfbar-30000-edition",
         "brand": "elfbar",
         "name": "ELFBAR 30.000 EDITION",
-        "price": "86.00",
+        "price": "116.00",
+        "retail_price": "156.00",
         "image": "Images Pods/Elfbar_30k_TE30K-removebg-preview.png",
         "retail_available": true,
         "flavors": [
@@ -351,8 +372,51 @@
         "id": "nikbar-40000-edition",
         "brand": "nikbar",
         "name": "NIKBAR 40.000 EDITION",
-        "price": "85.00",
+        "price": "94.00",
+        "retail_price": "126.00",
         "image": "Images Pods/Nikbar_40k-removebg-preview.png",
         "retail_available": false
+    },
+    {
+        "id": "elfbar-summer-40000",
+        "brand": "elfbar",
+        "name": "Elfbar Summer edition 40.000",
+        "price": "111.00",
+        "retail_price": "149.00",
+        "image": "Images Pods/elfbar-summer-40k.png",
+        "retail_available": true,
+        "flavors": [
+            "Passion Flash – maracujá + laranja (estilo raspadinha)",
+            "Hawaiian Slush – morango + laranja",
+            "Wild Berry Slush – mix de frutas silvestres",
+            "Green Apple Slush – maçã verde gelada",
+            "Triple Berry – frutas vermelhas",
+            "Cola Slush – raspadinha de cola",
+            "Peach Blue Slush – pêssego + blueberry",
+            "Strawberry Spark – morango cítrico",
+            "Black Mint – menta com amora",
+            "Neon Twist – mix de balas frutadas"
+        ]
+    },
+    {
+        "id": "elfbar-23000-edition",
+        "brand": "elfbar",
+        "name": "ELFBAR 23.000 EDITION",
+        "price": "99.00",
+        "retail_price": "133.00",
+        "image": "Images Pods/elfbar-23k.png",
+        "retail_available": true,
+        "flavors": [
+            "Blue Razz Lemonade",
+            "Strawberry Banana",
+            "Watermelon Ice",
+            "Kiwi Passionfruit Guava",
+            "Mango",
+            "Peach Ice",
+            "Strawberry Ice",
+            "Cola",
+            "Pineapple Peach Mango",
+            "Pink Lemonade"
+        ]
     }
 ]

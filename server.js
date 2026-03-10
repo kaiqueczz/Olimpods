@@ -160,9 +160,133 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
+    if (req.method === 'POST' && pathname === '/api/newsletter') {
+        const body = await readBody(req);
+        let email;
+        try {
+            const data = JSON.parse(body);
+            email = data.email;
+        } catch (e) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'error', message: 'E-mail inválido' }));
+            return;
+        }
+
+        console.log(`📧 Newsletter: Novo lead cadastrado -> ${email}`);
+
+        // Aqui você integraria com Resend, SendGrid, etc.
+        // Por enquanto, simulamos o sucesso.
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            status: 'success',
+            message: 'Bem-vindo à família Olimpo! Você receberá nossas novidades em breve.'
+        }));
+        return;
+    }
+
+    // ── AUTH ROUTES ──
+    const USERS_FILE = path.join(STATIC_DIR, 'users.json');
+
+    function getUsers() {
+        if (!fs.existsSync(USERS_FILE)) return [];
+        try {
+            return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+        } catch (e) { return []; }
+    }
+
+    function saveUsers(users) {
+        fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 4));
+    }
+
     if (req.method === 'GET' && pathname === '/api/health') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ status: 'online', message: 'Servidor Olimpo Ignite ativo!' }));
+        return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/auth/signup') {
+        const body = await readBody(req);
+        let userData;
+        try {
+            userData = JSON.parse(body);
+        } catch (e) {
+            res.writeHead(400); res.end(JSON.stringify({ status: 'error', message: 'Dados inválidos' }));
+            return;
+        }
+
+        const users = getUsers();
+        if (users.find(u => u.email === userData.email)) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'error', message: 'Este e-mail já está cadastrado.' }));
+            return;
+        }
+
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const newUser = {
+            ...userData,
+            verified: false,
+            verificationCode: verificationCode,
+            createdAt: new Date().toISOString()
+        };
+
+        users.push(newUser);
+        saveUsers(users);
+
+        console.log('');
+        console.log('📱 [WHATSAPP/SMS SIMULADO]');
+        console.log(`Para: ${userData.phone}`);
+        console.log(`Mensagem: Seu código de acesso Olimpo Pods é: ${verificationCode}`);
+        console.log('────────────────────────────────────────');
+        console.log('📧 [E-MAIL SIMULADO]');
+        console.log(`Para: ${userData.email}`);
+        console.log(`Assunto: Seu código de verificação Olimpo Pods`);
+        console.log(`Código: ${verificationCode}`);
+        console.log('════════════════════════════════════════');
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'success', message: 'Cadastro realizado! Enviamos o código para seu e-mail e celular.' }));
+        return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/auth/verify') {
+        const body = await readBody(req);
+        const { email, code } = JSON.parse(body);
+        const users = getUsers();
+        const user = users.find(u => u.email === email);
+
+        if (user && user.verificationCode === code) {
+            user.verified = true;
+            delete user.verificationCode;
+            saveUsers(users);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'success', message: 'Conta verificada com sucesso! Bem-vindo.' }));
+        } else {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'error', message: 'Código de verificação incorreto.' }));
+        }
+        return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/auth/login') {
+        const body = await readBody(req);
+        const { email, password } = JSON.parse(body);
+        const users = getUsers();
+        const user = users.find(u => u.email === email && u.password === password);
+
+        if (!user) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'error', message: 'E-mail ou senha incorretos.' }));
+        } else if (!user.verified) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'error', message: 'Por favor, verifique seu e-mail antes de logar.' }));
+        } else {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                status: 'success',
+                message: 'Login realizado!',
+                user: { name: user.fullname, email: user.email }
+            }));
+        }
         return;
     }
 

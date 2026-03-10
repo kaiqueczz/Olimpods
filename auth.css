@@ -60,19 +60,18 @@
 }
 
 .auth-logo {
-    height: 117px;
+    height: 80px;
     width: auto;
     filter: drop-shadow(0 0 15px var(--accent-glow));
 }
 
 .auth-title {
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: clamp(1.1rem, 5vw, 1.5rem);
     color: var(--accent-primary);
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    --gs-size: 1.5rem;
 }
 
 .auth-title.gradual-spacing {

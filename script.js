@@ -249,12 +249,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const slides = Array.from(track.children);
     let currentTranslate = 0;
-    let currentIndex = 1; // Start at second card
+    let currentIndex = 2; // Começa no 3º depoimento (Lucas Cavalcante)
 
     // Initial setup
     const updateSlideStyles = () => {
       slides.forEach((slide, index) => {
-        // Active state based purely on state index
         if (index === currentIndex) {
           slide.classList.add('active');
         } else {
@@ -262,63 +261,73 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const distance = Math.abs(index - currentIndex);
-        const relativeDistance = distance; // index-based distance
-
-        // 3D Perspective Tweaks based on index distance
-        const side = (index < currentIndex) ? -1 : 1;
-        const rotationVal = Math.min(distance * 15, 25) * side;
-        const scaleVal = Math.max(1.1 - (distance * 0.15), 0.8);
-        const blurVal = Math.min(distance * 6, 8);
-        const opacityVal = Math.max(1 - (distance * 0.5), 0.3);
-
-        if (index !== currentIndex) {
-          slide.style.transform = `scale(${scaleVal}) rotateY(${rotationVal}deg)`;
-          slide.style.filter = `blur(${blurVal}px)`;
-          slide.style.opacity = opacityVal;
-        } else {
-          slide.style.transform = `scale(1.1) rotateY(0deg) translateY(-10px)`;
-          slide.style.filter = `blur(0px)`;
-          slide.style.opacity = 1;
-        }
+        slide.style.zIndex = 10 - distance;
       });
     };
 
     const setPositionByIndex = () => {
       const containerWidth = container.offsetWidth;
+      const slideElements = track.querySelectorAll('.testimonial-card');
       const slideWidth = slides[0].offsetWidth;
-      const gap = 40;
+      const isMobile = window.innerWidth <= 768;
+      const gap = isMobile ? 24 : 40; // gap defined in CSS or media queries
 
-      // Center the active slide by calculating position relative to its center
-      // Total offset = initial padding (50vw) + spacing to current slide - half container
-      const trackPadding = containerWidth / 2;
-      currentTranslate = -(currentIndex * (slideWidth + gap) + (slideWidth / 2));
+      // Cálculo para centralizar o slide ativo:
+      // (Metade do container) - (Metade do slide) - (Offset acumulado dos slides anteriores + gaps)
+      const offsetToCenter = (containerWidth / 2) - (slideWidth / 2);
+      const accumulatedOffset = currentIndex * (slideWidth + gap);
 
-      setSliderPosition();
+      currentTranslate = offsetToCenter - accumulatedOffset;
+
       updateSlideStyles();
+      track.style.transform = `translateX(${currentTranslate}px)`;
     };
 
     const setSliderPosition = () => {
       track.style.transform = `translateX(${currentTranslate}px)`;
     };
 
-    // Listeners (Click Only)
+    // Listeners (Click & Swipe)
+    let touchStartX = 0;
+    let touchEndX = 0;
+
     slides.forEach((slide, index) => {
       slide.addEventListener('click', () => {
         if (currentIndex !== index) {
           currentIndex = index;
-          // Handle URL params for success messages
-          const urlParams = new URLSearchParams(window.location.search);
-          if (urlParams.get('login') === 'success' || urlParams.get('signup') === 'success' || urlParams.get('order') === 'success') {
-            // Show a small toast or just open the orders sidebar to show success
-            setTimeout(() => {
-              ordersBtn?.click();
-            }, 500);
-          }
           track.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
           setPositionByIndex();
         }
       });
     });
+
+    container.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    container.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+
+    const handleSwipe = () => {
+      const swipeThreshold = 50;
+      if (touchStartX - touchEndX > swipeThreshold) {
+        // Swipe Left -> Next
+        if (currentIndex < slides.length - 1) {
+          currentIndex++;
+          track.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+          setPositionByIndex();
+        }
+      } else if (touchEndX - touchStartX > swipeThreshold) {
+        // Swipe Right -> Prev
+        if (currentIndex > 0) {
+          currentIndex--;
+          track.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+          setPositionByIndex();
+        }
+      }
+    };
 
     // Initial position
     setTimeout(() => {
@@ -490,10 +499,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('scroll', () => {
     const currentScroll = window.scrollY;
-    if (currentScroll > 60) {
-      header.classList.add('scrolled');
-    } else {
-      header.classList.remove('scrolled');
+    if (header) {
+      if (currentScroll > 60) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
     }
     lastScroll = currentScroll;
   }, { passive: true });
@@ -768,10 +779,12 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadProducts() {
     // Fallback data for local testing (CORS workaround)
     const fallbackProducts = [
-      { "id": "ignite-v300-30000", "brand": "ignite", "name": "IGNITE V300 30.000 New Edition", "price": "98.00", "image": "Images Pods/Ignite_v300-removebg-preview.png" },
+      { "id": "ignite-v300-30000", "brand": "ignite", "name": "IGNITE V300 30.000 New Edition", "price": "98.00", "image": "Images Pods/Ignite_v250-removebg-preview.png" },
       { "id": "ignite-v250-25000", "brand": "ignite", "name": "IGNITE V250 25.000 Edition", "price": "90.00", "image": "Images Pods/Ignite_v250-removebg-preview.png" },
-      { "id": "ignite-v55-5500", "brand": "ignite", "name": "IGNITE V55 5.500 SLIM EDITION", "price": "65.00", "image": "Images Pods/Ignite_v55-removebg-preview.png" },
-      { "id": "lostmary-35000-edition", "brand": "lostmary", "name": "LOST MARY 35.000 EDITION", "price": "83.00", "image": "Images Pods/Lost_35k-removebg-preview.png" }
+      { "id": "ignite-v55-5500", "brand": "ignite", "name": "IGNITE V55 5.500 SLIM EDITION", "price": "65.00", "image": "Images Pods/Ignite_v50-removebg-preview.png" },
+      { "id": "lostmary-35000-edition", "brand": "lostmary", "name": "LOST MARY 35.000 EDITION", "price": "91.00", "retail_price": "123.00", "image": "Images Pods/Lost_35k-removebg-preview.png" },
+      { "id": "elfbar-summer-40000", "brand": "elfbar", "name": "Elfbar Summer edition 40.000", "price": "111.00", "retail_price": "149.00", "image": "Images Pods/elfbar-summer-40k.png" },
+      { "id": "elfbar-23000-edition", "brand": "elfbar", "name": "ELFBAR 23.000 EDITION", "price": "99.00", "retail_price": "133.00", "image": "Images Pods/elfbar-23k.png" }
     ];
 
     try {
@@ -784,6 +797,53 @@ document.addEventListener('DOMContentLoaded', () => {
       allProducts = fallbackProducts;
       renderProducts('all');
     }
+  }
+
+  // =========================================
+  // 5.8 Newsletter Integration
+  // =========================================
+  const newsletterForm = document.querySelector('.newsletter-form');
+  if (newsletterForm) {
+    newsletterForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const emailInput = newsletterForm.querySelector('input[type="email"]');
+      const submitBtn = newsletterForm.querySelector('button');
+      const originalText = submitBtn.textContent;
+
+      if (!emailInput.value) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '...';
+
+      try {
+        const response = await fetch('/api/newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailInput.value })
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+          emailInput.value = '';
+          submitBtn.style.backgroundColor = '#00ff88';
+          submitBtn.textContent = '✓';
+          alert(result.message);
+          setTimeout(() => {
+            submitBtn.style.backgroundColor = '';
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+          }, 3000);
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (err) {
+        console.error('Erro na newsletter:', err);
+        alert('Houve um erro ao se cadastrar. Tente novamente mais tarde.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
   }
 
   function renderProducts(category, query = '') {
@@ -823,8 +883,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <h3 class="product-name">${p.name}</h3>
           <div class="product-footer">
             <div class="product-price">
-              <span class="current">R$ ${((parseFloat(p.price) * (window.currentSaleType === 'retail' ? 1.4 : 1.0)).toFixed(2)).replace('.', ',')}</span>
-              ${window.currentSaleType === 'retail' ? `<span class="original">R$ ${(parseFloat(p.price) * 1.8).toFixed(2).replace('.', ',')}</span>` : ''}
+              <span class="current">R$ ${((window.currentSaleType === 'retail' ? (p.retail_price ? parseFloat(p.retail_price) : parseFloat(p.price) * 1.4) : parseFloat(p.price)).toFixed(2)).replace('.', ',')}</span>
+              ${window.currentSaleType === 'retail' ? `<span class="original">R$ ${(p.retail_price ? parseFloat(p.retail_price) * 1.3 : parseFloat(p.price) * 1.8).toFixed(2).replace('.', ',')}</span>` : ''}
             </div>
             <a href="product.html?id=${p.id}" class="buy-now-btn" aria-label="Ver mais">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -927,21 +987,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  const newsletterForm = document.querySelector('.newsletter-form');
-  newsletterForm?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const btn = newsletterForm.querySelector('button');
-    const input = newsletterForm.querySelector('input');
-    const originalText = btn.textContent;
-    btn.textContent = 'Enviando...';
-    btn.disabled = true;
-    setTimeout(() => {
-      alert(`Obrigado! ${input.value} foi cadastrado com sucesso.`);
-      btn.textContent = originalText;
-      btn.disabled = false;
-      input.value = '';
-    }, 1500);
-  });
 
 
   // =========================================

@@ -40,6 +40,14 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label" for="phone">Celular (WhatsApp)</label>
+                        <div class="input-wrapper">
+                            <input type="tel" id="phone" class="auth-input" placeholder="(00) 00000-0000" maxlength="15"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label" for="password">Senha</label>
                         <div class="input-wrapper">
                             <input type="password" id="password" class="auth-input" placeholder="Crie uma senha"
@@ -65,25 +73,110 @@
         </div>
     </div>
 
+    <div id="verifyModal" class="verify-modal" style="display: none;">
+        <div class="auth-card glow-card">
+            <h2 class="auth-title">Verifique seu E-mail</h2>
+            <p class="auth-subtitle">Enviamos um código de 6 dígitos para <strong id="sentEmail"></strong></p>
+            <form class="auth-form" id="verifyForm">
+                <div class="form-group">
+                    <label class="form-label">Código de Verificação</label>
+                    <input type="text" id="verifyCode" class="auth-input" placeholder="000000" maxlength="6" required>
+                </div>
+                <button type="submit" class="btn-auth">Verificar Conta</button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .verify-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+    </style>
+
     <script src="script.js"></script>
     <script>
-        // Prevention for demo purposes
-        document.getElementById('signupForm').addEventListener('submit', (e) => {
+        const signupForm = document.getElementById('signupForm');
+        const verifyModal = document.getElementById('verifyModal');
+        const verifyForm = document.getElementById('verifyForm');
+        const phoneInput = document.getElementById('phone');
+        let pendingEmail = '';
+
+        // Máscara para o celular
+        phoneInput.addEventListener('input', (e) => {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+
+        signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const pass = document.getElementById('password').value;
+            const fullname = document.getElementById('fullname').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
             const confirm = document.getElementById('confirm_password').value;
 
-            if (pass !== confirm) {
+            if (password !== confirm) {
                 alert('As senhas não coincidem!');
                 return;
             }
-            // Simulated registration
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userEmail', document.getElementById('email').value);
-            localStorage.setItem('userName', document.getElementById('fullname').value);
 
-            // Redirect with success message
-            window.location.href = 'index.html?signup=success';
+            if (phone.length < 14) {
+                alert('Por favor, insira um celular válido com DDD.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullname, email, phone, password })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    pendingEmail = email;
+                    document.getElementById('sentEmail').textContent = email;
+                    signupForm.closest('.auth-container').style.display = 'none';
+                    verifyModal.style.display = 'flex';
+                } else {
+                    alert(result.message);
+                }
+            } catch (err) {
+                console.error('Signup error:', err);
+                alert('Erro ao conectar com o servidor. Certifique-se de que o servidor Node.js está rodando (npm run dev ou node server.js).');
+            }
+        });
+
+        verifyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const code = document.getElementById('verifyCode').value;
+
+            try {
+                const response = await fetch('/api/auth/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: pendingEmail, code })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert('Conta verificada! Redirecionando para o login...');
+                    window.location.href = 'login.html?signup=success';
+                } else {
+                    alert(result.message);
+                }
+            } catch (err) {
+                alert('Erro na verificação.');
+            }
         });
     </script>
 </body>
