@@ -545,24 +545,61 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 
-  // Mobile Menu Toggle
+  // =========================================
+  // 4. Premium Mobile Sidebar & Accordion
+  // =========================================
   const mobileToggle = document.getElementById('mobileToggle');
-  const navMenu = document.getElementById('navMenu');
+  const mobileSidebar = document.getElementById('mobileSidebar');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const closeSidebar = document.getElementById('closeSidebar');
+  const accordionTrigger = document.querySelector('.accordion-trigger');
+  const sidebarAccordion = document.getElementById('categoryAccordion');
 
-  if (mobileToggle && navMenu) {
-    mobileToggle.addEventListener('click', () => {
-      mobileToggle.classList.toggle('active');
-      navMenu.classList.toggle('open');
-    });
+  const toggleSidebar = (open = true) => {
+    if (open) {
+      mobileSidebar.classList.add('open');
+      sidebarOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    } else {
+      mobileSidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  };
 
-    // Close mobile menu when clicking a link
-    navMenu.querySelectorAll('.dropdown-item').forEach(link => {
-      link.addEventListener('click', () => {
-        mobileToggle.classList.remove('active');
-        navMenu.classList.remove('open');
-      });
+  if (mobileToggle) {
+    mobileToggle.addEventListener('click', () => toggleSidebar(true));
+  }
+
+  if (closeSidebar) {
+    closeSidebar.addEventListener('click', () => toggleSidebar(false));
+  }
+
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', () => toggleSidebar(false));
+  }
+
+  // Accordion Logic
+  if (accordionTrigger && sidebarAccordion) {
+    accordionTrigger.addEventListener('click', () => {
+      sidebarAccordion.classList.toggle('active');
     });
   }
+
+  // Close sidebar and scroll to products when category is clicked
+  document.querySelectorAll('.category-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const cat = link.getAttribute('data-cat');
+      if (typeof renderProducts === 'function') {
+        renderProducts(cat);
+        // Update active tab button if exists
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.category === cat);
+        });
+      }
+      toggleSidebar(false);
+    });
+  });
 
 
   // =========================================
