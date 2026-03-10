@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
       currentTranslate = offsetToCenter - accumulatedOffset;
 
       updateSlideStyles();
-      track.style.transition = 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+      track.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
       track.style.transform = `translateX(${currentTranslate}px)`;
     };
 
@@ -958,7 +958,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       currentTranslate = offsetToCenter - accumulatedOffset;
 
-      track.style.transition = 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+      track.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
       track.style.transform = `translateX(${currentTranslate}px)`;
       updateSlideStyles();
     };
