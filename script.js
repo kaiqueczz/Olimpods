@@ -266,64 +266,32 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const setPositionByIndex = () => {
-      const containerWidth = container.offsetWidth;
-      const slideElements = track.querySelectorAll('.testimonial-card');
-      const slideWidth = slides[0].offsetWidth;
       const isMobile = window.innerWidth <= 768;
-      const gap = isMobile ? 24 : 40; // gap defined in CSS or media queries
+      const containerWidth = container.clientWidth; // Use clientWidth for more accuracy without borders
+      const slideWidth = slides[0].offsetWidth;
+      const gap = isMobile ? 24 : 40;
 
-      // Cálculo para centralizar o slide ativo:
-      // (Metade do container) - (Metade do slide) - (Offset acumulado dos slides anteriores + gaps)
+      // Center calculation: (Half Viewport) - (Half Slide) - (Previous Slides + Gaps)
       const offsetToCenter = (containerWidth / 2) - (slideWidth / 2);
       const accumulatedOffset = currentIndex * (slideWidth + gap);
 
       currentTranslate = offsetToCenter - accumulatedOffset;
 
       updateSlideStyles();
+      track.style.transition = 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
       track.style.transform = `translateX(${currentTranslate}px)`;
     };
-
-    const setSliderPosition = () => {
-      track.style.transform = `translateX(${currentTranslate}px)`;
-    };
-
-    // Listeners (Click & Swipe)
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    slides.forEach((slide, index) => {
-      slide.addEventListener('click', () => {
-        if (currentIndex !== index) {
-          currentIndex = index;
-          track.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
-          setPositionByIndex();
-        }
-      });
-    });
-
-    container.addEventListener('touchstart', (e) => {
-      touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
-
-    container.addEventListener('touchend', (e) => {
-      touchEndX = e.changedTouches[0].screenX;
-      handleSwipe();
-    }, { passive: true });
 
     const handleSwipe = () => {
-      const swipeThreshold = 50;
+      const swipeThreshold = 40; // More sensitive
       if (touchStartX - touchEndX > swipeThreshold) {
-        // Swipe Left -> Next
         if (currentIndex < slides.length - 1) {
           currentIndex++;
-          track.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
           setPositionByIndex();
         }
       } else if (touchEndX - touchStartX > swipeThreshold) {
-        // Swipe Right -> Prev
         if (currentIndex > 0) {
           currentIndex--;
-          track.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
           setPositionByIndex();
         }
       }
@@ -982,15 +950,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const setPositionByIndex = () => {
       const containerWidth = container.offsetWidth;
       const slideWidth = slides[0].offsetWidth;
-      const gap = 16;
+      const gap = 20; // Corrected gap for products
 
-      // Center the active slide
+      // Improved centering calculation
       const offsetToCenter = (containerWidth / 2) - (slideWidth / 2);
       const accumulatedOffset = currentIndex * (slideWidth + gap);
 
       currentTranslate = offsetToCenter - accumulatedOffset;
 
-      track.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+      track.style.transition = 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
       track.style.transform = `translateX(${currentTranslate}px)`;
       updateSlideStyles();
     };
@@ -1002,20 +970,12 @@ document.addEventListener('DOMContentLoaded', () => {
       track.style.transition = 'none';
     }, { passive: true });
 
-    container.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      const currentX = e.touches[0].clientX;
-      const diff = currentX - startX;
-      // Basic free scroll feel during drag (optional)
-      // track.style.transform = `translateX(${currentTranslate + diff}px)`;
-    }, { passive: true });
-
     container.addEventListener('touchend', (e) => {
       if (!isDragging) return;
       isDragging = false;
       const endX = e.changedTouches[0].clientX;
       const diff = startX - endX;
-      const threshold = 50;
+      const threshold = 40; // High sensitivity swoosh
 
       if (diff > threshold && currentIndex < slides.length - 1) {
         currentIndex++;
