@@ -48,6 +48,25 @@
   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* Responsive Utilities */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+}
+
 /* ---------- Glowing Border Effect ---------- */
 .glow-card {
   --glow-x: 50%;
@@ -551,11 +570,12 @@ input {
 
 .hero-subtitle {
   font-family: var(--font-body);
-  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  font-size: clamp(1rem, 1.8vw, 1.15rem);
   font-weight: 400;
-  color: #fff;
-  line-height: 1.7;
-  max-width: 900px;
+  color: #fff !important;
+  line-height: 1.6;
+  max-width: 800px;
+  /* Aligns closer to headline width */
   margin: 0 auto 40px;
   text-align: center;
   opacity: 0;
