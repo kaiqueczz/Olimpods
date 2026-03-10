@@ -1986,15 +1986,24 @@ input {
   }
 
   .hero h1 {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
+    /* Further reduced to ensure single line */
     /* Fit in one line */
-    letter-spacing: -1px;
+    letter-spacing: -0.5px;
     line-height: 1.2;
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: center;
   }
 
   .hero-subtitle {
     font-size: 0.95rem;
-    margin-bottom: 30px;
+    margin: 0 auto 35px;
+    max-width: 320px;
+    /* Forces rectangular shape */
+    line-height: 1.5;
+    text-align: center;
+    color: var(--text-secondary);
   }
 
   .gs-char {
