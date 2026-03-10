@@ -1935,7 +1935,7 @@ input {
    ============================================ */
 @media (max-width: 768px) {
   :root {
-    --section-padding: 60px 0;
+    --section-padding: 40px 0;
   }
 
   /* Products Carousel Mobile */
@@ -2108,6 +2108,17 @@ input {
     min-width: 220px;
     text-align: center;
     display: inline-block;
+  }
+
+  .section-title {
+    font-size: 1.6rem !important;
+    white-space: nowrap !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .section-header {
+    margin-bottom: 24px !important;
   }
 
   .gs-char {
