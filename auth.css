@@ -60,7 +60,7 @@
 }
 
 .auth-logo {
-    height: 80px;
+    height: 110px;
     width: auto;
     filter: drop-shadow(0 0 15px var(--accent-glow));
 }
@@ -72,10 +72,28 @@
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 1px;
+    white-space: nowrap;
+    /* Garante que fique em uma só linha */
 }
 
+@media (max-width: 380px) {
+    .auth-title {
+        font-size: 1.1rem;
+        /* Reduz um pouco mais em telas muito pequenas */
+    }
+}
+
+
 .auth-title.gradual-spacing {
+    display: flex;
     justify-content: center;
+    flex-wrap: nowrap;
+    /* Não quebra linha */
+}
+
+.auth-title.gradual-spacing .gs-word {
+    white-space: nowrap;
+    flex-wrap: nowrap;
 }
 
 .auth-subtitle {

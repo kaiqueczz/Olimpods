@@ -112,6 +112,8 @@
         }
     </style>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/supabase-config.js"></script>
     <script src="script.js"></script>
     <script>
         const signupForm = document.getElementById('signupForm');
@@ -145,25 +147,46 @@
             }
 
             try {
-                const response = await fetch('/api/auth/signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fullname, email, phone, password })
+                if (typeof supabaseClient === 'undefined') {
+                    throw new Error('Supabase não foi carregado. Desative bloqueadores de anúncios (AdBlock) e recarregue a página.');
+                }
+
+                // Supabase Signup
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            fullname: fullname,
+                            phone: phone
+                        }
+                    }
                 });
 
-                const result = await response.json();
+                if (error) throw error;
 
-                if (result.status === 'success') {
+                if (data.user && data.session) {
+                    // Se o e-mail não precisar de confirmação, loga direto
+                    alert('Cadastro realizado com sucesso!');
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userEmail', data.user.email);
+                    window.location.href = 'index.html?signup=success';
+                } else {
+                    // Se precisar de confirmação (padrão Supabase)
                     pendingEmail = email;
                     document.getElementById('sentEmail').textContent = email;
                     signupForm.closest('.auth-container').style.display = 'none';
                     verifyModal.style.display = 'flex';
-                } else {
-                    alert(result.message);
                 }
             } catch (err) {
                 console.error('Signup error:', err);
-                alert('Erro ao conectar com o servidor. Certifique-se de que o servidor Node.js está rodando (npm run dev ou node server.js).');
+                let msg = err.message || err;
+
+                if (msg.includes('Load failed')) {
+                    msg = 'Erro de rede: O carregamento falhou. Isso pode ser causado por um bloqueador de anúncios (AdBlock), firewall ou restrição do navegador (como no Safari). Tente desativar extensões ou acessar via http://localhost:3000 em vez de 127.0.0.1.';
+                }
+
+                alert('Erro no cadastro: ' + msg);
             }
         });
 
@@ -172,22 +195,24 @@
             const code = document.getElementById('verifyCode').value;
 
             try {
-                const response = await fetch('/api/auth/verify', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: pendingEmail, code })
+                // Supabase Verify OTP
+                const { data, error } = await supabaseClient.auth.verifyOtp({
+                    email: pendingEmail,
+                    token: code,
+                    type: 'signup'
                 });
 
-                const result = await response.json();
+                if (error) throw error;
 
-                if (result.status === 'success') {
-                    alert('Conta verificada! Redirecionando para o login...');
-                    window.location.href = 'login.html?signup=success';
-                } else {
-                    alert(result.message);
+                if (data.session) {
+                    alert('Conta verificada! Redirecionando...');
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userEmail', data.user.email);
+                    window.location.href = 'index.html?signup=success';
                 }
             } catch (err) {
-                alert('Erro na verificação.');
+                console.error('Verification error:', err);
+                alert('Erro na verificação: ' + (err.message || 'Código inválido ou expirado.'));
             }
         });
     </script>

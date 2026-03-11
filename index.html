@@ -202,6 +202,12 @@
 
       <!-- Testimonials -->
       <div class="carousel-container reveal">
+        <button class="carousel-nav-btn prev" id="prevTestimonial" aria-label="Anterior">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+
         <div class="carousel-track">
           <!-- Card 1 -->
           <div class="testimonial-card glow-card">
@@ -413,6 +419,14 @@
             </div>
           </div>
         </div>
+
+        <button class="carousel-nav-btn next" id="nextTestimonial" aria-label="Próximo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+
+        <div class="carousel-dots" id="carouselDots"></div>
       </div>
     </div>
   </section>
@@ -657,6 +671,8 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/supabase-config.js"></script>
   <script src="script.js"></script>
 </body>
 

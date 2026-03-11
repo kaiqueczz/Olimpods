@@ -18,9 +18,10 @@ const PORT = 3000;
 const STATIC_DIR = __dirname;
 
 // ── ZuckPay Credentials ──
-const ZUCKPAY_CLIENT_ID = 'kaiquejucas3_6052315761';
-const ZUCKPAY_CLIENT_SECRET = '13e8d60b1aebd51a1de6080ab6d1641c45b6671677dfc74b5da99f039929ca10';
+const ZUCKPAY_CLIENT_ID = 'sb_publishable_vF_WZOOcya33E4cr64mWkQ__B5QAhFc';
+const ZUCKPAY_CLIENT_SECRET = 'sb_secret_cMcD4XPobEb4M7JREQTkeQ__j6rN4th';
 const ZUCKPAY_AUTH = 'Basic ' + Buffer.from(`${ZUCKPAY_CLIENT_ID}:${ZUCKPAY_CLIENT_SECRET}`).toString('base64');
+
 
 // ── MIME Types ──
 const MIME_TYPES = {
@@ -157,6 +158,21 @@ const server = http.createServer(async (req, res) => {
         const body = await readBody(req);
         console.log('🔍 PIX Status check for:', orderId);
         proxyToZuckPay(`https://zuckpay.com.br/conta/v3/pix/status/${orderId}`, body, res);
+        return;
+    }
+    if (req.method === 'GET' && pathname === '/api/location') {
+        console.log('🌍 Fetching location...');
+        https.get('https://ipapi.co/json/', (apiRes) => {
+            let data = '';
+            apiRes.on('data', chunk => data += chunk);
+            apiRes.on('end', () => {
+                res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+                res.end(data);
+            });
+        }).on('error', (err) => {
+            res.writeHead(500);
+            res.end(JSON.stringify({ status: 'error', message: err.message }));
+        });
         return;
     }
 

@@ -245,72 +245,135 @@ document.addEventListener('DOMContentLoaded', () => {
   (function initTestimonialCarousel() {
     const container = document.querySelector('.carousel-container');
     const track = document.querySelector('.carousel-track');
+    const dotsContainer = document.getElementById('carouselDots');
+    const btnPrev = document.getElementById('prevTestimonial');
+    const btnNext = document.getElementById('nextTestimonial');
+
     if (!container || !track) return;
 
     const slides = Array.from(track.children);
-    let currentTranslate = 0;
     let currentIndex = 2; // Começa no 3º depoimento (Lucas Cavalcante)
+    let autoPlayTimer = null;
+    const AUTO_PLAY_DELAY = 5000;
 
-    // Initial setup
+    // Create dots
+    if (dotsContainer) {
+      dotsContainer.innerHTML = ''; // Clear if exists
+      slides.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = `dot ${i === currentIndex ? 'active' : ''}`;
+        dot.addEventListener('click', () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+      });
+    }
+
     const updateSlideStyles = () => {
       slides.forEach((slide, index) => {
-        if (index === currentIndex) {
-          slide.classList.add('active');
-        } else {
-          slide.classList.remove('active');
-        }
-
         const distance = Math.abs(index - currentIndex);
+        slide.classList.toggle('active', index === currentIndex);
         slide.style.zIndex = 10 - distance;
+
+        // Dynamic opacity and scale based on distance
+        if (index !== currentIndex) {
+          slide.style.opacity = Math.max(0.3, 0.7 - (distance * 0.2));
+          slide.style.transform = `scale(${Math.max(0.7, 0.9 - (distance * 0.05))})`;
+        } else {
+          slide.style.opacity = '1';
+          slide.style.transform = 'scale(1) translateY(-15px)';
+        }
       });
+
+      // Update dots
+      if (dotsContainer) {
+        Array.from(dotsContainer.children).forEach((dot, i) => {
+          dot.classList.toggle('active', i === currentIndex);
+        });
+      }
     };
 
     const setPositionByIndex = () => {
       const isMobile = window.innerWidth <= 768;
-      const containerWidth = container.clientWidth; // Use clientWidth for more accuracy without borders
+      const containerWidth = container.clientWidth;
       const slideWidth = slides[0].offsetWidth;
       const gap = isMobile ? 24 : 40;
 
-      // Center calculation: (Half Viewport) - (Half Slide) - (Previous Slides + Gaps)
       const offsetToCenter = (containerWidth / 2) - (slideWidth / 2);
       const accumulatedOffset = currentIndex * (slideWidth + gap);
+      const translateValue = offsetToCenter - accumulatedOffset;
 
-      currentTranslate = offsetToCenter - accumulatedOffset;
-
-      updateSlideStyles();
       track.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-      track.style.transform = `translateX(${currentTranslate}px)`;
+      track.style.transform = `translateX(${translateValue}px)`;
+      updateSlideStyles();
     };
 
+    const goToSlide = (index) => {
+      currentIndex = index;
+      setPositionByIndex();
+      resetAutoPlay();
+    };
+
+    const nextSlide = () => {
+      currentIndex = (currentIndex + 1) % slides.length;
+      setPositionByIndex();
+    };
+
+    const prevSlide = () => {
+      currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+      setPositionByIndex();
+    };
+
+    const startAutoPlay = () => {
+      if (autoPlayTimer) return;
+      autoPlayTimer = setInterval(nextSlide, AUTO_PLAY_DELAY);
+    };
+
+    const stopAutoPlay = () => {
+      if (autoPlayTimer) {
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+      }
+    };
+
+    const resetAutoPlay = () => {
+      stopAutoPlay();
+      startAutoPlay();
+    };
+
+    // Event Listeners
+    if (btnPrev) btnPrev.addEventListener('click', () => { prevSlide(); resetAutoPlay(); });
+    if (btnNext) btnNext.addEventListener('click', () => { nextSlide(); resetAutoPlay(); });
+
+    container.addEventListener('mouseenter', stopAutoPlay);
+    container.addEventListener('mouseleave', startAutoPlay);
+
+    // Swipe Support
     let touchStartX = 0;
     let touchEndX = 0;
 
     container.addEventListener('touchstart', e => {
       touchStartX = e.changedTouches[0].screenX;
+      stopAutoPlay();
     }, { passive: true });
 
     container.addEventListener('touchend', e => {
       touchEndX = e.changedTouches[0].screenX;
       handleSwipe();
+      startAutoPlay();
     }, { passive: true });
 
     const handleSwipe = () => {
       const swipeThreshold = 50;
       if (touchStartX - touchEndX > swipeThreshold) {
-        if (currentIndex < slides.length - 1) {
-          currentIndex++;
-          setPositionByIndex();
-        }
+        nextSlide();
       } else if (touchEndX - touchStartX > swipeThreshold) {
-        if (currentIndex > 0) {
-          currentIndex--;
-          setPositionByIndex();
-        }
+        prevSlide();
       }
     };
 
+    // Initial positioning
     setTimeout(() => {
       setPositionByIndex();
+      startAutoPlay();
       window.addEventListener('resize', setPositionByIndex);
     }, 100);
   })();
@@ -324,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!badge || !text) return;
 
     try {
-      const response = await fetch('https://ipapi.co/json/');
+      const response = await fetch('/api/location');
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
 
@@ -1172,15 +1235,35 @@ document.addEventListener('DOMContentLoaded', () => {
     `).join('');
   }
 
-  function checkAuthState() {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  async function checkAuthState() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const isLoggedIn = !!session;
+
     if (ordersBtn) {
       ordersBtn.style.display = isLoggedIn ? 'flex' : 'none';
     }
+
     if (accountBtn) {
-      // If logged in, maybe redirect to a profile or leave as is. 
-      // User requested only the "Meus pedidos" visibility.
+      if (isLoggedIn) {
+        accountBtn.setAttribute('title', `Logado como ${session.user.email}`);
+      } else {
+        accountBtn.setAttribute('title', 'Minha Conta');
+        accountBtn.href = 'login.html';
+      }
     }
+
+    localStorage.setItem('isLoggedIn', isLoggedIn ? 'true' : 'false');
+    if (isLoggedIn) {
+      localStorage.setItem('userEmail', session.user.email);
+    }
+  }
+
+  // Listen for auth changes
+  if (typeof supabaseClient !== 'undefined') {
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state change:', event);
+      checkAuthState();
+    });
   }
 
   // Handle Orders Toggle
