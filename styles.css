@@ -447,6 +447,51 @@ input {
   flex-shrink: 0;
 }
 
+/* Location Badge */
+.location-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  margin-right: 12px;
+  transition: all 0.3s var(--ease-smooth);
+}
+
+.location-badge:hover {
+  background: rgba(255, 11, 85, 0.1);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 15px rgba(255, 11, 85, 0.2);
+}
+
+.location-badge svg {
+  width: 14px;
+  height: 14px;
+  color: var(--accent-primary);
+  filter: drop-shadow(0 0 5px var(--accent-primary));
+}
+
+.location-badge span {
+  font-family: var(--font-short);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .location-badge {
+    padding: 4px 10px;
+    margin-right: 6px;
+  }
+
+  .location-badge span {
+    font-size: 0.65rem;
+  }
+}
+
 .action-btn {
   position: relative;
   display: flex;

@@ -313,7 +313,33 @@ document.addEventListener('DOMContentLoaded', () => {
       setPositionByIndex();
       window.addEventListener('resize', setPositionByIndex);
     }, 100);
+  })();
 
+  // =========================================
+  // 0.5.8 IP Location Badge Logic
+  // =========================================
+  (async function initIPLocation() {
+    const badge = document.getElementById('locationBadge');
+    const text = document.getElementById('locationText');
+    if (!badge || !text) return;
+
+    try {
+      const response = await fetch('https://ipapi.co/json/');
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+
+      if (data.city && data.region_code) {
+        text.textContent = `${data.city}-${data.region_code}`;
+        badge.style.display = 'flex';
+        // Delay slightly if needed to trigger the transition
+        requestAnimationFrame(() => {
+          badge.classList.add('animate-in');
+        });
+      }
+    } catch (err) {
+      console.warn('IP Location fetch failed:', err);
+      // Keep hidden on error
+    }
   })();
 
   // =========================================
