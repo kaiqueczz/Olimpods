@@ -282,8 +282,20 @@ document.addEventListener('DOMContentLoaded', () => {
       track.style.transform = `translateX(${currentTranslate}px)`;
     };
 
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    container.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    container.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+
     const handleSwipe = () => {
-      const swipeThreshold = 40; // More sensitive
+      const swipeThreshold = 50;
       if (touchStartX - touchEndX > swipeThreshold) {
         if (currentIndex < slides.length - 1) {
           currentIndex++;
@@ -297,7 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    // Initial position
     setTimeout(() => {
       setPositionByIndex();
       window.addEventListener('resize', setPositionByIndex);

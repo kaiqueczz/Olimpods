@@ -2135,13 +2135,16 @@ input {
     text-overflow: ellipsis;
   }
 
-  .section-header {
-    margin-bottom: 20px !important;
+  .products-section .gradual-spacing {
+    --gs-size: 1.2rem !important;
+    white-space: nowrap !important;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 20px;
   }
 
   .gs-char {
-    --gs-size: 1.5rem;
-    /* Matches hero h1 for single line */
+    --gs-size: 1.2rem;
   }
 
   .hero-description {
