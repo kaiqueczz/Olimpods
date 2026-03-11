@@ -94,40 +94,50 @@ body.checkout-page {
 
 @media (max-width: 1024px) {
     .checkout-grid {
-        grid-template-columns: 1fr;
-        gap: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .checkout-summary {
+        order: -1;
+        /* Resumo no topo no mobile */
     }
 
     .summary-card {
         position: static;
-        margin-top: 20px;
+        margin-top: 0;
+        padding: 20px;
     }
 }
 
 @media (max-width: 768px) {
     .checkout-header .logo img {
-        height: 40px;
+        height: 44px;
+    }
+
+    .checkout-main {
+        padding: 20px 0 40px;
     }
 
     .checkout-card {
-        padding: 24px 20px;
+        padding: 20px;
+        margin-bottom: 20px;
     }
 
     .form-row {
-        display: flex;
-        /* Override grid if necessary */
-        flex-direction: column;
+        grid-template-columns: 1fr;
         gap: 15px;
     }
 
     .card-title {
-        font-size: 1.2rem;
+        font-size: 1.15rem;
+        margin-bottom: 20px;
     }
 
-    .checkout-mini-footer .container {
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
+    .btn-checkout-submit {
+        padding: 16px;
+        font-size: 1rem;
     }
 }
 
