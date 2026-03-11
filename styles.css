@@ -2173,6 +2173,24 @@ input {
     grid-template-columns: 1fr;
   }
 
+  /* Story Section Refinement */
+  .story-content h3 {
+    font-size: 1.5rem !important;
+    max-height: none !important;
+    margin-bottom: 15px !important;
+    max-width: 85%;
+  }
+
+  .story-content p {
+    font-size: 0.9rem !important;
+    max-width: 85%;
+    line-height: 1.4 !important;
+  }
+
+  .story-visual {
+    max-width: 85%;
+  }
+
   .products-grid {
     grid-template-columns: 1fr;
   }
