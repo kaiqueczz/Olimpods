@@ -49,14 +49,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Vortex Config ---
-    const PARTICLE_COUNT = 700;
+    const PARTICLE_COUNT = 350;
     const PROP_COUNT = 9;   // x, y, vx, vy, life, ttl, speed, radius, hue
     const PROPS_LEN = PARTICLE_COUNT * PROP_COUNT;
     const RANGE_Y = 100;
     const BASE_TTL = 50;
     const RANGE_TTL = 150;
     const BASE_SPEED = 0.0;
-    const RANGE_SPEED = 1.5;
+    const RANGE_SPEED = 0.4;
     const BASE_RADIUS = 1;
     const RANGE_RADIUS = 2;
     const BASE_HUE = 0;     // pure red
