@@ -3156,13 +3156,15 @@ input {
    INSTITUTIONAL PAGES (Privacy, FAQ, Tracking)
    ============================================ */
 .institutional-page {
-  padding: 140px 0 100px;
+  padding: 100px 0 100px;
+  /* Reduced from 140px */
   min-height: 80vh;
 }
 
 .institutional-header {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 30px;
+  /* Reduced from 60px */
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
@@ -3171,7 +3173,8 @@ input {
 .institutional-header h1 {
   font-family: var(--font-display);
   font-size: 3.5rem;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
+  /* Reduced from 15px */
   text-transform: uppercase;
   letter-spacing: 2px;
   color: var(--accent-primary);
