@@ -199,27 +199,51 @@
 
 /* Submit Button */
 .btn-auth {
+    width: 100%;
+    padding: 14px;
     background: var(--accent-primary);
     color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 16px;
-    font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.4s var(--ease-bounce);
-    margin-top: 10px;
 }
 
-.btn-auth:hover {
-    transform: translateY(-3px);
+.btn-auth:hover:not(:disabled) {
     background: var(--accent-secondary);
-    box-shadow: 0 8px 25px var(--accent-glow);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 0, 64, 0.3);
 }
 
+.btn-auth:disabled {
+    background: #555;
+    color: #999;
+    cursor: not-allowed;
+    text-shadow: none;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Password Requirements Checklist */
+.password-requirements {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.password-requirements ul li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #aaa;
+    transition: color 0.3s;
+}
 /* Footer / Switch flow */
 .auth-footer {
     text-align: center;

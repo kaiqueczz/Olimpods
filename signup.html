@@ -65,6 +65,13 @@
                             <input type="password" id="password" class="auth-input" placeholder="Crie uma senha"
                                 required>
                         </div>
+                        <div class="password-requirements" id="passwordRequirements" style="display: none; margin-top: 10px; font-size: 0.85rem; color: #aaa;">
+                            <ul style="list-style-type: none; padding-left: 0; margin-bottom: 0;">
+                                <li id="reqUppercase" style="margin-bottom: 4px;">❌ Pelo menos 1 letra maiúscula</li>
+                                <li id="reqSpecialChar" style="margin-bottom: 4px;">❌ Pelo menos 1 caractere especial (!@#$ etc.)</li>
+                                <li id="reqNumber" style="margin-bottom: 4px;">❌ Pelo menos 1 número</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -86,15 +93,21 @@
     </div>
 
     <div id="verifyModal" class="verify-modal" style="display: none;">
-        <div class="auth-card glow-card">
+        <div class="auth-card glow-card" style="position: relative;">
             <h2 class="auth-title">Verifique seu E-mail</h2>
-            <p class="auth-subtitle">Enviamos um código de 6 dígitos para <strong id="sentEmail"></strong></p>
+            <p class="auth-subtitle">Enviamos um código de segurança para <strong id="sentEmail"></strong></p>
             <form class="auth-form" id="verifyForm">
                 <div class="form-group">
-                    <label class="form-label">Código de Verificação</label>
+                    <label class="form-label">Código de Segurança</label>
                     <input type="text" id="verifyCode" class="auth-input" placeholder="000000" maxlength="6" required>
                 </div>
-                <button type="submit" class="btn-auth">Verificar Conta</button>
+                <button type="submit" class="btn-auth" id="verifySubmitBtn">Verificar Conta</button>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button type="button" id="resendOtpBtn" class="btn-auth" style="background: rgba(255,255,255,0.1); color: #888; border: 1px solid #444; font-size: 0.9rem; padding: 10px;" disabled>
+                        Reenviar código (02:00)
+                    </button>
+                    <p id="resendMessage" style="color: #ff0040; font-size: 0.85rem; margin-top: 10px; display: none;">Código reenviado com sucesso!</p>
+                </div>
             </form>
         </div>
     </div>
@@ -128,21 +141,96 @@
             e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
         });
 
+        // Elementos de validação de senha
+        const passwordInput = document.getElementById('password');
+        const passReqContainer = document.getElementById('passwordRequirements');
+        const reqUppercase = document.getElementById('reqUppercase');
+        const reqSpecialChar = document.getElementById('reqSpecialChar');
+        const reqNumber = document.getElementById('reqNumber');
+
+        // Regex para validações
+        const regexUppercase = /[A-Z]/;
+        const regexSpecialChar = /[!@#$%^&*(),.?":{}|<>_+\-=\\[\]\\;'\\/`~]/;
+        const regexNumber = /[0-9]/;
+        const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Extrita, sem espaços, com .
+
+        let isPasswordValid = false;
+
+        // Mostrar validações ao digitar
+        passwordInput.addEventListener('focus', () => {
+             passReqContainer.style.display = 'block';
+        });
+
+        passwordInput.addEventListener('input', (e) => {
+             const val = e.target.value;
+             let validCount = 0;
+
+             // Checa Maiúscula
+             if (regexUppercase.test(val)) {
+                  reqUppercase.innerHTML = '✅ Pelo menos 1 letra maiúscula';
+                  reqUppercase.style.color = '#ff0040';
+                  validCount++;
+             } else {
+                  reqUppercase.innerHTML = '❌ Pelo menos 1 letra maiúscula';
+                  reqUppercase.style.color = '#aaa';
+             }
+
+             // Checa Caractere Especial
+             if (regexSpecialChar.test(val)) {
+                  reqSpecialChar.innerHTML = '✅ Pelo menos 1 caractere especial (!@#$ etc.)';
+                  reqSpecialChar.style.color = '#ff0040';
+                  validCount++;
+             } else {
+                  reqSpecialChar.innerHTML = '❌ Pelo menos 1 caractere especial (!@#$ etc.)';
+                  reqSpecialChar.style.color = '#aaa';
+             }
+
+             // Checa Número
+             if (regexNumber.test(val)) {
+                  reqNumber.innerHTML = '✅ Pelo menos 1 número';
+                  reqNumber.style.color = '#ff0040';
+                  validCount++;
+             } else {
+                  reqNumber.innerHTML = '❌ Pelo menos 1 número';
+                  reqNumber.style.color = '#aaa';
+             }
+
+             isPasswordValid = (validCount === 3 && val.length >= 6);
+        });
+
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const fullname = document.getElementById('fullname').value;
-            const email = document.getElementById('email').value;
+            const submitBtn = signupForm.querySelector('.btn-auth');
+            const originalBtnText = submitBtn.textContent;
+
+            // Transforma email em minúsculo e tira espaços em branco nas beiradas
+            const fullname = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
             const phone = document.getElementById('phone').value;
             const password = document.getElementById('password').value;
             const confirm = document.getElementById('confirm_password').value;
+
+            // Validação de Email rigorosa
+            if (!regexEmail.test(email)) {
+                alert('E-mail inválido. Verifique se não há espaços em branco e se o formato está correto (ex: email@dominio.com).');
+                return;
+            }
 
             if (password !== confirm) {
                 alert('As senhas não coincidem!');
                 return;
             }
 
+            if (!isPasswordValid) {
+                 alert('Sua senha não atende aos requisitos mínimos de segurança (Letra maiúscula, número e caractere especial).');
+                 passReqContainer.style.display = 'block';
+                 passwordInput.focus();
+                 return;
+            }
+
+            // Garante ao menos celular padrão Brasil: (11) 91234-5678 tem 15 caracteres
             if (phone.length < 14) {
-                alert('Por favor, insira um celular válido com DDD.');
+                alert('Por favor, insira um celular válido com DDD completo.');
                 return;
             }
 
@@ -150,6 +238,10 @@
                 if (typeof supabaseClient === 'undefined') {
                     throw new Error('Supabase não foi carregado. Desative bloqueadores de anúncios (AdBlock) e recarregue a página.');
                 }
+
+                // Iniciar estado de carregamento
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Cadastrando...';
 
                 // Supabase Signup
                 const { data, error } = await supabaseClient.auth.signUp({
@@ -172,27 +264,105 @@
                     localStorage.setItem('userEmail', data.user.email);
                     window.location.href = 'index.html?signup=success';
                 } else {
-                    // Se precisar de confirmação (padrão Supabase)
+                    // Se precisar de confirmação (padrão Supabase OTP via Email)
                     pendingEmail = email;
                     document.getElementById('sentEmail').textContent = email;
                     signupForm.closest('.auth-container').style.display = 'none';
                     verifyModal.style.display = 'flex';
+                    
+                    // Inicia cronômetro do Reenvio
+                    startOtpTimer();
                 }
             } catch (err) {
                 console.error('Signup error:', err);
                 let msg = err.message || err;
 
-                if (msg.includes('Load failed')) {
-                    msg = 'Erro de rede: O carregamento falhou. Isso pode ser causado por um bloqueador de anúncios (AdBlock), firewall ou restrição do navegador (como no Safari). Tente desativar extensões ou acessar via http://localhost:3000 em vez de 127.0.0.1.';
+                if (msg.includes('rate limit exceeded') || msg.toLowerCase().includes('rate limit')) {
+                    msg = 'Limite de tentativas excedido para este e-mail/IP. Por favor, aguarde e tente novamente.';
+                } else if (msg.includes('Load failed')) {
+                    msg = 'Erro de rede: O carregamento falhou. Tente desativar extensões (AdBlock) ou acessar via http://localhost:3000 em vez de 127.0.0.1.';
+                } else if (msg.toLowerCase().includes('already registered') || msg.includes('User already registered') || msg.toLowerCase().includes('email exists')) {
+                    msg = 'Este e-mail já está cadastrado em nosso sistema. Por favor, faça login em vez de criar uma nova conta.';
                 }
 
                 alert('Erro no cadastro: ' + msg);
+            } finally {
+                // Restaurar botão
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
+        });
+
+        // ==========================
+        //  LÓGICA DE VERIFICAÇÃO E REENVIO OTP
+        // ==========================
+        const resendBtn = document.getElementById('resendOtpBtn');
+        const resendMsg = document.getElementById('resendMessage');
+        const verifySubmitBtn = document.getElementById('verifySubmitBtn');
+        let otpTimerInterval;
+        
+        function startOtpTimer(durationSeconds = 120) {
+             let timer = durationSeconds;
+             resendBtn.disabled = true;
+             resendBtn.style.color = '#888';
+             resendBtn.style.cursor = 'not-allowed';
+             
+             clearInterval(otpTimerInterval);
+             
+             otpTimerInterval = setInterval(() => {
+                  let minutes = parseInt(timer / 60, 10);
+                  let seconds = parseInt(timer % 60, 10);
+
+                  minutes = minutes < 10 ? "0" + minutes : minutes;
+                  seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                  resendBtn.textContent = `Reenviar código (${minutes}:${seconds})`;
+
+                  if (--timer < 0) {
+                      clearInterval(otpTimerInterval);
+                      resendBtn.textContent = "Reenviar código";
+                      resendBtn.disabled = false;
+                      resendBtn.style.color = '#fff';
+                      resendBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+                      resendBtn.style.cursor = 'pointer';
+                  }
+             }, 1000);
+        }
+
+        resendBtn.addEventListener('click', async () => {
+             resendBtn.disabled = true;
+             resendBtn.textContent = "Reenviando...";
+             resendMsg.style.display = 'none';
+             
+             try {
+                  const { error } = await supabaseClient.auth.resend({
+                       type: 'signup',
+                       email: pendingEmail
+                  });
+                  
+                  if (error) throw error;
+                  
+                  resendMsg.textContent = "Código reenviado com sucesso!";
+                  resendMsg.style.color = "#ff0040";
+                  resendMsg.style.display = "block";
+                  startOtpTimer(); // Reinicia os 2 minutos
+                  
+             } catch (err) {
+                  console.error("Resend error:", err);
+                  resendMsg.textContent = "Erro ao reenviar: " + (err.message || "Tente novamente mais tarde.");
+                  resendMsg.style.color = "#ff4040";
+                  resendMsg.style.display = "block";
+                  resendBtn.disabled = false;
+                  resendBtn.textContent = "Reenviar código";
+             }
         });
 
         verifyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const code = document.getElementById('verifyCode').value;
+            const code = document.getElementById('verifyCode').value.trim();
+            const oBtnTxt = verifySubmitBtn.textContent;
+            verifySubmitBtn.disabled = true;
+            verifySubmitBtn.textContent = "Verificando...";
 
             try {
                 // Supabase Verify OTP
@@ -204,15 +374,27 @@
 
                 if (error) throw error;
 
-                if (data.session) {
-                    alert('Conta verificada! Redirecionando...');
+                if (data.session || data.user) {
+                    // Cadastrado e validado com sucesso
+                    alert('Conta verificada e ativada com sucesso! Bem-vindo(a) à Olimpo Pods.');
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('userEmail', data.user.email);
                     window.location.href = 'index.html?signup=success';
                 }
             } catch (err) {
                 console.error('Verification error:', err);
-                alert('Erro na verificação: ' + (err.message || 'Código inválido ou expirado.'));
+                
+                let msg = err.message || 'Código inválido ou expirado.';
+                if (msg.includes('Token has expired')) {
+                     msg = 'Este código expirou. Por favor, solicite o reenvio clicando no botão abaixo.';
+                } else if (msg.includes('Invalid Try') || msg.toLowerCase().includes('otp')) {
+                     msg = 'Erro: Código incorreto.';
+                }
+
+                alert('Falha na verificação: ' + msg);
+            } finally {
+                 verifySubmitBtn.disabled = false;
+                 verifySubmitBtn.textContent = oBtnTxt;
             }
         });
     </script>

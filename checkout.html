@@ -17,6 +17,20 @@
 
 <body class="checkout-page">
 
+    <!-- Announcement Bar -->
+    <div class="top-banner">
+        <div class="banner-track">
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+        </div>
+    </div>
+
     <!-- Header Simplificado -->
     <header class="checkout-header">
         <div class="container">
@@ -127,6 +141,24 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Receberá as opções de frete montadas pelo JS -->
+                    <div id="shipping-options-container" class="hidden" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <h3 style="font-size: 1rem; margin-bottom: 15px; color: #fff;">Opções de Entrega</h3>
+                        <div id="shipping-methods-list" style="display: flex; flex-direction: column; gap: 10px;">
+                            <!-- Exemplo do que será injetado:
+                            <label class="shipping-option">
+                                <input type="radio" name="shippingMethod" value="...">
+                                <div class="shipping-info">
+                                    <span class="shipping-name">PAC</span>
+                                    <span class="shipping-deadline">7 dias úteis</span>
+                                </div>
+                                <span class="shipping-price">R$ 25,00</span>
+                            </label>
+                            -->
+                        </div>
+                    </div>
+
                 </div>
 
                 <!-- Pagamento -->

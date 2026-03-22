@@ -63,6 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
         state: document.getElementById('state')
     };
 
+    window.selectedShippingCost = 0;
+    window.selectedShippingMethod = '';
+
     if (cepInput) {
         let currentCepFetched = "";
         cepInput.addEventListener('input', async (e) => {
@@ -88,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         fields.state.value = data.uf || "";
 
                         showAddressFields();
+                        fetchShippingOptions(val);
 
                         // Focus on number field for better UX
                         const numInput = document.getElementById('number');
@@ -134,7 +138,62 @@ document.addEventListener('DOMContentLoaded', () => {
         addressFields.style.maxHeight = '0';
         addressFields.style.opacity = '0';
         addressFields.style.marginTop = '0';
+        document.getElementById('shipping-options-container')?.classList.add('hidden');
     }
+
+    async function fetchShippingOptions(cep) {
+        const container = document.getElementById('shipping-options-container');
+        const list = document.getElementById('shipping-methods-list');
+        if (!container || !list) return;
+
+        container.classList.remove('hidden');
+
+        const options = [
+            { group: "Correios", isGroupRecommended: false, name: "PAC", price: 140, deadline: "10 dias úteis", recommended: false },
+            { group: "Correios", isGroupRecommended: false, name: "SEDEX", price: 150, deadline: "6 dias úteis", recommended: false },
+            { group: "Transportadoras", isGroupRecommended: true, name: "Jadlog", price: 290, deadline: "12 dias úteis", recommended: false },
+            { group: "Transportadoras", isGroupRecommended: true, name: "Loggi", price: 160, deadline: "15 dias úteis", recommended: false },
+        ];
+
+        let htmlContent = '';
+        let currentGroup = '';
+
+        options.forEach(opt => {
+            if (opt.group !== currentGroup) {
+                currentGroup = opt.group;
+                const groupBadge = opt.isGroupRecommended ? `<span style="background: var(--accent-primary); color: #fff; font-size: 0.70rem; font-weight: bold; padding: 4px 8px; border-radius: 4px; margin-left: 10px; text-transform: uppercase; letter-spacing: 0.5px;">* MAIS INDICADO</span>` : '';
+                htmlContent += `<div style="margin-top: 20px; margin-bottom: 12px; font-weight: 700; color: #fff; font-size: 1.15rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; display: flex; align-items: center;">${currentGroup} ${groupBadge}</div>`;
+            }
+
+            const recBadge = opt.recommended ? `<span style="background: var(--accent-primary); color: #fff; font-size: 0.65rem; font-weight: bold; padding: 3px 6px; border-radius: 4px; margin-left: 8px; text-transform: uppercase; letter-spacing: 0.5px;">* Mais indicado</span>` : '';
+            
+            htmlContent += `
+                <label class="shipping-option" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; cursor:pointer; border:1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; margin-bottom: 10px;">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <input type="radio" name="shippingMethod" value="${opt.price}" data-name="${opt.name}" onchange="updateShippingSelection(this)" style="accent-color: var(--accent-primary); width: 20px; height: 20px; cursor: pointer;">
+                        <div class="shipping-info" style="display:flex; flex-direction:column;">
+                            <span class="shipping-name" style="font-weight:600; color:#fff; font-size:1.1rem; display: flex; align-items: center;">${opt.name} ${recBadge}</span>
+                            <span class="shipping-deadline" style="font-size:0.85rem; color:#aaa; margin-top: 3px;">Entrega em até ${opt.deadline}</span>
+                        </div>
+                    </div>
+                    <span class="shipping-price" style="font-weight:700; color:var(--accent-primary); font-size:1.15rem;">R$ ${opt.price.toFixed(2).replace('.', ',')}</span>
+                </label>
+            `;
+        });
+
+        list.innerHTML = htmlContent;
+
+        // Limpa a seleção forçando o usuário a escolher
+        window.selectedShippingCost = 0;
+        window.selectedShippingMethod = '';
+        if (typeof validateWholesale === 'function') validateWholesale();
+    }
+
+    window.updateShippingSelection = (radio) => {
+        window.selectedShippingCost = parseFloat(radio.value);
+        window.selectedShippingMethod = radio.getAttribute('data-name');
+        if (typeof validateWholesale === 'function') validateWholesale();
+    };
 
 
     // =========================================
@@ -253,23 +312,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const shippingValEl = document.querySelector('.shipping-value');
-            const freeShippingNotice = document.getElementById('free-shipping-notice');
-            if (freeShippingNotice) freeShippingNotice.style.display = 'block';
+            if (freeShippingNotice) {
+                freeShippingNotice.style.display = 'block';
+                if (totalItems >= 50) {
+                    freeShippingNotice.textContent = "✓ Você ganhou frete grátis!";
+                    freeShippingNotice.style.color = "#00ff88";
+                } else {
+                    freeShippingNotice.textContent = `Faltam ${50 - totalItems} peças para ganhar Frete Grátis`;
+                    freeShippingNotice.style.color = "#888";
+                }
+            }
 
-            if (totalItems >= 2) {
+            if (totalItems >= 50) {
                 if (shippingValEl) {
                     shippingValEl.textContent = window.addressIsComplete ? "Grátis" : "---";
                     shippingValEl.style.color = window.addressIsComplete ? "#00ff88" : "";
                 }
             } else {
                 if (shippingValEl) {
-                    shippingValEl.textContent = window.addressIsComplete ? "R$ 25,00" : "---";
+                    shippingValEl.textContent = window.addressIsComplete ? `R$ ${window.selectedShippingCost.toFixed(2).replace('.', ',')}` : "---";
                     shippingValEl.style.color = "";
                 }
             }
 
             // Update Total with shipping
-            const shippingCost = (window.addressIsComplete && totalItems < 2) ? 25 : 0;
+            const shippingCost = (window.addressIsComplete && totalItems < 50) ? window.selectedShippingCost : 0;
             const finalTotal = currentSubtotal + shippingCost;
             if (totalEl) totalEl.textContent = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
 
@@ -277,15 +344,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const freeShippingNotice = document.getElementById('free-shipping-notice');
-        if (freeShippingNotice) freeShippingNotice.style.display = 'none';
-
-        // Wholesale shipping is always free
-        const shippingValEl = document.querySelector('.shipping-value');
-        if (shippingValEl) {
-            shippingValEl.textContent = window.addressIsComplete ? "Grátis" : "---";
-            shippingValEl.style.color = window.addressIsComplete ? "#00ff88" : "";
+        if (freeShippingNotice) {
+            freeShippingNotice.style.display = 'block';
+            if (totalItems >= 50) {
+                freeShippingNotice.textContent = "✓ Você ganhou frete grátis!";
+                freeShippingNotice.style.color = "#00ff88";
+            } else {
+                freeShippingNotice.textContent = `Faltam ${50 - totalItems} peças para ganhar Frete Grátis`;
+                freeShippingNotice.style.color = "#888";
+            }
         }
-        if (totalEl) totalEl.textContent = `R$ ${currentSubtotal.toFixed(2).replace('.', ',')}`;
+
+        const shippingValEl = document.querySelector('.shipping-value');
+        if (totalItems >= 50) {
+            if (shippingValEl) {
+                shippingValEl.textContent = window.addressIsComplete ? "Grátis" : "---";
+                shippingValEl.style.color = window.addressIsComplete ? "#00ff88" : "";
+            }
+        } else {
+            if (shippingValEl) {
+                shippingValEl.textContent = window.addressIsComplete ? `R$ ${window.selectedShippingCost.toFixed(2).replace('.', ',')}` : "---";
+                shippingValEl.style.color = "";
+            }
+        }
+
+        const shippingCost = (window.addressIsComplete && totalItems < 50) ? window.selectedShippingCost : 0;
+        const finalTotal = currentSubtotal + shippingCost;
+        if (totalEl) totalEl.textContent = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
 
         if (totalItems < 10) {
             if (!warning) {
@@ -363,6 +448,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            const totalItems = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
+            if (!window.selectedShippingMethod && totalItems < 50 && localStorage.getItem('ignite_sale_type') !== 'retail') {
+                alert("Por favor, selecione uma opção de entrega antes de finalizar o pedido.");
+                return;
+            }
+
             submitBtn.disabled = true;
             submitBtn.textContent = "Processando...";
 
@@ -386,8 +477,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Calculate shipping before API call to ensure correct total in PIX
             const shippingEl = document.querySelector('.shipping-value');
             const isFreeShipping = shippingEl?.textContent.includes('Grátis');
-            const shippingVal = isFreeShipping ? 0 : 25;
-            const shippingMethod = isFreeShipping ? 'PAC (Grátis)' : 'PAC';
+            const shippingVal = isFreeShipping ? 0 : window.selectedShippingCost;
+            const shippingMethod = isFreeShipping ? 'Grátis (Transportadora Padrão)' : (window.selectedShippingMethod || 'Padrão');
             const finalTotal = parseFloat((subtotal + shippingVal).toFixed(2));
 
             // PIX via servidor local (proxy para ZuckPay)
@@ -519,6 +610,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
                 userOrders.push(newOrder);
                 localStorage.setItem('userOrders', JSON.stringify(userOrders));
+
+                // Send to backend Admin Dashboard globally
+                fetch('/api/orders/new', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newOrder)
+                }).catch(err => console.error("Admin sync error:", err));
 
                 // Automatic Account Creation / Login
                 localStorage.setItem('isLoggedIn', 'true');
@@ -657,9 +755,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "Ignite v400 mix",
             "Blacksheep 30k",
             "Elfbar 40k",
-            "Lostmary 20k",
-            "Oxbar 10k",
-            "Waka 12k"
+            "Lostmary 20k",            "Waka 12k"
         ];
 
         // 1. Inject Bulbs around the container

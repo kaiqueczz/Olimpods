@@ -200,6 +200,83 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
+    // ── SHIPPING ROUTES ──
+    if (req.method === 'POST' && pathname === '/api/shipping') {
+        const body = await readBody(req);
+        let shippingData;
+        try {
+            shippingData = JSON.parse(body);
+        } catch (e) {
+            res.writeHead(400); res.end(JSON.stringify({ status: 'error', message: 'Dados de frete inválidos' }));
+            return;
+        }
+
+        const { calcularPrecoPrazo } = require('correios-brasil');
+
+        // CEP de Origem Fixo (CEP da Empresa Central) 
+        const CEP_ORIGEM = '01001000'; // Exemplo CEP SP Centro, trocar se necessário
+        const CEP_DESTINO = shippingData.cep.replace(/\D/g, '');
+
+        if (!CEP_DESTINO || CEP_DESTINO.length !== 8) {
+            res.writeHead(400); res.end(JSON.stringify({ status: 'error', message: 'CEP de destino inválido' }));
+            return;
+        }
+
+        // Correios Args Setup
+        // format: 1 is Box
+        const correiosArgsPac = {
+            sCepOrigem: CEP_ORIGEM,
+            sCepDestino: CEP_DESTINO,
+            nVlPeso: shippingData.weight || '1',
+            nCdFormato: '1',
+            nVlComprimento: '20',
+            nVlAltura: '20',
+            nVlLargura: '20',
+            nCdServico: ['04510'], // PAC
+            nVlDiametro: '0',
+        };
+
+        const correiosArgsSedex = {
+            ...correiosArgsPac,
+            nCdServico: ['04014'], // SEDEX
+        };
+
+        console.log(`🚚 Calculando frete para CEP: ${CEP_DESTINO}`);
+
+        try {
+            const [pacResult, sedexResult] = await Promise.all([
+                calcularPrecoPrazo(correiosArgsPac),
+                calcularPrecoPrazo(correiosArgsSedex)
+            ]);
+
+            const options = [];
+
+            if (pacResult && pacResult[0] && pacResult[0].Valor) {
+                options.push({
+                    name: 'PAC',
+                    price: parseFloat(pacResult[0].Valor.replace(',', '.')),
+                    deadline: `${pacResult[0].PrazoEntrega} dias úteis`
+                });
+            }
+
+            if (sedexResult && sedexResult[0] && sedexResult[0].Valor) {
+                options.push({
+                    name: 'SEDEX',
+                    price: parseFloat(sedexResult[0].Valor.replace(',', '.')),
+                    deadline: `${sedexResult[0].PrazoEntrega} dias úteis`
+                });
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'success', options }));
+        } catch (err) {
+            console.error('Erro Correios API:', err);
+            res.writeHead(500); res.end(JSON.stringify({ status: 'error', message: 'Erro na integração com os Correios' }));
+        }
+
+        return;
+    }
+
     // ── AUTH ROUTES ──
     const USERS_FILE = path.join(STATIC_DIR, 'users.json');
 
@@ -302,6 +379,129 @@ const server = http.createServer(async (req, res) => {
                 message: 'Login realizado!',
                 user: { name: user.fullname, email: user.email }
             }));
+        }
+        return;
+    }
+
+    // ── ADMIN & ORDERS ROUTES ──
+    const ORDERS_FILE = path.join(STATIC_DIR, 'orders.json');
+
+    function getOrders() {
+        if (!fs.existsSync(ORDERS_FILE)) return [];
+        try {
+            return JSON.parse(fs.readFileSync(ORDERS_FILE, 'utf8'));
+        } catch (e) { return []; }
+    }
+
+    function saveOrders(orders) {
+        fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 4));
+    }
+
+    if (req.method === 'POST' && pathname === '/api/orders/new') {
+        const body = await readBody(req);
+        let orderData;
+        try {
+            orderData = JSON.parse(body);
+        } catch (e) {
+            res.writeHead(400); res.end(JSON.stringify({ status: 'error', message: 'Dados inválidos' }));
+            return;
+        }
+
+        const orders = getOrders();
+        // Prevent duplicates
+        if (!orders.find(o => o.id === orderData.id)) {
+            orders.push(orderData);
+            saveOrders(orders);
+            console.log(`📦 Novo pedido recebido #${orderData.id}`);
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'success' }));
+        return;
+    }
+
+    if (req.method === 'GET' && pathname === '/api/admin/data') {
+        let products = [];
+        try {
+            const PRODUCTS_FILE = path.join(STATIC_DIR, 'products.json');
+            if (fs.existsSync(PRODUCTS_FILE)) {
+                products = JSON.parse(fs.readFileSync(PRODUCTS_FILE, 'utf8'));
+            }
+        } catch(e) {}
+
+        const payload = {
+            status: 'success',
+            users: getUsers(),
+            orders: getOrders(),
+            products: products
+        };
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(payload));
+        return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/admin/dispatch') {
+        const body = await readBody(req);
+        const { orderId, trackingCode } = JSON.parse(body);
+        const orders = getOrders();
+        const order = orders.find(o => o.id === orderId);
+
+        if (!order) {
+            res.writeHead(404); res.end(JSON.stringify({ status: 'error', message: 'Pedido não encontrado' }));
+            return;
+        }
+
+        // Mark as dispatched
+        order.status = 'Enviado';
+        saveOrders(orders);
+
+        // Nodemailer Setup
+        const nodemailer = require('nodemailer');
+        
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                // To DO: Replace with real credentials inside server.js or .env
+                user: 'SEU_EMAIL_AQUI@gmail.com',
+                pass: 'SUA_SENHA_DE_APP_AQUI'
+            }
+        });
+
+        const customerFirstName = (order.customer?.name || 'Cliente').split(' ')[0];
+
+        const mailOptions = {
+            from: 'Olimpo Pods Ignite <noreply@olimpopodsignite.com>',
+            to: order.customer?.email,
+            subject: `Seu pedido #${order.id} foi Despachado! 🚀`,
+            html: `
+                <div style="font-family: Arial, sans-serif; color: #222; max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h2 style="color: #ff0b55; text-transform: uppercase;">Pedido Despachado!</h2>
+                    </div>
+                    <p style="font-size: 16px;">Olá <strong>${customerFirstName}</strong>,</p>
+                    <p style="font-size: 15px; color: #555; line-height: 1.5;">O seu pedido <strong>#${order.id}</strong> foi completamente separado, embalado e está a caminho! Aqui está o seu código de rastreamento para você acompanhar a entrega:</p>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0; text-align: center; border: 2px dashed #ddd;">
+                        <p style="margin: 0; font-size: 14px; color: #888; text-transform: uppercase;">CÓDIGO DE RASTREIO</p>
+                        <p style="margin: 10px 0 0 0; font-size: 28px; font-weight: 900; color: #000; letter-spacing: 2px;">${trackingCode}</p>
+                    </div>
+
+                    <p style="font-size: 14px; color: #777;">Você pode rastrear essa remessa diretamente no site da transportadora responsável ou dos Correios.</p>
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                    <p style="font-size: 12px; color: #999; text-align: center;">Olimpo Pods | Obrigado pela preferência e confiança.</p>
+                </div>
+            `
+        };
+
+        try {
+            await transporter.sendMail(mailOptions);
+            console.log(`✉️  E-mail de rastreio Enviado para ${order.customer?.email}`);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'success', message: 'E-mail enviado e status do pedido atualizado!' }));
+        } catch (err) {
+            console.error('Erro NodeMailer:', err);
+            // Updates locally, but alerts frontend about credentials
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'success', message: 'Separado com sucesso! Mas o e-mail falhou por causa das credenciais não configuradas (Gmail).' }));
         }
         return;
     }

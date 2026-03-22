@@ -1,422 +1,295 @@
 [
-    {
-        "id": "ignite-v300-30000",
-        "brand": "ignite",
-        "name": "IGNITE V300 30.000 New Edition",
-        "price": "111.00",
-        "retail_price": "149.00",
-        "image": "Images Pods/Ignite_v250-removebg-preview.png",
-        "retail_available": false,
-        "flavors": [
-            "Blueberry Ice",
-            "Banana Ice",
-            "Lush Ice (Melancia com mentol)",
-            "Peach Ice",
-            "Mango Ice",
-            "Strawberry Ice",
-            "Grape Ice"
-        ]
-    },
-    {
-        "id": "ignite-v250-25000",
-        "brand": "ignite",
-        "name": "IGNITE V250 25.000 Edition",
-        "price": "103.00",
-        "retail_price": "138.00",
-        "image": "Images Pods/Ignite_v250-removebg-preview.png",
-        "retail_available": false,
-        "flavors": [
-            "Blueberry Ice",
-            "Banana Ice",
-            "Peach Ice",
-            "Mango Ice",
-            "Strawberry Ice"
-        ]
-    },
-    {
-        "id": "ignite-v55-5500",
-        "brand": "ignite",
-        "name": "IGNITE V55 5.500 SLIM EDITION",
-        "price": "73.00",
-        "retail_price": "98.00",
-        "image": "Images Pods/Ignite_v50-removebg-preview.png",
-        "retail_available": false,
-        "flavors": [
-            "Blueberry Ice",
-            "Lush Ice (Melancia com mentol)",
-            "Peach Ice",
-            "Strawberry Ice",
-            "Grape Ice"
-        ]
-    },
-    {
-        "id": "ignite-v155-15500",
-        "brand": "ignite",
-        "name": "IGNITE V155 15.500 ULTRA SLIM",
-        "price": "94.00",
-        "retail_price": "126.00",
-        "image": "Images Pods/Ignite_v150_pro-removebg-preview.png",
-        "retail_available": true,
-        "flavors": [
-            "Blueberry Ice",
-            "Banana Ice",
-            "Lush Ice (Melancia com mentol)",
-            "Peach Ice",
-            "Mango Ice",
-            "Strawberry Ice",
-            "Grape Ice"
-        ]
-    },
-    {
-        "id": "ignite-v400-mix",
-        "brand": "ignite",
-        "name": "IGNITE V400 MIX 40.000 Edition",
-        "price": "126.00",
-        "retail_price": "170.00",
-        "image": "Images Pods/Ignite_v400_mix-removebg-preview.png",
-        "retail_available": false,
-        "flavors": [
-            "Blueberry Ice",
-            "Banana Ice",
-            "Lush Ice (Melancia com mentol)",
-            "Peach Ice"
-        ]
-    },
-    {
-        "id": "ignite-v400-ice",
-        "brand": "ignite",
-        "name": "IGNITE V400 Ice 40.000 Edition",
-        "price": "117.00",
-        "retail_price": "158.00",
-        "image": "Images Pods/Ignite_v400_mix-removebg-preview.png",
-        "retail_available": false,
-        "flavors": [
-            "Mango Ice",
-            "Strawberry Ice",
-            "Grape Ice",
-            "Peach Ice"
-        ]
-    },
-    {
-        "id": "ignite-v80-new",
-        "brand": "ignite",
-        "name": "IGNITE V80 NEW 8.000 Edition",
-        "price": "85.00",
-        "retail_price": "114.00",
-        "image": "Images Pods/Ignite_v80-removebg-preview.png",
-        "retail_available": true,
-        "flavors": [
-            "Blueberry Ice",
-            "Banana Ice",
-            "Lush Ice (Melancia com mentol)",
-            "Peach Ice",
-            "Mango Ice",
-            "Strawberry Ice",
-            "Grape Ice"
-        ]
-    },
-    {
-        "id": "ignite-v120-pro",
-        "brand": "ignite",
-        "name": "IGNITE V120 PRO 12.000 Edition",
-        "price": "83.00",
-        "retail_price": "112.00",
-        "image": "Images Pods/Ignite_v120_pro-removebg-preview.png",
-        "retail_available": false,
-        "flavors": [
-            "Blueberry Ice",
-            "Lush Ice (Melancia com mentol)",
-            "Mango Ice",
-            "Strawberry Ice",
-            "Grape Ice"
-        ]
-    },
-    {
-        "id": "ignite-v150-pro",
-        "brand": "ignite",
-        "name": "IGNITE V150 PRO 15.000 Edition",
-        "price": "82.00",
-        "retail_price": "110.00",
-        "image": "Images Pods/Ignite_v150_pro-removebg-preview.png",
-        "retail_available": true,
-        "flavors": [
-            "Blueberry Ice",
-            "Banana Ice",
-            "Lush Ice (Melancia com mentol)",
-            "Peach Ice",
-            "Mango Ice",
-            "Strawberry Ice",
-            "Grape Ice"
-        ]
-    },
-    {
-        "id": "ignite-v50-5000",
-        "brand": "ignite",
-        "name": "IGNITE V50 5.000 New Edition",
-        "price": "69.00",
-        "retail_price": "93.00",
-        "image": "Images Pods/Ignite_v50-removebg-preview.png",
-        "retail_available": true,
-        "flavors": [
-            "Blueberry Ice",
-            "Lush Ice (Melancia com mentol)",
-            "Peach Ice",
-            "Strawberry Ice",
-            "Grape Ice"
-        ]
-    },
-    {
-        "id": "oxbar-35000-edition",
-        "brand": "oxbar",
-        "name": "OXBAR 35.000 EDITION",
-        "price": "88.00",
-        "retail_price": "119.00",
-        "image": "Images Pods/oxbar-35k-removebg-preview.png",
-        "retail_available": false,
-        "flavors": [
-            "Blueberry Raspberry",
-            "Watermelon Ice",
-            "Mango Ice",
-            "Peach Mango Watermelon",
-            "Strawberry Watermelon",
-            "Cool Mint",
-            "Banana Ice",
-            "Grape Ice"
-        ]
-    },
-    {
-        "id": "oxbar-9500-new",
-        "brand": "oxbar",
-        "name": "OXBAR 9500 NEW EDITION",
-        "price": "66.00",
-        "retail_price": "89.00",
-        "image": "Images Pods/oxbar_9500-removebg-preview.png",
-        "retail_available": false,
-        "flavors": [
-            "Blueberry Raspberry",
-            "Watermelon Ice",
-            "Mango Ice",
-            "Peach Mango Watermelon",
-            "Strawberry Watermelon",
-            "Cool Mint",
-            "Banana Ice",
-            "Grape Ice"
-        ]
-    },
-    {
-        "id": "oxbar-g-prime-25000",
-        "brand": "oxbar",
-        "name": "OXBAR G PRIME 25.000 EDITION",
-        "price": "55.00",
-        "retail_price": "74.00",
-        "image": "Images Pods/Oxbar_G_Prime-removebg-preview.png",
-        "retail_available": true,
-        "flavors": [
-            "Blueberry Raspberry",
-            "Watermelon Ice",
-            "Mango Ice",
-            "Peach Mango Watermelon",
-            "Strawberry Watermelon",
-            "Cool Mint",
-            "Banana Ice",
-            "Grape Ice"
-        ]
-    },
-    {
-        "id": "oxbar-30000-edition",
-        "brand": "oxbar",
-        "name": "OXBAR 30.000 EDITION",
-        "price": "81.00",
-        "retail_price": "109.00",
-        "image": "Images Pods/oxbar_30k-removebg-preview.png",
-        "retail_available": false,
-        "flavors": [
-            "Blueberry Raspberry",
-            "Watermelon Ice",
-            "Mango Ice",
-            "Peach Mango Watermelon",
-            "Strawberry Watermelon",
-            "Cool Mint",
-            "Banana Ice",
-            "Grape Ice"
-        ]
-    },
-    {
-        "id": "blacksheep-30000-2em1",
-        "brand": "blacksheep",
-        "name": "BLACKSHEEP 30.000 | 2 EM 1 EDITION",
-        "price": "109.00",
-        "retail_price": "147.00",
-        "image": "Images Pods/Elfbar_30k-removebg-preview-2.png",
-        "retail_available": false,
-        "flavors": [
-            "Strawberry Banana + Blueberry Ice",
-            "Mango Ice + Peach Ice",
-            "Watermelon Ice + Grape Ice",
-            "Strawberry Ice + Kiwi Passionfruit",
-            "Blueberry Raspberry + Cherry Ice",
-            "Pineapple Ice + Coconut",
-            "Peach Mango + Strawberry Watermelon",
-            "Grape Ice + Strawberry Banana"
-        ]
-    },
-    {
-        "id": "blacksheep-20000-2em1",
-        "brand": "blacksheep",
-        "name": "BLACKSHEEP 20.000 | 2 EM 1 EDITION",
-        "price": "95.00",
-        "retail_price": "128.00",
-        "image": "Images Pods/blacksheep_20k-removebg-preview.png",
-        "retail_available": false,
-        "flavors": [
-            "Strawberry Banana + Blueberry Ice",
-            "Mango Ice + Peach Ice",
-            "Watermelon Ice + Grape Ice",
-            "Strawberry Ice + Kiwi Passionfruit",
-            "Blueberry Raspberry + Cherry Ice",
-            "Pineapple Ice + Coconut",
-            "Peach Mango + Strawberry Watermelon",
-            "Grape Ice + Strawberry Banana"
-        ]
-    },
-    {
-        "id": "lostmary-35000-edition",
-        "brand": "lostmary",
-        "name": "LOST MARY 35.000 EDITION",
-        "price": "91.00",
-        "retail_price": "123.00",
-        "image": "Images Pods/Lost_35k-removebg-preview.png",
-        "retail_available": false,
-        "flavors": [
-            "Blue Razz Ice",
-            "Triple Mango",
-            "Strawberry Ice",
-            "Watermelon Ice",
-            "Pineapple Ice",
-            "Kiwi Passionfruit Guava",
-            "Grape",
-            "Cherry Ice"
-        ]
-    },
-    {
-        "id": "lostmary-20000-edition",
-        "brand": "lostmary",
-        "name": "LOST MARY 20.000 EDITION",
-        "price": "87.00",
-        "retail_price": "117.00",
-        "image": "Images Pods/Lost_20k-removebg-preview.png",
-        "retail_available": true,
-        "flavors": [
-            "Blue Razz Ice",
-            "Triple Mango",
-            "Strawberry Ice",
-            "Watermelon Ice",
-            "Pineapple Ice",
-            "Kiwi Passionfruit Guava",
-            "Grape",
-            "Cherry Ice"
-        ]
-    },
-    {
-        "id": "adjust-40000-edition",
-        "brand": "adjust",
-        "name": "ADJUST 40.000 Edition",
-        "price": "91.00",
-        "retail_price": "123.00",
-        "image": "Images Pods/adjust_40k-removebg-preview.png",
-        "retail_available": false
-    },
-    {
-        "id": "elfbar-40000-edition",
-        "brand": "elfbar",
-        "name": "ELFBAR 40.000 Edition",
-        "price": "111.00",
-        "retail_price": "149.00",
-        "image": "Images Pods/Elfbar_40k_ice_king-removebg-preview.png",
-        "retail_available": false,
-        "flavors": [
-            "Blue Razz Lemonade",
-            "Strawberry Banana",
-            "Watermelon Ice",
-            "Kiwi Passionfruit Guava",
-            "Mango",
-            "Peach Ice",
-            "Strawberry Ice",
-            "Cola",
-            "Pineapple Peach Mango",
-            "Pink Lemonade"
-        ]
-    },
-    {
-        "id": "elfbar-30000-edition",
-        "brand": "elfbar",
-        "name": "ELFBAR 30.000 EDITION",
-        "price": "116.00",
-        "retail_price": "156.00",
-        "image": "Images Pods/Elfbar_30k_TE30K-removebg-preview.png",
-        "retail_available": true,
-        "flavors": [
-            "Blue Razz Lemonade",
-            "Strawberry Banana",
-            "Watermelon Ice",
-            "Kiwi Passionfruit Guava",
-            "Mango",
-            "Peach Ice",
-            "Strawberry Ice",
-            "Cola",
-            "Pineapple Peach Mango",
-            "Pink Lemonade"
-        ]
-    },
-    {
-        "id": "nikbar-40000-edition",
-        "brand": "nikbar",
-        "name": "NIKBAR 40.000 EDITION",
-        "price": "94.00",
-        "retail_price": "126.00",
-        "image": "Images Pods/Nikbar_40k-removebg-preview.png",
-        "retail_available": false
-    },
-    {
-        "id": "elfbar-summer-40000",
-        "brand": "elfbar",
-        "name": "Elfbar Summer edition 40.000",
-        "price": "111.00",
-        "retail_price": "149.00",
-        "image": "Images Pods/elfbar-summer-40k.png",
-        "retail_available": true,
-        "flavors": [
-            "Passion Flash – maracujá + laranja (estilo raspadinha)",
-            "Hawaiian Slush – morango + laranja",
-            "Wild Berry Slush – mix de frutas silvestres",
-            "Green Apple Slush – maçã verde gelada",
-            "Triple Berry – frutas vermelhas",
-            "Cola Slush – raspadinha de cola",
-            "Peach Blue Slush – pêssego + blueberry",
-            "Strawberry Spark – morango cítrico",
-            "Black Mint – menta com amora",
-            "Neon Twist – mix de balas frutadas"
-        ]
-    },
-    {
-        "id": "elfbar-23000-edition",
-        "brand": "elfbar",
-        "name": "ELFBAR 23.000 EDITION",
-        "price": "99.00",
-        "retail_price": "133.00",
-        "image": "Images Pods/elfbar-23k.png",
-        "retail_available": true,
-        "flavors": [
-            "Blue Razz Lemonade",
-            "Strawberry Banana",
-            "Watermelon Ice",
-            "Kiwi Passionfruit Guava",
-            "Mango",
-            "Peach Ice",
-            "Strawberry Ice",
-            "Cola",
-            "Pineapple Peach Mango",
-            "Pink Lemonade"
-        ]
-    }
+  {
+    "id": "elfbar-30k",
+    "brand": "elfbar",
+    "name": "Elfbar 30k",
+    "flavors": [
+      "Não tem muito 🚨",
+      "Strawberry ice",
+      "Strawberry watermelon ice",
+      "Blueberry sour raspberry 10pc",
+      "Green apple ice",
+      "Miami mint"
+    ],
+    "price": "95.00",
+    "retail_price": "145.00",
+    "image": "assets/img/Elfbar_30k-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "elfbar-40k",
+    "brand": "elfbar",
+    "name": "Elfbar 40k",
+    "flavors": [
+      "Não tem muito 🚨🚨",
+      "Strawberry watermelon",
+      "Dragon strawnana",
+      "Double apple ice",
+      "Baja splash",
+      "Summer splash",
+      "Green apple ice",
+      "Strawberry ice"
+    ],
+    "price": "100.00",
+    "retail_price": "150.00",
+    "image": "assets/img/Elfbar_40k-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "elfbar-40k-summer-edition",
+    "brand": "elfbar",
+    "name": "Elfbar 40k Summer Edition",
+    "flavors": [
+      "Tem 10 de cada 🚨🚨🚨🚨",
+      "Raspberry watermelon",
+      "La grape",
+      "Sour strawberry dragon fruit",
+      "Black mint",
+      "Pomegranate blast",
+      "Scary berry",
+      "Cool menthol",
+      "Strawberry orange lime",
+      "Orange blast"
+    ],
+    "price": "100.00",
+    "retail_price": "150.00",
+    "image": "assets/img/Elfbar_40k_summer-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "elfbar-gh-23k",
+    "brand": "elfbar",
+    "name": "Elfbar GH 23k",
+    "flavors": [
+      "Watermelon ice",
+      "Strawberry ice",
+      "Peach mango watermelon",
+      "Strawberries banana",
+      "Miami mint",
+      "Grape ice",
+      "Ice mint",
+      "Spring mint",
+      "Sakura grape",
+      "Baja splash",
+      "Green apple ice",
+      "Blueberry pear",
+      "Blue razz ice cream",
+      "Pineapple plums lime mint",
+      "Lime grapefruit ice"
+    ],
+    "price": "95.00",
+    "retail_price": "145.00",
+    "image": "assets/img/Elfbar_23k-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "ignite-v250",
+    "brand": "ignite",
+    "name": "Ignite V250",
+    "flavors": [
+      "Icy mint",
+      "Menthol",
+      "Grape ice",
+      "Strawberry kiwi 25pc🚨",
+      "Strawberry ice 25pc🚨",
+      "Strawberry banana 25pc🚨",
+      "Watermelon ice 25pc🚨"
+    ],
+    "price": "93.00",
+    "retail_price": "140.00",
+    "image": "assets/img/Ignite_v250-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "ignite-v400-sweet",
+    "brand": "ignite",
+    "name": "Ignite V400 sweet",
+    "flavors": [
+      "Strawberry apple watermelon"
+    ],
+    "price": "95.00",
+    "retail_price": "145.00",
+    "image": "assets/img/Ignite_v400_sweet-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "ignite-v400-mix",
+    "brand": "ignite",
+    "name": "Ignite V400 mix",
+    "flavors": [
+      "Orange - strawberry ice",
+      "Pineapple mango - strawberry",
+      "Watermelon grape - açaí ice",
+      "Banana - strawberry ice",
+      "Grape ice - strawberry",
+      "Blueberry - raspberry blackberry",
+      "Strawberry watermelon - aloe grape",
+      "Mango ice - passion fruit guava",
+      "Peach watermelon - mango ice",
+      "Grape pop - peach ice",
+      "Mighty melon - menthol",
+      "Strawberry watermelon-apple",
+      "Icy mint - peach grape",
+      "Strawberry- grape",
+      "Peach watermelon- mango ice",
+      "Pineapple-passion fruit sour kiwi",
+      "Banana- strawberry mango ice",
+      "Cherry ice - watermelon ice",
+      "Watermelon ice- grape ice"
+    ],
+    "price": "104.00",
+    "retail_price": "160.00",
+    "image": "assets/img/Ignite_v400_mix-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "ignite-v400-ice",
+    "brand": "ignite",
+    "name": "Ignite V400 ice",
+    "flavors": [
+      "Strawberry banana ice",
+      "Strawberry kiwi",
+      "Sakura grape",
+      "Strawberry apple watermelon",
+      "Strawberry",
+      "Strawberry watermelon",
+      "Menthol",
+      "Icy mint",
+      "Grape peach",
+      "Grape",
+      "Watermelon",
+      "Pineapple 15pc 🚨",
+      "Pineapple kiwi dragon fruit 30pc"
+    ],
+    "price": "105.00",
+    "retail_price": "160.00",
+    "image": "assets/img/Ignite_v400_ice-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "ignite-v300",
+    "brand": "ignite",
+    "name": "Ignite V300",
+    "flavors": [
+      "Sweet and sour pomegranate",
+      "Green apple",
+      "Watermelon mix",
+      "Aloe grape ice",
+      "Strawberry banana",
+      "Strawberry ice",
+      "Watermelon ice",
+      "Strawberry kiwi",
+      "Dragon fruit watermelon",
+      "Banana ice"
+    ],
+    "price": "100.00",
+    "retail_price": "150.00",
+    "image": "assets/img/Ignite_v300-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "ignite-v155",
+    "brand": "ignite",
+    "name": "Ignite V155",
+    "flavors": [
+      "Blueberry ice",
+      "Kiwi passion fruit guava",
+      "Strawberry ice",
+      "Strawberry watermelon ice",
+      "Banana ice 10pc"
+    ],
+    "price": "83.00",
+    "retail_price": "125.00",
+    "image": "assets/img/Ignite_v155-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "ignite-v80",
+    "brand": "ignite",
+    "name": "Ignite V80",
+    "flavors": [
+      "Frozen mint",
+      "Arctic gum",
+      "Spearmint gum",
+      "Grape ice",
+      "Strawberry kiwi",
+      "Menthol",
+      "Icy mint",
+      "Blueberry lemon",
+      "Frozen mint water",
+      "Grapefruit mint",
+      "Frozen cola",
+      "Açaí ice",
+      "Frozen apple",
+      "Banana ice",
+      "Apple mint",
+      "Blueberry ice",
+      "Frozen blueberry",
+      "Passion fruit sour kiwi"
+    ],
+    "price": "77.00",
+    "retail_price": "120.00",
+    "image": "assets/img/Ignite_v80-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "v300-ultra-slim",
+    "brand": "ignite",
+    "name": "V300 ultra slim",
+    "flavors": [
+      "15 de cada sabor 🚨🚨🚨",
+      "Minty melon",
+      "Watermelon ice",
+      "Cactus lime soda",
+      "Blueberry ice",
+      "Aloe grape ice",
+      "Banana coconut water 10pc"
+    ],
+    "price": "105.00",
+    "retail_price": "160.00",
+    "image": "assets/img/Ignite_v300_ultra_thin-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "black-sheep-30k",
+    "brand": "blacksheep",
+    "name": "Black sheep 30k",
+    "flavors": [
+      "Grape - passion fruit 20pc🚨"
+    ],
+    "price": "93.00",
+    "retail_price": "140.00",
+    "image": "assets/img/Elfbar_30k-removebg-preview-2.png",
+    "retail_available": true
+  },
+  {
+    "id": "p100-kit",
+    "brand": "ignite",
+    "name": "P100 kit",
+    "flavors": [
+      "30pc 🚨🚨🚨",
+      "Green apple",
+      "Menthol"
+    ],
+    "price": "95.00",
+    "retail_price": "145.00",
+    "image": "assets/img/Ignite_p100_kit-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "cartucho-p100",
+    "brand": "ignite",
+    "name": "cartucho p100",
+    "flavors": [
+      "Watermelon ice",
+      "Banana ice",
+      "Grape ice",
+      "Blueberry ice",
+      "Strawberry kiwi"
+    ],
+    "price": "60.00",
+    "retail_price": "90.00",
+    "image": "assets/img/Cartucho_ignite_p100-removebg-preview.png",
+    "retail_available": true
+  }
 ]

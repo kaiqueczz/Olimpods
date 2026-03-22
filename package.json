@@ -1,0 +1,26 @@
+{
+  "name": "projeto-lp-ignite",
+  "version": "1.0.0",
+  "description": "",
+  "main": "account.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaiqueczz/Olimpods.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/kaiqueczz/Olimpods/issues"
+  },
+  "homepage": "https://github.com/kaiqueczz/Olimpods#readme",
+  "dependencies": {
+    "correios-brasil": "^3.0.6",
+    "nodemailer": "^8.0.3"
+  }
+}

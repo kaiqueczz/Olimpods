@@ -884,21 +884,308 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadProducts() {
     // Fallback data for local testing (CORS workaround)
     const fallbackProducts = [
-      { "id": "ignite-v300-30000", "brand": "ignite", "name": "IGNITE V300 30.000 New Edition", "price": "98.00", "image": "Images Pods/Ignite_v250-removebg-preview.png" },
-      { "id": "ignite-v250-25000", "brand": "ignite", "name": "IGNITE V250 25.000 Edition", "price": "90.00", "image": "Images Pods/Ignite_v250-removebg-preview.png" },
-      { "id": "ignite-v55-5500", "brand": "ignite", "name": "IGNITE V55 5.500 SLIM EDITION", "price": "65.00", "image": "Images Pods/Ignite_v50-removebg-preview.png" },
-      { "id": "lostmary-35000-edition", "brand": "lostmary", "name": "LOST MARY 35.000 EDITION", "price": "91.00", "retail_price": "123.00", "image": "Images Pods/Lost_35k-removebg-preview.png" },
-      { "id": "elfbar-summer-40000", "brand": "elfbar", "name": "Elfbar Summer edition 40.000", "price": "111.00", "retail_price": "149.00", "image": "Images Pods/elfbar-summer-40k.png" },
-      { "id": "elfbar-23000-edition", "brand": "elfbar", "name": "ELFBAR 23.000 EDITION", "price": "99.00", "retail_price": "133.00", "image": "Images Pods/elfbar-23k.png" }
+      {
+        "id": "elfbar-30k",
+        "brand": "elfbar",
+        "name": "Elfbar 30k",
+        "flavors": [
+          "Não tem muito 🚨",
+          "Strawberry ice",
+          "Strawberry watermelon ice",
+          "Blueberry sour raspberry 10pc",
+          "Green apple ice",
+          "Miami mint"
+        ],
+        "price": "95.00",
+        "retail_price": "145.00",
+        "image": "assets/img/Elfbar_30k-removebg-preview.png",
+        "retail_available": true
+      },
+      {
+        "id": "elfbar-40k",
+        "brand": "elfbar",
+        "name": "Elfbar 40k",
+        "flavors": [
+          "Não tem muito 🚨🚨",
+          "Strawberry watermelon",
+          "Dragon strawnana",
+          "Double apple ice",
+          "Baja splash",
+          "Summer splash",
+          "Green apple ice",
+          "Strawberry ice"
+        ],
+        "price": "100.00",
+        "retail_price": "150.00",
+        "image": "assets/img/Elfbar_40k-removebg-preview.png",
+        "retail_available": true
+      },
+      {
+        "id": "elfbar-40k-summer-edition",
+        "brand": "elfbar",
+        "name": "Elfbar 40k Summer Edition",
+        "flavors": [
+          "Tem 10 de cada 🚨🚨🚨🚨",
+          "Raspberry watermelon",
+          "La grape",
+          "Sour strawberry dragon fruit",
+          "Black mint",
+          "Pomegranate blast",
+          "Scary berry",
+          "Cool menthol",
+          "Strawberry orange lime",
+          "Orange blast"
+        ],
+        "price": "100.00",
+        "retail_price": "150.00",
+        "image": "assets/img/Elfbar_40k_summer-removebg-preview.png",
+        "retail_available": true
+      },
+      {
+        "id": "elfbar-gh-23k",
+        "brand": "elfbar",
+        "name": "Elfbar GH 23k",
+        "flavors": [
+          "Watermelon ice",
+          "Strawberry ice",
+          "Peach mango watermelon",
+          "Strawberries banana",
+          "Miami mint",
+          "Grape ice",
+          "Ice mint",
+          "Spring mint",
+          "Sakura grape",
+          "Baja splash",
+          "Green apple ice",
+          "Blueberry pear",
+          "Blue razz ice cream",
+          "Pineapple plums lime mint",
+          "Lime grapefruit ice"
+        ],
+        "price": "95.00",
+        "retail_price": "145.00",
+        "image": "assets/img/Elfbar_23k-removebg-preview.png",
+        "retail_available": true
+      },
+      {
+        "id": "ignite-v250",
+        "brand": "ignite",
+        "name": "Ignite V250",
+        "flavors": [
+          "Icy mint",
+          "Menthol",
+          "Grape ice",
+          "Strawberry kiwi 25pc🚨",
+          "Strawberry ice 25pc🚨",
+          "Strawberry banana 25pc🚨",
+          "Watermelon ice 25pc🚨"
+        ],
+        "price": "93.00",
+        "retail_price": "140.00",
+        "image": "assets/img/Ignite_v250-removebg-preview.png",
+        "retail_available": true
+      },
+      {
+        "id": "ignite-v400-sweet",
+        "brand": "ignite",
+        "name": "Ignite V400 sweet",
+        "flavors": [
+          "Strawberry apple watermelon"
+        ],
+        "price": "95.00",
+        "retail_price": "145.00",
+        "image": "assets/img/Ignite_v400_sweet-removebg-preview.png",
+        "retail_available": true
+      },
+      {
+        "id": "ignite-v400-mix",
+        "brand": "ignite",
+        "name": "Ignite V400 mix",
+        "flavors": [
+          "Orange - strawberry ice",
+          "Pineapple mango - strawberry",
+          "Watermelon grape - açaí ice",
+          "Banana - strawberry ice",
+          "Grape ice - strawberry",
+          "Blueberry - raspberry blackberry",
+          "Strawberry watermelon - aloe grape",
+          "Mango ice - passion fruit guava",
+          "Peach watermelon - mango ice",
+          "Grape pop - peach ice",
+          "Mighty melon - menthol",
+          "Strawberry watermelon-apple",
+          "Icy mint - peach grape",
+          "Strawberry- grape",
+          "Peach watermelon- mango ice",
+          "Pineapple-passion fruit sour kiwi",
+          "Banana- strawberry mango ice",
+          "Cherry ice - watermelon ice",
+          "Watermelon ice- grape ice"
+        ],
+        "price": "104.00",
+        "retail_price": "160.00",
+        "image": "assets/img/Ignite_v400_mix-removebg-preview.png",
+        "retail_available": true
+      },
+      {
+        "id": "ignite-v400-ice",
+        "brand": "ignite",
+        "name": "Ignite V400 ice",
+        "flavors": [
+          "Strawberry banana ice",
+          "Strawberry kiwi",
+          "Sakura grape",
+          "Strawberry apple watermelon",
+          "Strawberry",
+          "Strawberry watermelon",
+          "Menthol",
+          "Icy mint",
+          "Grape peach",
+          "Grape",
+          "Watermelon",
+          "Pineapple 15pc 🚨",
+          "Pineapple kiwi dragon fruit 30pc"
+        ],
+        "price": "105.00",
+        "retail_price": "160.00",
+        "image": "assets/img/Ignite_v400_ice-removebg-preview.png",
+        "retail_available": true
+      },
+      {
+        "id": "ignite-v300",
+        "brand": "ignite",
+        "name": "Ignite V300",
+        "flavors": [
+          "Sweet and sour pomegranate",
+          "Green apple",
+          "Watermelon mix",
+          "Aloe grape ice",
+          "Strawberry banana",
+          "Strawberry ice",
+          "Watermelon ice",
+          "Strawberry kiwi",
+          "Dragon fruit watermelon",
+          "Banana ice"
+        ],
+        "price": "100.00",
+        "retail_price": "150.00",
+        "image": "assets/img/Ignite_v300-removebg-preview.png",
+        "retail_available": true
+      },
+      {
+        "id": "ignite-v155",
+        "brand": "ignite",
+        "name": "Ignite V155",
+        "flavors": [
+          "Blueberry ice",
+          "Kiwi passion fruit guava",
+          "Strawberry ice",
+          "Strawberry watermelon ice",
+          "Banana ice 10pc"
+        ],
+        "price": "83.00",
+        "retail_price": "125.00",
+        "image": "assets/img/Ignite_v155-removebg-preview.png",
+        "retail_available": true
+      },
+      {
+        "id": "ignite-v80",
+        "brand": "ignite",
+        "name": "Ignite V80",
+        "flavors": [
+          "Frozen mint",
+          "Arctic gum",
+          "Spearmint gum",
+          "Grape ice",
+          "Strawberry kiwi",
+          "Menthol",
+          "Icy mint",
+          "Blueberry lemon",
+          "Frozen mint water",
+          "Grapefruit mint",
+          "Frozen cola",
+          "Açaí ice",
+          "Frozen apple",
+          "Banana ice",
+          "Apple mint",
+          "Blueberry ice",
+          "Frozen blueberry",
+          "Passion fruit sour kiwi"
+        ],
+        "price": "77.00",
+        "retail_price": "120.00",
+        "image": "assets/img/Ignite_v80-removebg-preview.png",
+        "retail_available": true
+      },
+      {
+        "id": "v300-ultra-slim",
+        "brand": "ignite",
+        "name": "V300 ultra slim",
+        "flavors": [
+          "15 de cada sabor 🚨🚨🚨",
+          "Minty melon",
+          "Watermelon ice",
+          "Cactus lime soda",
+          "Blueberry ice",
+          "Aloe grape ice",
+          "Banana coconut water 10pc"
+        ],
+        "price": "105.00",
+        "retail_price": "160.00",
+        "image": "assets/img/Ignite_v300_ultra_thin-removebg-preview.png",
+        "retail_available": true
+      },
+      {
+        "id": "black-sheep-30k",
+        "brand": "blacksheep",
+        "name": "Black sheep 30k",
+        "flavors": [
+          "Grape - passion fruit 20pc🚨"
+        ],
+        "price": "93.00",
+        "retail_price": "140.00",
+        "image": "assets/img/Elfbar_30k-removebg-preview-2.png",
+        "retail_available": true
+      },
+      {
+        "id": "p100-kit",
+        "brand": "ignite",
+        "name": "P100 kit",
+        "flavors": [
+          "30pc 🚨🚨🚨",
+          "Green apple",
+          "Menthol"
+        ],
+        "price": "95.00",
+        "retail_price": "145.00",
+        "image": "assets/img/Ignite_p100_kit-removebg-preview.png",
+        "retail_available": true
+      },
+      {
+        "id": "cartucho-p100",
+        "brand": "ignite",
+        "name": "cartucho p100",
+        "flavors": [
+          "Watermelon ice",
+          "Banana ice",
+          "Grape ice",
+          "Blueberry ice",
+          "Strawberry kiwi"
+        ],
+        "price": "60.00",
+        "retail_price": "90.00",
+        "image": "assets/img/Cartucho_ignite_p100-removebg-preview.png",
+        "retail_available": true
+      }
     ];
 
     try {
-      const response = await fetch('products.json');
+      const response = await fetch('products.json?v=' + new Date().getTime());
       if (!response.ok) throw new Error();
       allProducts = await response.json();
       renderProducts('all');
     } catch (err) {
-      console.warn('Usando dados de fallback (local test).');
+      console.warn('Usando dados de fallback (local test ou erro CORS).');
       allProducts = fallbackProducts;
       renderProducts('all');
     }
@@ -1246,9 +1533,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (accountBtn) {
       if (isLoggedIn) {
         accountBtn.setAttribute('title', `Logado como ${session.user.email}`);
+        accountBtn.href = 'account.html'; // Redireciona para o painel se já logado
       } else {
         accountBtn.setAttribute('title', 'Minha Conta');
-        accountBtn.href = 'login.html';
+        accountBtn.href = 'login.html'; // Envia para login se deslogado
       }
     }
 
@@ -1272,39 +1560,19 @@ document.addEventListener('DOMContentLoaded', () => {
     window.toggleOrdersSidebar(true);
   });
 
+  // Handle Account Btn explicitly for faster routing
+  accountBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (localStorage.getItem('isLoggedIn') === 'true') {
+      window.location.href = 'account.html';
+    } else {
+      window.location.href = 'login.html';
+    }
+  });
+
   document.getElementById('closeOrders')?.addEventListener('click', () => window.toggleOrdersSidebar(false));
 
-  // Dummy Order Generation (Temporary for UI analysis)
-  if (!localStorage.getItem('userOrders') || JSON.parse(localStorage.getItem('userOrders')).length === 0) {
-    const dummyOrder = {
-      id: 54321,
-      date: new Date().toLocaleDateString('pt-BR'),
-      customer: {
-        name: "João Silva",
-        email: "joao@exemplo.com",
-        phone: "(11) 98888-7777"
-      },
-      shipping: {
-        cep: "01001-000",
-        address: "Praça da Sé",
-        number: "100",
-        neighborhood: "Sé",
-        city: "São Paulo",
-        state: "SP",
-        cost: 0,
-        method: "PAC (Grátis)"
-      },
-      items: [
-        { name: "IGNITE V150 15.000", qty: 2, price: 85.00, flavor: "Watermelon Ice" },
-        { name: "ELF BAR BC10000", qty: 1, price: 95.00, flavor: "Blue Razz Ice" }
-      ],
-      subtotal: 265.00,
-      total: 265.00,
-      status: 'Em processamento',
-      agency: 'Agência Olimpo Pods - Centro'
-    };
-    localStorage.setItem('userOrders', JSON.stringify([dummyOrder]));
-  }
+  // Lista de Pedidos (vazia inicialmente a menos que exista fetch real do servidor)
 
   checkAuthState();
   // Ensure UI matches state on load

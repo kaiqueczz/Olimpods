@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Olimpo Admin Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <img src="assets/logo-ignite.png" alt="Olimpo Admin" class="rotating-logo" style="width: 80px;">
+            <span style="margin-top: 15px;">DASHBOARD</span>
+        </div>
+        <ul class="nav-links">
+            <li class="active" data-target="orders-view">📦 Controle de pedidos</li>
+            <li data-target="finance-view">💰 Financeiro</li>
+            <li data-target="stock-view">🏢 Controle de Estoque</li>
+            <li data-target="leads-view">👥 Leads Cadastrados</li>
+        </ul>
+        <button id="logout-btn" class="logout-btn">Sair do Painel</button>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <h1 style="color: var(--accent); text-transform: uppercase; font-weight: 900; letter-spacing: 1px; font-size: 2.2rem;">VISÃO GERAL</h1>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <h3>Total de Pedidos</h3>
+                    <p id="total-orders-count">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Leads Registrados</h3>
+                    <p id="total-users-count">0</p>
+                </div>
+            </div>
+        </header>
+
+        <div id="orders-view" class="view-section active">
+            <div class="section-header">
+                <h2>Controle de pedidos</h2>
+                <button id="refresh-orders" class="refresh-btn">⟳ Atualizar</button>
+            </div>
+            
+            <div id="orders-container" class="orders-grid">
+                <!-- Orders will be injected here via JS -->
+            </div>
+        </div>
+
+        <div id="finance-view" class="view-section">
+            <div class="section-header">
+                <h2>Faturamento e Receita</h2>
+            </div>
+            <div class="stats-row" style="margin-bottom: 30px;">
+                <div class="stat-card" style="border-left: 4px solid #00ff88;">
+                    <h3>Faturamento (Aprovados)</h3>
+                    <p id="total-revenue">R$ 0,00</p>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid #ffaa00;">
+                    <h3>Faturamento (Pendentes)</h3>
+                    <p id="pending-revenue">R$ 0,00</p>
+                </div>
+            </div>
+            <div class="table-card">
+                <table class="leads-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>ID Pedido</th>
+                            <th>Cliente</th>
+                            <th>Valor</th>
+                            <th>Status Pagamento</th>
+                        </tr>
+                    </thead>
+                    <tbody id="finance-tbody">
+                        <!-- Transações -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="stock-view" class="view-section">
+            <div class="section-header">
+                <h2>Controle de Estoque (Catálogo)</h2>
+                <div>
+                    <span style="font-size:0.8rem; color:var(--text-muted); margin-right:15px;">Métrica simulada baseada nos pedidos</span>
+                </div>
+            </div>
+            
+            <div class="orders-grid" id="stock-container">
+                <!-- Stock cards will be injected here -->
+            </div>
+        </div>
+
+        <div id="leads-view" class="view-section">
+            <div class="section-header">
+                <h2>Leads Recentes (Newsletter/Cadastros)</h2>
+            </div>
+            
+            <div class="table-card">
+                <table class="leads-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Telefone/WhatsApp</th>
+                            <th>Status Verificação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leads-tbody">
+                        <!-- Leads will be injected here via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Rastreio -->
+    <div id="tracking-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Disparar Pedido Pronto</h3>
+            <p>Informe o código de rastreio para enviar automaticamente por e-mail para <strong id="customer-name-display"></strong>.</p>
+            
+            <div class="input-group">
+                <label>Código de Rastreio (Correios/Transportadora)</label>
+                <input type="text" id="tracking-code-input" placeholder="Ex: QA123456789BR">
+            </div>
+
+            <div class="modal-actions">
+                <button id="cancel-tracking" class="btn-cancel">Cancelar</button>
+                <button id="confirm-tracking" class="btn-primary">Aprovar e Enviar E-mail</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
