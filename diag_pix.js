@@ -1,14 +1,16 @@
 const https = require('https');
 
-const ZUCKPAY_CLIENT_ID = 'sb_publishable_vF_WZOOcya33E4cr64mWkQ__B5QAhFc';
-const ZUCKPAY_CLIENT_SECRET = 'sb_secret_cMcD4XPobEb4M7JREQTkeQ__j6rN4th';
+const ZUCKPAY_CLIENT_ID = 'kaiquejucas3_6052315761';
+const ZUCKPAY_CLIENT_SECRET = '13e8d60b1aebd51a1de6080ab6d1641c45b6671677dfc74b5da99f039929ca10';
 const ZUCKPAY_AUTH = 'Basic ' + Buffer.from(`${ZUCKPAY_CLIENT_ID}:${ZUCKPAY_CLIENT_SECRET}`).toString('base64');
 
 const payload = JSON.stringify({
     nome: 'Teste Antigravity',
     cpf: '12345678909',
+    email: 'teste@olimpo.com',
+    telefone: '11999999999',
     valor: 1.50,
-    urlnoty: 'https://olimpomods.com.br/webhook/zuckpay'
+    urlnoty: 'https://olimpoods.digital/webhook/zuckpay'
 });
 
 const options = {

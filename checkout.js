@@ -472,8 +472,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const pixPayload = {
                 nome: name,
                 cpf: cpf.replace(/\D/g, ''),
+                email: document.getElementById('email').value,
+                telefone: document.getElementById('phone').value.replace(/\D/g, ''),
                 valor: finalTotal,
-                urlnoty: 'https://olimpomods.com.br/webhook/zuckpay'
+                urlnoty: 'https://olimpoods.digital/webhook/zuckpay'
             };
 
             const MAX_RETRIES = 3;
