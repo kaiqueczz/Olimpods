@@ -630,6 +630,18 @@ input {
   animation: fadeInUp 0.8s 0.6s var(--ease-smooth) both;
 }
 
+@media (max-width: 768px) {
+  .hero-subtitle {
+    font-size: 0.85rem;
+    padding: 0 10px;
+    max-width: 380px; /* Aligns visually with the width of the H1 on typical 390px screens */
+    margin: 0 auto 30px;
+  }
+  .hero h1.gradual-spacing .gs-char {
+    font-size: clamp(2rem, 10vw, 3rem) !important;
+  }
+}
+
 .hero-cta {
   display: inline-block;
   padding: 14px 36px;
