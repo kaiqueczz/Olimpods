@@ -632,11 +632,12 @@ input {
 
 @media (max-width: 768px) {
   .hero-subtitle {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
+    letter-spacing: -0.01em;
     padding: 0;
     width: 100%;
-    max-width: 95vw;
-    margin: 0 auto 30px;
+    max-width: 100%;
+    margin: 0 auto 25px;
   }
   .hero h1.gradual-spacing .gs-char {
     font-size: clamp(2rem, 10vw, 3rem) !important;
