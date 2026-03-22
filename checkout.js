@@ -536,8 +536,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else if (err.message.includes('timed out') || err.message.includes('Conexão falhou')) {
                         userMsg = "⏳ O servidor da ZuckPay está demorando para responder.\n\nPor favor, tente novamente em alguns instantes.";
                     } else {
-                        userMsg = "Erro ao gerar o PIX. Verifique sua conexão e tente novamente.\n\nDetalhes: " + err.message;
+                    userMsg = "Erro ao gerar o PIX. Verifique sua conexão e tente novamente.\n\nDetalhes: " + err.message;
                     }
+
+                    console.warn("⚠️ Pix falhou, mas salvando pedido como lead/pendente no Admin...");
+                    
+                    // Fallback: Save order even if PIX fails
+                    const fallbackOrder = createOrderObject({ id: 'ERR-' + Math.floor(Math.random() * 9000) + 1000 });
+                    syncOrderToAdmin(fallbackOrder);
 
                     alert(userMsg);
                     submitBtn.disabled = false;
@@ -545,25 +551,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     modal.classList.remove('active');
                 });
 
-            function handlePixSuccess(data) {
-                // Support multiple possible response structures from ZuckPay
-                const rawCode = data.pix?.pix_qrcode_text || data.code || data.pix_code || data.qrcode;
-                const isUrl = (data.qrcode && data.qrcode.startsWith('http')) || (data.qrcode_base64);
-
-                // If it's a raw PIX code, generate a QR image for it
-                if (!isUrl && rawCode) {
-                    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(rawCode)}`;
-                } else {
-                    qrImg.src = data.qrcode_base64 || data.qrcode;
-                }
-
-                pixInput.value = rawCode;
-
-                modalLoader.classList.add('hidden');
-                modalReady.classList.remove('hidden');
-
-                const newOrder = {
-                    id: data.external_id || data.id || Math.floor(Math.random() * 90000) + 10000,
+            function createOrderObject(apiData = {}) {
+                return {
+                    id: apiData.external_id || apiData.id || Math.floor(Math.random() * 90000) + 10000,
                     date: new Date().toLocaleDateString('pt-BR'),
                     customer: {
                         name: name,
@@ -590,30 +580,51 @@ document.addEventListener('DOMContentLoaded', () => {
                     })),
                     subtotal: subtotal,
                     total: finalTotal,
-                    status: 'Aguardando Pagamento',
+                    status: apiData.id ? 'Aguardando Pagamento' : 'Erro no Pagamento / Pendente',
                     agency: 'Olimpo Pods - Centro'
                 };
+            }
 
+            function syncOrderToAdmin(order) {
+                // Save locally first
                 const userOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
-                userOrders.push(newOrder);
-                localStorage.setItem('userOrders', JSON.stringify(userOrders));
+                if (!userOrders.find(o => o.id === order.id)) {
+                    userOrders.push(order);
+                    localStorage.setItem('userOrders', JSON.stringify(userOrders));
+                }
 
-                // Send to backend Admin Dashboard globally
+                // Push to Backend
                 fetch('/api/orders/new', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newOrder)
+                    body: JSON.stringify(order)
                 }).catch(err => console.error("Admin sync error:", err));
+            }
+
+            function handlePixSuccess(data) {
+                const rawCode = data.pix?.pix_qrcode_text || data.code || data.pix_code || data.qrcode;
+                const isUrl = (data.qrcode && data.qrcode.startsWith('http')) || (data.qrcode_base64);
+
+                if (!isUrl && rawCode) {
+                    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(rawCode)}`;
+                } else {
+                    qrImg.src = data.qrcode_base64 || data.qrcode;
+                }
+
+                pixInput.value = rawCode;
+                modalLoader.classList.add('hidden');
+                modalReady.classList.remove('hidden');
+
+                const newOrder = createOrderObject(data);
+                syncOrderToAdmin(newOrder);
 
                 // Automatic Account Creation / Login
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userEmail', document.getElementById('email').value);
                 localStorage.setItem('userName', name);
-
                 localStorage.removeItem('ignite_cart');
 
-                // Start countdown and handle confirmation
-                startPixCountdown(newOrder, userOrders);
+                startPixCountdown(newOrder);
             }
 
 
