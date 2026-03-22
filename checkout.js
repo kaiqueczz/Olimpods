@@ -410,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.addEventListener('click', () => {
             if (submitBtn.disabled) return;
 
-            const required = ['email', 'name', 'phone', 'cpf', 'cep', 'address', 'number', 'password', 'confirm-password'];
+            const required = ['email', 'name', 'phone', 'cpf', 'cep', 'address', 'number'];
             let hasError = false;
 
             required.forEach(id => {
@@ -427,19 +427,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (emailEl && !validateEmail(emailEl.value)) {
                 emailEl.style.borderColor = '#ff0b55';
                 alert("Por favor, insira um e-mail válido.");
-                return;
-            }
-
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-
-            if (password.length < 6) {
-                alert("A senha deve ter pelo menos 6 caracteres.");
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                alert("As senhas não coincidem.");
                 return;
             }
 

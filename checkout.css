@@ -92,54 +92,7 @@ body.checkout-page {
     align-items: start;
 }
 
-@media (max-width: 1024px) {
-    .checkout-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
 
-    .checkout-summary {
-        order: -1;
-        /* Resumo no topo no mobile */
-    }
-
-    .summary-card {
-        position: static;
-        margin-top: 0;
-        padding: 20px;
-    }
-}
-
-@media (max-width: 768px) {
-    .checkout-header .logo img {
-        height: 44px;
-    }
-
-    .checkout-main {
-        padding: 20px 0 40px;
-    }
-
-    .checkout-card {
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-
-    .card-title {
-        font-size: 1.15rem;
-        margin-bottom: 20px;
-    }
-
-    .btn-checkout-submit {
-        padding: 16px;
-        font-size: 1rem;
-    }
-}
 
 /* Cards */
 .checkout-card {
@@ -759,4 +712,63 @@ body.checkout-page {
     color: #00ff88;
     transform: scale(1.1);
     transition: all 0.3s ease;
+}
+
+/* ==================================== */
+/* MOBILE RESPONSIVE QUERIES (AT THE END)*/
+/* ==================================== */
+
+@media (max-width: 1024px) {
+    .checkout-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .checkout-summary {
+        order: -1;
+        /* Resumo no topo no mobile */
+    }
+
+    .summary-card {
+        position: static;
+        margin-top: 0;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    body.checkout-page {
+        overflow-x: hidden;
+    }
+
+    .checkout-header .logo img {
+        height: 44px;
+    }
+
+    .checkout-main {
+        padding: 20px 0 40px;
+        overflow-x: hidden;
+    }
+
+    .checkout-card {
+        padding: 24px 20px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+
+    .card-title {
+        font-size: 1.15rem;
+        margin-bottom: 20px;
+    }
+
+    .btn-checkout-submit {
+        padding: 16px;
+        font-size: 1rem;
+    }
 }
