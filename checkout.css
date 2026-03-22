@@ -722,17 +722,18 @@ body.checkout-page {
     .checkout-grid {
         display: flex !important;
         flex-direction: column-reverse !important;
-        gap: 20px;
+        gap: 30px;
     }
 
     .checkout-summary {
-        margin-bottom: 10px;
+        margin-bottom: 20px;
+        width: 100%;
     }
 
     .summary-card {
         position: static;
         margin-top: 0;
-        padding: 20px;
+        padding: 25px;
     }
 }
 
@@ -742,28 +743,42 @@ body.checkout-page {
     }
 
     .checkout-main {
-        padding: 20px 0 40px;
+        padding: 20px 0 60px;
     }
 
     .checkout-card {
-        padding: 24px 20px;
-        margin-bottom: 20px;
+        padding: 30px 20px;
+        margin-bottom: 25px;
         box-sizing: border-box;
+        width: 100%;
+    }
+
+    .form-group input {
+        padding: 18px 16px; /* Increased bar size */
+        font-size: 1.05rem;
     }
 
     .form-row {
         display: flex !important;
         flex-direction: column !important;
-        gap: 15px;
+        gap: 20px;
     }
 
     .card-title {
-        font-size: 1.15rem;
-        margin-bottom: 20px;
+        font-size: 1.3rem;
+        margin-bottom: 25px;
     }
 
     .btn-checkout-submit {
-        padding: 16px;
-        font-size: 1rem;
+        padding: 20px;
+        font-size: 1.1rem;
+        border-radius: 12px;
+    }
+
+    .checkout-summary .summary-title {
+        font-size: 1.4rem;
+        text-align: center;
+        border-bottom: 1px solid var(--border-subtle);
+        padding-bottom: 15px;
     }
 }
