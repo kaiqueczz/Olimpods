@@ -720,14 +720,13 @@ body.checkout-page {
 
 @media (max-width: 1024px) {
     .checkout-grid {
-        display: flex;
-        flex-direction: column;
+        display: flex !important;
+        flex-direction: column-reverse !important;
         gap: 20px;
     }
 
     .checkout-summary {
-        order: -1;
-        /* Resumo no topo no mobile */
+        margin-bottom: 10px;
     }
 
     .summary-card {
@@ -738,17 +737,12 @@ body.checkout-page {
 }
 
 @media (max-width: 768px) {
-    body.checkout-page {
-        overflow-x: hidden;
-    }
-
     .checkout-header .logo img {
         height: 44px;
     }
 
     .checkout-main {
         padding: 20px 0 40px;
-        overflow-x: hidden;
     }
 
     .checkout-card {
@@ -758,7 +752,8 @@ body.checkout-page {
     }
 
     .form-row {
-        grid-template-columns: 1fr !important;
+        display: flex !important;
+        flex-direction: column !important;
         gap: 15px;
     }
 
