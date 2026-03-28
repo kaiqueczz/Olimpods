@@ -5,7 +5,16 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Forced login check removed to allow automatic account creation during checkout
+    // =========================================
+    // 0. API Config
+    // =========================================
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isNodePort = window.location.port === '3000';
+    
+    // Se estivermos no localhost:3000 ou em qualquer outro domínio (produção), 
+    // usamos caminhos relativos para garantir que o fetch acerte o servidor correto.
+    const API_BASE = (isLocalhost && !isNodePort) ? 'http://localhost:3000' : '';
+
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     // const checkoutWrapper = document.getElementById('checkout-wrapper'); 
     // ^ Variable kept if needed later, but auth-shield is gone.
@@ -51,9 +60,150 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // =========================================
-    // 2. Smart Shipping (CEP Lookup)
+    // 0. Checkout Store Logic (Up-sell & Sync)
     // =========================================
+    let checkoutCart = [];
+    let currentSubtotal = 0;
+
+    const syncCartFromStorage = () => {
+        const stored = localStorage.getItem('ignite_cart');
+        try {
+            checkoutCart = stored ? JSON.parse(stored) : [];
+            if (typeof renderCart === 'function') renderCart();
+        } catch (e) {
+            console.error("Cart sync error:", e);
+            checkoutCart = [];
+        }
+    };
+
+    // Initial load
+    syncCartFromStorage();
+
+    // Emergency sync if cart is empty on start (prevents race conditions)
+    if (checkoutCart.length === 0) {
+        setTimeout(syncCartFromStorage, 300);
+    }
+
+    // Listen for storage changes (multi-tab sync)
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'ignite_cart') {
+            syncCartFromStorage();
+        }
+    });
+
+    // Meta Pixel: InitiateCheckout (on land)
+    if (window.fbq) fbq('track', 'InitiateCheckout');
+
+    const checkoutUpsellGrid = document.getElementById('checkout-upsell-products');
+    const nextBtn = document.getElementById('nextBtnCheckout');
+
+    const prevBtn = document.getElementById('prevBtnCheckout');
+
+    async function loadCheckoutUpsellProducts() {
+        if (!checkoutUpsellGrid) return;
+        try {
+            const response = await fetch('products.json?v=' + Date.now());
+            if (!response.ok) throw new Error("Falha ao carregar products.json");
+            const allProducts = await response.json();
+            
+            updateCheckoutUpsell(allProducts || []);
+        } catch (error) {
+            console.error("Erro ao carregar sugestões, usando fallback:", error);
+            updateCheckoutUpsell(window.PRODUCTS_DATA || []);
+        }
+    }
+
+    function updateCheckoutUpsell(allProducts) {
+        if (!checkoutUpsellGrid) return;
+        const cartBrands = [...new Set(checkoutCart.map(item => item.brand || 'Olimpo'))];
+        const sorted = [...allProducts].sort((a, b) => {
+            const aMatch = cartBrands.includes(a.brand || 'Olimpo');
+            const bMatch = cartBrands.includes(b.brand || 'Olimpo');
+            if (aMatch && !bMatch) return -1;
+            if (!aMatch && bMatch) return 1;
+            return 0;
+        });
+        renderCheckoutUpsellProducts(sorted);
+    }
+
+    function renderCheckoutUpsellProducts(products) {
+        if (!checkoutUpsellGrid) return;
+        checkoutUpsellGrid.innerHTML = '';
+        const totalItemsCount = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
+        const hasDiscount = (totalItemsCount >= 30);
+
+        products.forEach((p, idx) => {
+            const card = document.createElement('div');
+            card.className = 'product-card animate-in';
+            card.style.animationDelay = `${idx * 0.05}s`;
+            
+            let imgSrc = p.image || 'assets/logo-ignite.png';
+            if (imgSrc && !imgSrc.includes('/') && !imgSrc.startsWith('http')) {
+                imgSrc = 'Images Pods/' + imgSrc;
+            }
+
+            const price = parseFloat(p.price);
+            const discountPrice = price * 0.95;
+            
+            const priceHtml = hasDiscount 
+                ? `<span class="original" style="text-decoration: line-through; color: #888; font-size: 0.8rem; margin-right: 5px;">R$ ${price.toFixed(2).replace('.', ',')}</span> <span class="current" style="color: #ff0b55;">R$ ${discountPrice.toFixed(2).replace('.', ',')}</span>`
+                : `<span class="current">R$ ${price.toFixed(2).replace('.', ',')}</span>`;
+
+            card.innerHTML = `
+                <div class="product-image">
+                    <img src="${imgSrc}" alt="${p.name}" class="product-img-real" onerror="this.src='assets/logo-ignite.png'">
+                </div>
+                <div class="product-info">
+                    <div class="product-brand">${p.brand || 'Olimpo'}</div>
+                    <div class="product-name">${p.name}</div>
+                    <div class="product-footer">
+                        <div class="product-price">
+                            ${priceHtml}
+                        </div>
+                        <button class="add-cart-btn" onclick="addToCartFromCheckout('${p.id}', '${p.name}', ${parseFloat(p.price)}, '${p.image || ''}')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            checkoutUpsellGrid.appendChild(card);
+        });
+        updateArrows();
+    }
+
+    const updateArrows = () => {
+        if (prevBtn) {
+            if (checkoutUpsellGrid.scrollLeft <= 5) prevBtn.classList.add('hidden');
+            else prevBtn.classList.remove('hidden');
+        }
+        if (nextBtn) {
+            if (checkoutUpsellGrid.scrollLeft + checkoutUpsellGrid.clientWidth >= checkoutUpsellGrid.scrollWidth - 5) nextBtn.classList.add('hidden');
+            else nextBtn.classList.remove('hidden');
+        }
+    };
+
+    if (nextBtn) {
+        nextBtn.onclick = () => {
+            checkoutUpsellGrid.scrollBy({ left: 305, behavior: 'smooth' });
+            setTimeout(updateArrows, 400);
+        };
+    }
+    if (prevBtn) {
+        prevBtn.onclick = () => {
+            checkoutUpsellGrid.scrollBy({ left: -305, behavior: 'smooth' });
+            setTimeout(updateArrows, 400);
+        };
+    }
+
+
+    checkoutUpsellGrid.addEventListener('scroll', updateArrows);
+    loadCheckoutUpsellProducts();
+
+
+
+
     const addressFields = document.getElementById('address-fields');
+
     const cepLoading = document.querySelector('.cep-loading');
 
     const fields = {
@@ -147,14 +297,55 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container || !list) return;
 
         container.classList.remove('hidden');
+        list.innerHTML = '<p style="color: #888; padding: 10px;">Calculando opções de frete...</p>';
 
-        const options = [
-            { group: "Correios", isGroupRecommended: false, name: "PAC", price: 140, deadline: "10 dias úteis", recommended: false },
-            { group: "Correios", isGroupRecommended: false, name: "SEDEX", price: 150, deadline: "6 dias úteis", recommended: false },
-            { group: "Transportadoras", isGroupRecommended: true, name: "Jadlog", price: 290, deadline: "12 dias úteis", recommended: false },
-            { group: "Transportadoras", isGroupRecommended: true, name: "Loggi", price: 160, deadline: "15 dias úteis", recommended: false },
-        ];
+        try {
+            const totalItems = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
+            const apiUrl = `${API_BASE}/api/shipping`;
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    cep: cep,
+                    weight: Math.ceil(totalItems * 0.1) // Estimativa: 100g por pod
+                })
+            });
 
+            const data = await response.json();
+            
+            if (data.status === 'success' && data.options && data.options.length > 0) {
+                // All 4 options come from the server with group info
+                const allOptions = data.options.map(opt => ({
+                    ...opt,
+                    isGroupRecommended: opt.group === 'Transportadoras',
+                    recommended: false
+                }));
+
+                renderShippingList(allOptions);
+            } else {
+                throw new Error("Nenhuma opção de frete retornada");
+            }
+        } catch (error) {
+            console.error("Erro ao carregar frete real, usando fallback:", error);
+            // Fallback para não travar o checkout
+            const fallbackOptions = [
+                { group: "Correios", isGroupRecommended: false, name: "PAC", price: 70.00, deadline: "10 dias úteis", recommended: false },
+                { group: "Correios", isGroupRecommended: false, name: "SEDEX", price: 100.00, deadline: "6 dias úteis", recommended: false },
+                { group: "Transportadoras", isGroupRecommended: true, name: "Loggi", price: 160.00, deadline: "15 dias úteis", recommended: false },
+                { group: "Transportadoras", isGroupRecommended: true, name: "Jadlog", price: 220.00, deadline: "12 dias úteis", recommended: false },
+            ];
+            renderShippingList(fallbackOptions);
+
+        }
+
+        // Limpa a seleção forçando o usuário a escolher
+        window.selectedShippingCost = 0;
+        window.selectedShippingMethod = '';
+        if (typeof validateWholesale === 'function') validateWholesale();
+    }
+
+    function renderShippingList(options) {
+        const list = document.getElementById('shipping-methods-list');
         let htmlContent = '';
         let currentGroup = '';
 
@@ -182,11 +373,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         list.innerHTML = htmlContent;
-
-        // Limpa a seleção forçando o usuário a escolher
-        window.selectedShippingCost = 0;
-        window.selectedShippingMethod = '';
-        if (typeof validateWholesale === 'function') validateWholesale();
     }
 
     window.updateShippingSelection = (radio) => {
@@ -219,11 +405,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalEl = document.getElementById('summary-total');
     const submitBtn = document.getElementById('submit-purchase');
 
-    let checkoutCart = JSON.parse(localStorage.getItem('ignite_cart')) || [];
-    let currentSubtotal = 0; // Broader scope for validation
+    // checkoutCart already managed by syncCartFromStorage()
+    // currentSubtotal already declared at top level
 
-    window.updateCheckoutQty = (index, delta) => {
-        checkoutCart[index].quantity += delta;
+    window.updateCheckoutQty = (index, delta, manualValue = null) => {
+        if (manualValue !== null) {
+            checkoutCart[index].quantity = Math.max(1, parseInt(manualValue) || 1);
+        } else {
+            checkoutCart[index].quantity += delta;
+        }
+
         if (checkoutCart[index].quantity < 1) {
             window.removeCheckoutItem(index);
         } else {
@@ -249,19 +440,30 @@ document.addEventListener('DOMContentLoaded', () => {
         summaryItems.innerHTML = '';
         currentSubtotal = 0;
 
+        const totalItemsCount = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
+        const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
+        const hasDiscount = (saleType === 'wholesale' && totalItemsCount >= 30 && totalItemsCount < 50);
+
         checkoutCart.forEach((item, index) => {
             const price = parseFloat(item.price);
-            currentSubtotal += price * item.quantity;
+            const itemTotal = price * item.quantity;
+            currentSubtotal += itemTotal;
 
             const itemEl = document.createElement('div');
             itemEl.className = 'cart-item';
 
-            // Ensure image path is correct
             let imgSrc = item.image || 'assets/logo-ignite.png';
-            // If it's a simple filename like 'Ignite_v300-removebg-preview.png', prepend 'Images Pods/'
             if (imgSrc && !imgSrc.includes('/') && !imgSrc.startsWith('http')) {
                 imgSrc = 'Images Pods/' + imgSrc;
             }
+
+            const unitPriceHtml = hasDiscount 
+                ? `<span style="text-decoration: line-through; color: #888; font-size: 0.75rem;">R$ ${price.toFixed(2).replace('.', ',')}</span> <span style="color: #ff0b55;">R$ ${(price * 0.95).toFixed(2).replace('.', ',')}</span>`
+                : `R$ ${price.toFixed(2).replace('.', ',')}`;
+
+            const totalItemPriceHtml = hasDiscount
+                ? `R$ ${(itemTotal * 0.95).toFixed(2).replace('.', ',')}`
+                : `R$ ${itemTotal.toFixed(2).replace('.', ',')}`;
 
             itemEl.innerHTML = `
                 <div class="item-img">
@@ -270,19 +472,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="item-info">
                     <span class="item-name">${item.name}</span>
                     <span class="item-flavor">Sabor: ${item.flavor || 'N/A'}</span>
+                    <div class="item-price-unit" style="font-size: 0.85rem; margin-top: 4px;">Preço unit: ${unitPriceHtml}</div>
                     <div class="item-controls">
                         <div class="qty-stepper">
                             <button onclick="updateCheckoutQty(${index}, -1)">-</button>
-                            <span>${item.quantity}</span>
+                            <input type="number" class="qty-stepper-val" value="${item.quantity}" min="1" onchange="updateCheckoutQty(${index}, 0, this.value)">
                             <button onclick="updateCheckoutQty(${index}, 1)">+</button>
                         </div>
                         <button class="btn-remove-checkout" onclick="removeCheckoutItem(${index})">Remover</button>
                     </div>
                 </div>
-                <div class="item-price">R$ ${(price * item.quantity).toFixed(2).replace('.', ',')}</div>
+                <div class="item-price">${totalItemPriceHtml}</div>
             `;
             summaryItems.appendChild(itemEl);
         });
+
 
         if (subtotalEl) subtotalEl.textContent = `R$ ${currentSubtotal.toFixed(2).replace('.', ',')}`;
         if (totalEl) totalEl.textContent = `R$ ${currentSubtotal.toFixed(2).replace('.', ',')}`;
@@ -300,108 +504,136 @@ document.addEventListener('DOMContentLoaded', () => {
     function validateWholesale() {
         const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
         const totalItems = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
-        const warningId = 'wholesale-warning';
-        let warning = document.getElementById(warningId);
-
-        if (saleType === 'retail') {
-            if (warning) warning.remove();
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.style.opacity = '1';
-                submitBtn.style.cursor = 'pointer';
-            }
-
-            const shippingValEl = document.querySelector('.shipping-value');
-            if (freeShippingNotice) {
-                freeShippingNotice.style.display = 'block';
-                if (totalItems >= 50) {
-                    freeShippingNotice.textContent = "✓ Você ganhou frete grátis!";
-                    freeShippingNotice.style.color = "#00ff88";
-                } else {
-                    freeShippingNotice.textContent = `Faltam ${50 - totalItems} peças para ganhar Frete Grátis`;
-                    freeShippingNotice.style.color = "#888";
-                }
-            }
-
-            if (totalItems >= 50) {
-                if (shippingValEl) {
-                    shippingValEl.textContent = window.addressIsComplete ? "Grátis" : "---";
-                    shippingValEl.style.color = window.addressIsComplete ? "#00ff88" : "";
-                }
-            } else {
-                if (shippingValEl) {
-                    shippingValEl.textContent = window.addressIsComplete ? `R$ ${window.selectedShippingCost.toFixed(2).replace('.', ',')}` : "---";
-                    shippingValEl.style.color = "";
-                }
-            }
-
-            // Update Total with shipping
-            const shippingCost = (window.addressIsComplete && totalItems < 50) ? window.selectedShippingCost : 0;
-            const finalTotal = currentSubtotal + shippingCost;
-            if (totalEl) totalEl.textContent = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
-
-            return;
-        }
-
+        const stickyBar = document.getElementById('stickyUpsellBar');
+        const stickyMsg = document.getElementById('upsellMessage');
+        const stickyFill = document.getElementById('upsellProgressFill');
         const freeShippingNotice = document.getElementById('free-shipping-notice');
-        if (freeShippingNotice) {
-            freeShippingNotice.style.display = 'block';
-            if (totalItems >= 50) {
-                freeShippingNotice.textContent = "✓ Você ganhou frete grátis!";
-                freeShippingNotice.style.color = "#00ff88";
+        const staticProgressFill = document.getElementById('upsellProgressFillCheckout');
+        const staticMessage = document.querySelector('.checkout-upsell-promo p');
+
+        // Rewards Logic
+        let discount = 0;
+        let isFreeShipping = false;
+        let showUpsell = false;
+        let finalProgress = 0;
+        let msg = "";
+
+        if (saleType === 'wholesale') {
+            showUpsell = true;
+            if (totalItems < 10) {
+                finalProgress = (totalItems / 10) * 20;
+                msg = `Faltam <b>${10 - totalItems}</b> itens para liberar o Atacado`;
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = '0.5';
+                    submitBtn.style.cursor = 'not-allowed';
+                }
             } else {
-                freeShippingNotice.textContent = `Faltam ${50 - totalItems} peças para ganhar Frete Grátis`;
-                freeShippingNotice.style.color = "#888";
-            }
-        }
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                }
 
-        const shippingValEl = document.querySelector('.shipping-value');
-        if (totalItems >= 50) {
-            if (shippingValEl) {
-                shippingValEl.textContent = window.addressIsComplete ? "Grátis" : "---";
-                shippingValEl.style.color = window.addressIsComplete ? "#00ff88" : "";
+                if (totalItems < 30) {
+                    finalProgress = 20 + ((totalItems - 10) / 20) * 40;
+                    msg = `Faltam <b>${30 - totalItems}</b> itens para 5% de desconto`;
+                    if (stickyFill) stickyFill.classList.remove('glow');
+                } else if (totalItems < 50) {
+                    discount = currentSubtotal * 0.05;
+                    finalProgress = 60 + ((totalItems - 30) / 20) * 40;
+                    msg = `🎉 5% OFF Ativado! Faltam <b>${50 - totalItems}</b> para <b>Frete Grátis</b>`;
+                    if (stickyFill) stickyFill.classList.add('glow');
+                } else {
+                    // Stacking Rewards: 5% OFF persists plus Free Shipping
+                    discount = currentSubtotal * 0.05;
+                    isFreeShipping = true;
+                    finalProgress = 100;
+                    msg = `🔥 Frete Grátis e 5% OFF Ativados! Nível Máximo Alcançado.`;
+                    showUpsell = false; 
+                    if (stickyFill) stickyFill.classList.add('glow');
+                }
+
             }
         } else {
-            if (shippingValEl) {
-                shippingValEl.textContent = window.addressIsComplete ? `R$ ${window.selectedShippingCost.toFixed(2).replace('.', ',')}` : "---";
-                shippingValEl.style.color = "";
+            // Retail Mode (Varejo)
+            // Rule: 50 items for free shipping
+            showUpsell = false;
+            if (totalItems >= 50) isFreeShipping = true;
+        }
+
+        // Update the textual notice above the items
+        if (freeShippingNotice) {
+            if (isFreeShipping) {
+                freeShippingNotice.textContent = "✓ Você ganhou frete grátis!";
+                freeShippingNotice.style.color = "#ff0b55";
+            } else if (saleType === 'wholesale') {
+                freeShippingNotice.textContent = `Adicione ${50 - totalItems} peças e ganhe frete grátis`;
+                freeShippingNotice.style.color = "#ff0b55";
+            } else {
+                freeShippingNotice.textContent = `Faltam ${50 - totalItems} para Frete Grátis`;
             }
         }
 
-        const shippingCost = (window.addressIsComplete && totalItems < 50) ? window.selectedShippingCost : 0;
-        const finalTotal = currentSubtotal + shippingCost;
+        // Apply visual updates to Sticky Bar (Hidden on checkout, using Static instead)
+        if (stickyBar) {
+            stickyBar.classList.remove('active');
+        }
+
+        // Apply visual updates to Static Bar (Checkout Layout) - Focus on 30 units
+        if (staticProgressFill) {
+            const visualProgress = Math.min((totalItems / 30) * 100, 100);
+            staticProgressFill.style.width = `${visualProgress}%`;
+            
+            if (totalItems >= 30) {
+                staticProgressFill.classList.add('glow');
+                if (staticMessage) {
+                    staticMessage.innerHTML = `<span style="font-size: 1.1rem; text-shadow: 0 0 10px rgba(255, 11, 85, 0.5);">🎉 PARABÉNS! Você ganhou 5% de desconto!</span>`;
+                }
+            } else {
+                staticProgressFill.classList.remove('glow');
+                if (staticMessage) {
+                    staticMessage.innerHTML = `Faltam <strong>${30 - totalItems}</strong> peças para ganhar <strong>5% de Desconto</strong>!`;
+                }
+            }
+        }
+
+
+
+
+        // --- Recalculate Totals & Update UI ---
+        const shippingEl = document.querySelector('.shipping-value');
+        let shippingVal = window.addressIsComplete ? (window.selectedShippingCost || 0) : 0;
+        
+        if (isFreeShipping && window.addressIsComplete) {
+            if (shippingEl) {
+                shippingEl.textContent = 'Grátis 🚀';
+                shippingEl.style.color = '#ff0b55';
+            }
+            shippingVal = 0;
+        } else if (shippingEl) {
+            shippingEl.textContent = window.addressIsComplete ? `R$ ${shippingVal.toFixed(2).replace('.', ',')}` : "Calculando...";
+            shippingEl.style.color = "";
+        }
+
+        const discountedSubtotal = currentSubtotal - discount;
+        const finalTotal = discountedSubtotal + shippingVal;
+
+        if (subtotalEl) {
+            if (discount > 0) {
+                subtotalEl.innerHTML = `
+                    <span style="text-decoration: line-through; color: #888; font-size: 0.8rem;">R$ ${currentSubtotal.toFixed(2).replace('.', ',')}</span>
+                    <span style="color: #ff0b55;">R$ ${discountedSubtotal.toFixed(2).replace('.', ',')}</span>
+                    <div style="font-size: 0.7rem; color: #ff0b55;">(5% de desconto aplicado)</div>
+                `;
+            } else {
+                subtotalEl.textContent = `R$ ${currentSubtotal.toFixed(2).replace('.', ',')}`;
+            }
+        }
+
         if (totalEl) totalEl.textContent = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
-
-        if (totalItems < 10) {
-            if (!warning) {
-                warning = document.createElement('div');
-                warning.id = warningId;
-                warning.style.color = '#ff0b55';
-                warning.style.background = 'rgba(255, 11, 85, 0.1)';
-                warning.style.padding = '15px';
-                warning.style.borderRadius = '8px';
-                warning.style.marginBottom = '20px';
-                warning.style.fontSize = '0.9rem';
-                warning.style.fontWeight = '600';
-                warning.style.border = '1px solid rgba(255, 11, 85, 0.2)';
-                const grid = document.querySelector('.checkout-grid');
-                if (grid) grid.parentNode.insertBefore(warning, grid);
-            }
-            warning.innerHTML = `⚠️ <strong>Atenção:</strong> Pedidos somente acima de 10 peças. Você tem apenas ${totalItems}. <a href="index.html#produtos" style="color: var(--accent-primary); text-decoration: underline;">Adicione mais itens</a> para finalizar.`;
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.style.opacity = '0.5';
-                submitBtn.style.cursor = 'not-allowed';
-            }
-        } else {
-            if (warning) warning.remove();
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.style.opacity = '1';
-                submitBtn.style.cursor = 'pointer';
-            }
-        }
     }
+
 
     // =========================================
     // 5. Submit Order (ZuckPay Integration)
@@ -459,14 +691,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = document.getElementById('name').value;
             const cpf = document.getElementById('cpf').value;
             const items = checkoutCart;
-            const subtotal = items.reduce((sum, i) => sum + (parseFloat(i.price) * i.quantity), 0);
+            
+            // Re-calcular subtotal com desconto de 5% se total >= 30 (Sincronizado com validateWholesale)
+            const baseSubtotal = items.reduce((sum, i) => sum + (parseFloat(i.price) * i.quantity), 0);
+            const totalItemsCount = items.reduce((sum, i) => sum + i.quantity, 0);
+            let discount = 0;
+            if (totalItemsCount >= 30) {
+                // Discount now persists correctly for all items >= 30
+                discount = baseSubtotal * 0.05;
+            }
+            const discountedSubtotal = baseSubtotal - discount;
 
-            // Calculate shipping before API call to ensure correct total in PIX
+            // Calculate shipping
             const shippingEl = document.querySelector('.shipping-value');
             const isFreeShipping = shippingEl?.textContent.includes('Grátis');
             const shippingVal = isFreeShipping ? 0 : window.selectedShippingCost;
             const shippingMethod = isFreeShipping ? 'Grátis (Transportadora Padrão)' : (window.selectedShippingMethod || 'Padrão');
-            const finalTotal = parseFloat((subtotal + shippingVal).toFixed(2));
+            const finalTotal = parseFloat((discountedSubtotal + shippingVal).toFixed(2));
 
             // PIX via servidor local (proxy para ZuckPay)
             const pixPayload = {
@@ -479,50 +720,47 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             const MAX_RETRIES = 3;
-            const RETRY_DELAY = 3000; // 3 seconds between retries
+            const RETRY_DELAY = 3000;
 
             async function attemptPixGeneration(attempt) {
                 console.log(`🔄 PIX: Tentativa ${attempt}/${MAX_RETRIES}...`);
 
                 try {
-                    const res = await fetch('/api/pix/qrcode', {
+                    const apiUrl = `${API_BASE}/api/pix/qrcode`;
+                    const res = await fetch(apiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(pixPayload)
                     });
 
+                    // Robust Check: If not JSON or not OK, inspect body
+                    const contentType = res.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        const text = await res.text();
+                        console.error("❌ Resposta não-JSON:", text);
+                        throw new Error(`Erro no servidor (não-JSON). Status: ${res.status}`);
+                    }
+
                     const data = await res.json();
 
-                    // Check for success (ZuckPay real response uses payment_code or pix object)
-                    if (data.status === 'success' || data.qrcode || data.pix_code || data.code || data.payment_code || data.pix) {
-                        console.log("✅ PIX gerado com sucesso na tentativa", attempt);
+                    if (data.transactionId || data.status === 'PENDING' || data.status === 'success' || data.qrcode || data.pix_code) {
+                        console.log("✅ PIX gerado com sucesso. Transaction:", data.transactionId);
                         return data;
                     }
 
-                    // API returned an error
-                    console.warn(`⚠️ PIX tentativa ${attempt} falhou:`, data);
-
-                    // If we have retries left and the error is transient
-                    if (attempt < MAX_RETRIES) {
-                        const isTransient = res.status >= 500 || res.status === 404;
-                        if (isTransient) {
-                            console.log(`⏳ Aguardando ${RETRY_DELAY / 1000}s antes da próxima tentativa...`);
-                            await new Promise(r => setTimeout(r, RETRY_DELAY));
-                            return attemptPixGeneration(attempt + 1);
-                        }
-                    }
-
-                    // Non-retryable or exhausted retries
-                    throw new Error(data.message || "Erro na API ZuckPay");
-
-                } catch (err) {
-                    // Network-level fetch errors (server offline, etc.)
-                    if (attempt < MAX_RETRIES) {
-                        console.log(`⏳ Erro de rede, tentando novamente em ${RETRY_DELAY / 1000}s...`);
+                    if (attempt < MAX_RETRIES && (res.status >= 500 || res.status === 404)) {
+                        console.log(`⏳ Tentando novamente em ${RETRY_DELAY/1000}s...`);
                         await new Promise(r => setTimeout(r, RETRY_DELAY));
                         return attemptPixGeneration(attempt + 1);
                     }
 
+                    throw new Error(data.message || 'Erro na API ZuckPay: resposta inesperada');
+
+                } catch (err) {
+                    if (attempt < MAX_RETRIES && !err.message.includes('não-JSON')) {
+                        await new Promise(r => setTimeout(r, RETRY_DELAY));
+                        return attemptPixGeneration(attempt + 1);
+                    }
                     throw err;
                 }
             }
@@ -532,13 +770,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 .catch(err => {
                     console.error("❌ Falha definitiva na geração do PIX:", err);
 
+                    modal.classList.remove('active'); // Destrava o loader
+                    
                     let userMsg;
                     if (err.message.includes('403')) {
                         userMsg = "⚠️ A API da ZuckPay bloqueou a requisição (erro 403).\n\nIsso pode significar que sua conta precisa de atenção. Entre em contato com o suporte da ZuckPay.";
                     } else if (err.message.includes('timed out') || err.message.includes('Conexão falhou')) {
                         userMsg = "⏳ O servidor da ZuckPay está demorando para responder.\n\nPor favor, tente novamente em alguns instantes.";
                     } else {
-                    userMsg = "Erro ao gerar o PIX. Verifique sua conexão e tente novamente.\n\nDetalhes: " + err.message;
+                        userMsg = "Erro ao gerar o PIX. Verifique sua conexão e tente novamente.\n\nDetalhes: " + err.message;
                     }
 
                     console.warn("⚠️ Pix falhou, mas salvando pedido como lead/pendente no Admin...");
@@ -580,7 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         image: i.image,
                         flavor: i.flavor
                     })),
-                    subtotal: subtotal,
+                    subtotal: discountedSubtotal,
                     total: finalTotal,
                     status: apiData.id ? 'Aguardando Pagamento' : 'Erro no Pagamento / Pendente',
                     agency: 'Olimpo Pods - Centro'
@@ -596,7 +836,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Push to Backend
-                fetch('/api/orders/new', {
+                const apiUrl = `${API_BASE}/api/orders/new`;
+                fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(order)
@@ -604,26 +845,46 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             function handlePixSuccess(data) {
-                const rawCode = data.pix?.pix_qrcode_text || data.code || data.pix_code || data.qrcode;
-                const isUrl = (data.qrcode && data.qrcode.startsWith('http')) || (data.qrcode_base64);
+                // ZuckPay response format: { transactionId, qrcode, pix_code, qrcode_image, checkout_url, status }
+                const rawCode = data.pix_code || data.qrcode || data.pix?.pix_qrcode_text || data.code || '';
+                const qrImageUrl = data.qrcode_image || '';
 
-                if (!isUrl && rawCode) {
+                // Use direct QR image URL from ZuckPay if available, otherwise generate via external API
+                if (qrImageUrl) {
+                    qrImg.src = qrImageUrl;
+                } else if (rawCode) {
                     qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(rawCode)}`;
-                } else {
-                    qrImg.src = data.qrcode_base64 || data.qrcode;
                 }
 
                 pixInput.value = rawCode;
                 modalLoader.classList.add('hidden');
                 modalReady.classList.remove('hidden');
 
-                const newOrder = createOrderObject(data);
+                // Use transactionId as the order ID
+                const orderData = {
+                    ...data,
+                    id: data.transactionId || data.external_id || data.id || Math.floor(Math.random() * 90000) + 10000
+                };
+
+                const newOrder = createOrderObject(orderData);
                 syncOrderToAdmin(newOrder);
 
                 // Automatic Account Creation / Login
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userEmail', document.getElementById('email').value);
                 localStorage.setItem('userName', name);
+                
+                // Meta Pixel: Purchase
+                if (window.fbq) {
+                    const totalValue = parseFloat(document.getElementById('final-total')?.textContent.replace('R$ ', '').replace(',', '.')) || 0;
+                    fbq('track', 'Purchase', {
+                        value: totalValue,
+                        currency: 'BRL',
+                        content_ids: checkoutCart.map(item => item.id),
+                        content_type: 'product'
+                    });
+                }
+
                 localStorage.removeItem('ignite_cart');
 
                 startPixCountdown(newOrder);
@@ -652,10 +913,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Active Polling for Real Payment Status (via local proxy)
                     pollInterval = setInterval(() => {
                         const orderId = orderObj.id;
-                        fetch('/api/pix/status/' + orderId, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({})
+                        const statusUrl = `${API_BASE}/api/pix/status/` + orderId;
+                    fetch(statusUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ order_id: orderId })
                         })
                             .then(res => res.json())
                             .then(data => {
@@ -682,6 +944,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     orderObj.status = "Pago & Aprovado";
                     localStorage.setItem('userOrders', JSON.stringify(ordersList));
+                    
+                    // Trigger PDF generation on server
+                    const payUrl = `${API_BASE}/api/orders/${orderObj.id}/pay`;
+                fetch(payUrl, { method: 'POST' })
+                    .then(() => {
+                    })
+                        .catch(err => console.warn("Erro ao notificar servidor sobre pagamento:", err));
 
                     const readyMsg = document.querySelector('.modal-subtitle');
                     if (readyMsg) {

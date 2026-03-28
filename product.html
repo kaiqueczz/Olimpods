@@ -252,11 +252,30 @@
         }
 
         .q-val {
-            width: 40px;
+            width: 50px; /* Slightly wider for input */
             text-align: center;
             font-weight: 600;
             border-left: 1px solid var(--border-subtle);
             border-right: 1px solid var(--border-subtle);
+            background: transparent;
+            color: #fff;
+            border-top: none;
+            border-bottom: none;
+            font-size: 1rem;
+            -moz-appearance: textfield; /* Remove arrows in Firefox */
+            appearance: none;
+        }
+
+        .q-val::-webkit-outer-spin-button,
+        .q-val::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 0;
+        }
+
+        .q-val:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .btn-buy {
@@ -274,6 +293,7 @@
             align-items: center;
             justify-content: center;
         }
+        
 
         .btn-add-cart {
             flex: 1;
@@ -406,7 +426,7 @@
         }
 
         .opt-price.free {
-            color: #00ff88;
+            color: #ff0b55;
         }
 
         @media (max-width: 992px) {
@@ -442,9 +462,40 @@
             }
         }
     </style>
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1423800812314865');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1423800812314865&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
 </head>
 
 <body>
+
+    <!-- Announcement Bar -->
+    <div class="top-banner">
+        <div class="banner-track">
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+        </div>
+    </div>
 
 
 
@@ -514,6 +565,30 @@
             <div class="loading-state">Carregando produto...</div>
         </div>
     </main>
+
+    <section class="checkout-extra-products">
+        <div class="container">
+            <div class="checkout-upsell-promo">
+                <p id="productUpsellPromoText">A partir de 30 unidades ganhe <strong>5% de Desconto</strong>!</p>
+                <div class="upsell-info" style="max-width: 600px; margin: 0 auto;">
+                    <div class="upsell-progress-container" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); height: 12px; border-radius: 6px; overflow: hidden;">
+                        <div class="upsell-progress-fill" id="productUpsellProgressFill" style="height: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="upsell-products-wrapper">
+                <button class="carousel-nav-btn prev" id="prevBtnProduct" aria-label="Anterior">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <div class="upsell-carousel" id="product-upsell-carousel">
+                    <div style="text-align: center; color: #888; width: 100%;">Carregando sugestões...</div>
+                </div>
+                <button class="carousel-nav-btn next" id="nextBtnProduct" aria-label="Próximo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+        </div>
+    </section>
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="footer-section" id="contato">
@@ -650,76 +725,28 @@
     </div>
 
     <script>
-        async function loadProduct() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
 
-            if (!productId) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            const fallbackProducts = [
-                { "id": "ignite-v300-30000", "brand": "ignite", "name": "IGNITE V300 30.000 New Edition", "price": "98.00", "image": "Images Pods/Ignite_v250-removebg-preview.png" },
-                { "id": "ignite-v250-25000", "brand": "ignite", "name": "IGNITE V250 25.000 Edition", "price": "90.00", "image": "Images Pods/Ignite_v250-removebg-preview.png" },
-                { "id": "ignite-v55-5500", "brand": "ignite", "name": "IGNITE V55 5.500 SLIM EDITION", "price": "65.00", "image": "Images Pods/Ignite_v50-removebg-preview.png" },
-                { "id": "ignite-v155-15500", "brand": "ignite", "name": "IGNITE V155 15.500 ULTRA SLIM", "price": "85.00", "image": "Images Pods/Ignite_v150_pro-removebg-preview.png" },
-                { "id": "ignite-v400-mix", "brand": "ignite", "name": "IGNITE V400 MIX 40.000 Edition", "price": "110.00", "image": "Images Pods/Ignite_v400_mix-removebg-preview.png" },
-                { "id": "ignite-v400-ice", "brand": "ignite", "name": "IGNITE V400 Ice 40.000 Edition", "price": "110.00", "image": "Images Pods/Ignite_v400_mix-removebg-preview.png" },
-                { "id": "ignite-v80-new", "brand": "ignite", "name": "IGNITE V80 NEW 8.000 Edition", "price": "78.00", "image": "Images Pods/Ignite_v80-removebg-preview.png" },
-                { "id": "ignite-v120-pro", "brand": "ignite", "name": "IGNITE V120 PRO 12.000 Edition", "price": "79.99", "image": "Images Pods/Ignite_v120_pro-removebg-preview.png" },
-                { "id": "ignite-v150-pro", "brand": "ignite", "name": "IGNITE V150 PRO 15.000 Edition", "price": "76.00", "image": "Images Pods/Ignite_v150_pro-removebg-preview.png" },
-                { "id": "ignite-v50-5000", "brand": "ignite", "name": "IGNITE V50 5.000 New Edition", "price": "64.00", "image": "Images Pods/Ignite_v50-removebg-preview.png" },
-                { "id": "oxbar-35000-edition", "brand": "oxbar", "name": "OXBAR 35.000 EDITION", "price": "83.00", "image": "Images Pods/oxbar-35k-removebg-preview.png" },
-                { "id": "oxbar-9500-new", "brand": "oxbar", "name": "OXBAR 9500 NEW EDITION", "price": "65.00", "image": "Images Pods/oxbar_9500-removebg-preview.png" },
-                { "id": "oxbar-g-prime-25000", "brand": "oxbar", "name": "OXBAR G PRIME 25.000 EDITION", "price": "56.00", "image": "Images Pods/Oxbar_G_Prime-removebg-preview.png" },
-                { "id": "oxbar-30000-edition", "brand": "oxbar", "name": "OXBAR 30.000 EDITION", "price": "78.00", "image": "Images Pods/oxbar_30k-removebg-preview.png" },
-                { "id": "blacksheep-30000-2em1", "brand": "blacksheep", "name": "BLACKSHEEP 30.000 | 2 EM 1 EDITION", "price": "94.00", "image": "Images Pods/Elfbar_30k-removebg-preview-2.png" },
-                { "id": "blacksheep-20000-2em1", "brand": "blacksheep", "name": "BLACKSHEEP 20.000 | 2 EM 1 EDITION", "price": "87.00", "image": "Images Pods/blacksheep_20k-removebg-preview.png" },
-                { "id": "lostmary-35000-edition", "brand": "lostmary", "name": "LOST MARY 35.000 EDITION", "price": "83.00", "image": "Images Pods/Lost_35k-removebg-preview.png" },
-                { "id": "lostmary-20000-edition", "brand": "lostmary", "name": "LOST MARY 20.000 EDITION", "price": "80.00", "image": "Images Pods/Lost_20k-removebg-preview.png" },
-                { "id": "adjust-40000-edition", "brand": "adjust", "name": "ADJUST 40.000 Edition", "price": "80.00", "image": "Images Pods/adjust_40k-removebg-preview.png" },
-                { "id": "elfbar-summer-40000", "brand": "elfbar", "name": "Elfbar Summer edition 40.000", "price": "100.00", "retail_price": "165.00", "image": "Images Pods/elfbar-summer-40k.png", "flavors": ["Passion Flash – maracujá + laranja (estilo raspadinha)", "Hawaiian Slush – morango + laranja", "Wild Berry Slush – mix de frutas silvestres", "Green Apple Slush – maçã verde gelada", "Triple Berry – frutas vermelhas", "Cola Slush – raspadinha de cola", "Peach Blue Slush – pêssego + blueberry", "Strawberry Spark – morango cítrico", "Black Mint – menta com amora", "Neon Twist – mix de balas frutadas"] },
-                { "id": "elfbar-23000-edition", "brand": "elfbar", "name": "ELFBAR 23.000 EDITION", "price": "97.00", "retail_price": "125.00", "image": "Images Pods/elfbar-23k.png", "flavors": ["Blue Razz Lemonade", "Strawberry Banana", "Watermelon Ice", "Kiwi Passionfruit Guava", "Mango", "Peach Ice", "Strawberry Ice", "Cola", "Pineapple Peach Mango", "Pink Lemonade"] },
-                { "id": "elfbar-40000-edition", "brand": "elfbar", "name": "ELFBAR 40.000 Edition", "price": "100.00", "image": "Images Pods/Elfbar_40k_ice_king-removebg-preview.png" },
-                { "id": "elfbar-30000-edition", "brand": "elfbar", "name": "ELFBAR 30.000 EDITION", "price": "86.00", "image": "Images Pods/Elfbar_30k_TE30K-removebg-preview.png" },
-                { "id": "nikbar-40000-edition", "brand": "nikbar", "name": "NIKBAR 40.000 EDITION", "price": "85.00", "available": false, "image": "Images Pods/Nikbar_40k-removebg-preview.png" }
-            ];
-
-            try {
-                let product;
-                try {
-                    const response = await fetch('products.json');
-                    if (!response.ok) throw new Error();
-                    const products = await response.json();
-                    product = products.find(p => p.id === productId);
-                } catch (e) {
-                    console.warn('Usando fallback no detalhe (local test).');
-                    product = fallbackProducts.find(p => p.id === productId);
-                }
-
-                if (!product) {
-                    document.getElementById('productContent').innerHTML = '<h2>Produto não encontrado</h2>';
-                    return;
-                }
-
-                renderProduct(product);
-            } catch (err) {
-                console.error('Erro ao carregar produto:', err);
-            }
-        }
 
         function renderProduct(product) {
             const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
             const basePrice = parseFloat(product.price);
+            
+            // Verifica o carrinho para aplicar desconto cumulativo de 30 unidades
+            const cartItems = JSON.parse(localStorage.getItem('ignite_cart')) || [];
+            const totalItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+            const hasBulkDiscount = (saleType === 'wholesale' && totalItemsCount >= 30);
 
             // Usa retail_price se existir no JSON, senão calcula 1.4x
             let finalPrice;
             if (saleType === 'retail') {
                 finalPrice = product.retail_price ? parseFloat(product.retail_price) : basePrice * 1.4;
             } else {
-                finalPrice = basePrice;
+                finalPrice = hasBulkDiscount ? basePrice * 0.95 : basePrice;
             }
+
+            const priceDisplayHtml = hasBulkDiscount 
+                ? `<span style="text-decoration: line-through; color: #888; font-size: 1.5rem; margin-right: 15px;">R$ ${basePrice.toFixed(2).replace('.', ',')}</span> <span>R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>`
+                : `R$ ${finalPrice.toFixed(2).replace('.', ',')}`;
 
             const content = `
                 <div class="breadcrumb">
@@ -740,7 +767,8 @@
                   <div class="product-info-column">
                     <div class="p-brand" id="prodBrand">${product.brand}</div>
                     <h1 class="p-name" id="prodName">${product.name}</h1>
-                    <div class="p-price" id="prodPrice">R$ ${finalPrice.toFixed(2).replace('.', ',')}</div>
+                    <div class="div-promo-label" style="display: ${hasBulkDiscount ? 'block' : 'none'}; background: rgba(255, 11, 85, 0.1); color: #ff0b55; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(255, 11, 85, 0.2); margin-bottom: 10px; width: fit-content;">🎉 5% DE DESCONTO ATIVADO</div>
+                    <div class="p-price" id="prodPrice">${priceDisplayHtml}</div>
 
                     <div class="p-options">
                       <label class="p-option-label">Sabores</label>
@@ -779,7 +807,7 @@
                       <div class="p-actions">
                         <div class="quantity-control">
                           <button class="q-btn" onclick="updateQty(-1)">-</button>
-                          <div class="q-val" id="qtyVal">1</div>
+                          <input type="number" class="q-val" id="qtyVal" value="1" min="1" step="1" oninput="validateQty(this)">
                           <button class="q-btn" onclick="updateQty(1)">+</button>
                         </div>
                         <div class="action-buttons-group">
@@ -798,10 +826,27 @@
                          <!-- Results injected here -->
                       </div>
                     </div>
+
+                    <!-- Mobile Brand Carousels -->
+                    <div id="mobile-brand-carousels" class="mobile-brand-carousels mobile-only" style="margin-top: 40px;">
+                        <!-- Injected by loadProduct -->
+                    </div>
                   </div>
                 </div>
             `;
             document.getElementById('productContent').innerHTML = content;
+
+            // Meta Pixel: ViewContent
+            if (window.fbq) {
+                fbq('track', 'ViewContent', {
+                    content_name: product.name,
+                    content_category: product.brand,
+                    content_ids: [product.id],
+                    content_type: 'product',
+                    value: parseFloat(finalPrice),
+                    currency: 'BRL'
+                });
+            }
 
             // Script para o seletor customizado
             const trigger = document.getElementById('selectTrigger');
@@ -861,7 +906,8 @@
                 return;
             }
 
-            const qty = parseInt(document.getElementById('qtyVal').textContent);
+            const qtyInput = document.getElementById('qtyVal');
+            const qty = parseInt(qtyInput.value) || 1;
             const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
 
             const isWholesale = saleType === 'wholesale';
@@ -900,11 +946,16 @@
             resultsBox.classList.add('active');
         }
 
+        function validateQty(input) {
+            if (input.value < 1) input.value = 1;
+            // Opcional: limitar máximo se necessário
+        }
+
         function updateQty(delta) {
             const qtyVal = document.getElementById('qtyVal');
-            let current = parseInt(qtyVal.textContent);
+            let current = parseInt(qtyVal.value) || 1;
             current = Math.max(1, current + delta);
-            qtyVal.textContent = current;
+            qtyVal.value = current;
         }
 
         function handleBuyNow(id, name, price, image) {
@@ -916,7 +967,8 @@
         }
 
         function addToCart(id, name, price, image, redirect = false) {
-            const qty = parseInt(document.getElementById('qtyVal').textContent);
+            const qtyInput = document.getElementById('qtyVal');
+            const qty = parseInt(qtyInput.value) || 1;
             const flavorValue = document.getElementById('flavorValue');
             const flavor = flavorValue ? flavorValue.value : '';
 
@@ -945,13 +997,120 @@
                 localStorage.setItem('ignite_cart', JSON.stringify(window.cart));
                 window.location.href = 'checkout.html';
             }
+
+            // Meta Pixel: AddToCart
+            if (window.fbq) {
+                fbq('track', 'AddToCart', {
+                    content_name: name,
+                    content_ids: [id],
+                    content_type: 'product',
+                    value: parseFloat(price) * qty,
+                    currency: 'BRL'
+                });
+            }
+
             return true;
+        }
+
+
+        async function loadProduct() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            if (!productId) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('products.json?v=' + Date.now());
+                if (!response.ok) throw new Error("Falha ao carregar produtos");
+                const products = await response.json();
+                const product = products.find(p => p.id === productId);
+
+                if (product) {
+                    renderProduct(product);
+                    // Initialize the carousel with the current product's brand
+                    if (window.initProductCarousel) {
+                        window.initProductCarousel(product.brand || '');
+                    }
+                    // Render special mobile brand carousels
+                    renderMobileBrandCarousels(products);
+                } else {
+                    document.getElementById('product-detail').innerHTML = '<p>Produto não encontrado.</p>';
+                }
+            } catch (error) {
+                console.error("Erro ao carregar produto:", error);
+                document.getElementById('product-detail').innerHTML = '<p>Erro ao carregar produto.</p>';
+            }
+        }
+
+        function renderMobileBrandCarousels(allProducts) {
+            const container = document.getElementById('mobile-brand-carousels');
+            if (!container) return;
+
+            // Group by brand
+            const brands = {};
+            allProducts.forEach(p => {
+                if (!brands[p.brand]) brands[p.brand] = [];
+                brands[p.brand].push(p);
+            });
+
+            const cartItems = JSON.parse(localStorage.getItem('ignite_cart')) || [];
+            const totalCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+            const hasDiscount = totalCount >= 30;
+
+            let html = '<h3 class="mobile-section-title">Confira outras marcas</h3>';
+            
+            for (const brand in brands) {
+                const brandProducts = brands[brand];
+                html += `
+                    <div class="mobile-brand-section">
+                        <h4 class="brand-title">${brand.toUpperCase()}</h4>
+                        <div class="brand-row-carousel">
+                            ${brandProducts.map(p => {
+                                const price = parseFloat(p.price);
+                                const discPrice = price * 0.95;
+                                const isRetail = localStorage.getItem('ignite_sale_type') === 'retail';
+                                const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : (hasDiscount ? discPrice : price);
+                                
+                                return `
+                                    <div class="mobile-product-card" onclick="window.location.href='product.html?id=${p.id}'">
+                                        <div class="m-card-img">
+                                            <img src="${p.image || 'assets/logo-ignite.png'}" alt="${p.name}">
+                                        </div>
+                                        <div class="m-card-info">
+                                            <span class="m-name">${p.name}</span>
+                                            <span class="m-price">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
         }
 
         loadProduct();
     </script>
+    <!-- ==================== STICKY UP-SELL BAR ==================== -->
+    <div class="sticky-upsell-bar" id="stickyUpsellBar">
+        <div class="upsell-info">
+            <div class="upsell-message" id="upsellMessage">Faltam <b>30 itens</b> para 5% de desconto!</div>
+            <div class="upsell-progress-container">
+                <div class="upsell-progress-fill" id="upsellProgressFill"></div>
+            </div>
+            <div class="progress-subtext right">50+ unidades frete é grátis.</div>
+        </div>
+        <div class="upsell-actions">
+            <button class="btn-view-cart" onclick="window.toggleCartSidebar(true)">Ver Carrinho</button>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/supabase-config.js"></script>
+    <script src="assets/products-data.js"></script>
     <script src="script.js"></script>
 </body>
 

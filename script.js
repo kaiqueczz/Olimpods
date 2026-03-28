@@ -4,6 +4,7 @@
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Smooth Scroll (Lenis Removed for performance - Native Scroll Active)
 
   // =========================================
   // 0. Vortex Particle Background (Canvas)
@@ -49,14 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Vortex Config ---
-    const PARTICLE_COUNT = 350;
+    const PARTICLE_COUNT = 180; // Optimized from 350
     const PROP_COUNT = 9;   // x, y, vx, vy, life, ttl, speed, radius, hue
     const PROPS_LEN = PARTICLE_COUNT * PROP_COUNT;
     const RANGE_Y = 100;
     const BASE_TTL = 50;
     const RANGE_TTL = 150;
     const BASE_SPEED = 0.0;
-    const RANGE_SPEED = 0.4;
+    const RANGE_SPEED = 0.3; // Slightly slower for smoother feel
     const BASE_RADIUS = 1;
     const RANGE_RADIUS = 2;
     const BASE_HUE = 0;     // pure red
@@ -91,8 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function resize() {
-      w = canvas.width = canvas.parentElement.offsetWidth;
-      h = canvas.height = canvas.parentElement.offsetHeight;
+      const dpr = Math.min(window.devicePixelRatio, 1.5); // Cap DPR for performance
+      w = canvas.width = canvas.parentElement.offsetWidth * dpr;
+      h = canvas.height = canvas.parentElement.offsetHeight * dpr;
+      ctx.scale(dpr, dpr);
+      w = canvas.parentElement.offsetWidth;
+      h = canvas.parentElement.offsetHeight;
       center = [0.5 * w, 0.35 * h];
     }
 
@@ -115,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function drawParticle(x, y, x2, y2, life, ttl, radius, hue) {
-      ctx.save();
       ctx.lineCap = 'round';
       ctx.lineWidth = radius;
       ctx.strokeStyle = `hsla(${hue},100%,60%,${fadeIO(life, ttl)})`;
@@ -124,7 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.lineTo(x2, y2);
       ctx.stroke();
       ctx.closePath();
-      ctx.restore();
     }
 
     function updateParticle(i) {
@@ -165,25 +168,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (fx > w || fx < 0 || fy > h || fy < 0 || life > ttl) initParticle(i);
     }
 
-    function renderGlow() {
-      ctx.save();
-      ctx.filter = 'blur(8px) brightness(150%)';
+    // Simplified glow: no expensive filters
+    function drawGlowPass() {
       ctx.globalCompositeOperation = 'lighter';
-      ctx.drawImage(canvas, 0, 0);
-      ctx.restore();
-
-      ctx.save();
-      ctx.filter = 'blur(4px) brightness(150%)';
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.drawImage(canvas, 0, 0);
-      ctx.restore();
-    }
-
-    function renderToScreen() {
-      ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.drawImage(canvas, 0, 0);
-      ctx.restore();
     }
 
     function render() {
@@ -191,16 +178,24 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = BG_COLOR;
       ctx.fillRect(0, 0, w, h);
-
+ 
+      ctx.globalCompositeOperation = 'lighter'; // Keep it for additive blending
       for (let i = 0; i < PROPS_LEN; i += PROP_COUNT) updateParticle(i);
-
-      renderGlow();
-      renderToScreen();
+ 
       requestAnimationFrame(render);
     }
 
     resize();
-    window.addEventListener('resize', resize);
+    function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    const debouncedResize = debounce(resize, 150);
+    window.addEventListener('resize', debouncedResize);
     initParticles();
     render();
   })();
@@ -432,7 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
             span.classList.add('gs-accent');
           }
           span.textContent = char;
-          span.style.setProperty('--char-delay', `${charIndex * 0.04}s`);
+          // span.style.setProperty('--char-delay', `${charIndex * 0.04}s`); // Delay removed
           wordSpan.appendChild(span);
           charIndex++;
         });
@@ -457,47 +452,12 @@ document.addEventListener('DOMContentLoaded', () => {
     box.style.setProperty('--swoosh-i', i);
   });
 
-  // =========================================
-  // 1. Scroll Reveal (Intersection Observer)
-  // =========================================
-  const revealElements = document.querySelectorAll('.reveal');
+  // Scroll Reveal Disabled for performance (content immediately visible)
+  document.querySelectorAll('.reveal').forEach(el => el.classList.add('animate-in'));
 
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('animate-in');
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  }, {
-    threshold: 0.15,
-    rootMargin: '0px 0px -40px 0px'
-  });
-
-  revealElements.forEach(el => revealObserver.observe(el));
-
-  // =========================================
-  // 1.5 Typewriter Animation
-  // =========================================
+  // Typewriter Animation Disabled for performance
   document.querySelectorAll('.typewriter').forEach(el => {
-    const text = el.getAttribute('data-text') || '';
-    el.textContent = '';
-    const twObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          let i = 0;
-          const interval = setInterval(() => {
-            el.textContent += text[i];
-            i++;
-            if (i >= text.length) {
-              clearInterval(interval);
-            }
-          }, 60);
-          twObserver.unobserve(el);
-        }
-      });
-    }, { threshold: 0.5 });
-    twObserver.observe(el);
+    el.textContent = el.getAttribute('data-text') || '';
   });
 
 
@@ -777,12 +737,45 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!list) return;
 
     // Progress Visibility Logic (Always run)
+    let stickyBar = document.getElementById('stickyUpsellBar');
+    
+    // Inject sticky bar if missing
+    if (!stickyBar) {
+      stickyBar = document.createElement('div');
+      stickyBar.id = 'stickyUpsellBar';
+      stickyBar.className = 'sticky-upsell-bar';
+      stickyBar.innerHTML = `
+        <div class="upsell-info">
+          <div class="upsell-message" id="upsellMessage">...</div>
+          <div class="upsell-progress-container">
+            <div class="upsell-progress-fill" id="upsellProgressFill"></div>
+          </div>
+          <div class="progress-subtext right">Acima de 50 itens o frete é grátis.</div>
+        </div>
+        <div class="upsell-actions">
+          <button class="btn-view-cart" onclick="window.toggleCartSidebar(true)">Ver Carrinho</button>
+        </div>
+      `;
+      document.body.appendChild(stickyBar);
+    }
+
+    // Meta Pixel: InitiateCheckout handler
+    const sidebarCheckoutBtn = document.getElementById('sidebarCheckoutBtn');
+    if (sidebarCheckoutBtn && !sidebarCheckoutBtn.dataset.pixelTracked) {
+        sidebarCheckoutBtn.addEventListener('click', () => {
+            if (window.fbq) fbq('track', 'InitiateCheckout');
+        });
+        sidebarCheckoutBtn.dataset.pixelTracked = 'true';
+    }
+
     if (window.currentSaleType === 'retail') {
       if (progressBar) progressBar.style.display = 'none';
       if (checkoutBtn) checkoutBtn.classList.remove('disabled');
+      if (stickyBar) stickyBar.classList.remove('active');
     } else {
       if (progressBar) progressBar.style.display = 'block';
     }
+
 
     list.innerHTML = '';
 
@@ -790,7 +783,7 @@ document.addEventListener('DOMContentLoaded', () => {
       list.innerHTML = '<div class="empty-cart-msg">Seu carrinho está vazio.</div>';
       if (totalEl) totalEl.textContent = 'R$ 0,00';
       if (progressFill) progressFill.style.width = '0%';
-      if (progressText) progressText.innerHTML = 'Faltam <b>10</b> itens para o mínimo';
+      if (progressText) progressText.innerHTML = 'Faltam <b>30</b> itens para 5% de desconto';
       if (progressPercent) progressPercent.textContent = '0%';
 
       if (window.currentSaleType === 'wholesale') {
@@ -819,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="sidebar-item-controls">
             <div class="sidebar-qty">
               <button class="sidebar-qty-btn" onclick="updateSidebarQty(${index}, -1)">-</button>
-              <span class="sidebar-qty-val">${item.quantity}</span>
+              <input type="number" class="sidebar-qty-val" value="${item.quantity}" min="1" onchange="updateSidebarQty(${index}, 0, this.value)">
               <button class="sidebar-qty-btn" onclick="updateSidebarQty(${index}, 1)">+</button>
             </div>
             <span class="sidebar-item-price">R$ ${(itemPrice * item.quantity).toFixed(2).replace('.', ',')}</span>
@@ -832,30 +825,99 @@ document.addEventListener('DOMContentLoaded', () => {
       list.appendChild(itemCard);
     });
 
-    if (totalEl) totalEl.textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+    if (totalEl) {
+      const hasDiscount = (window.currentSaleType === 'wholesale' && totalItems >= 30);
+      const discount = hasDiscount ? subtotal * 0.05 : 0;
+      const finalSubtotal = subtotal - discount;
+
+      if (hasDiscount) {
+        totalEl.innerHTML = `
+          <span style="text-decoration: line-through; color: #888; font-size: 0.8rem;">R$ ${subtotal.toFixed(2).replace('.', ',')}</span>
+          <span style="color: var(--accent-primary); font-weight: 800;">R$ ${finalSubtotal.toFixed(2).replace('.', ',')}</span>
+        `;
+      } else {
+        totalEl.textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+      }
+    }
+
+    // Milestone markers for visual feedback
+    const milestones = document.querySelectorAll('.milestone-marker');
+    milestones.forEach(m => {
+        const goal = parseInt(m.getAttribute('data-goal'));
+        if (totalItems >= goal) m.classList.add('reached');
+        else m.classList.remove('reached');
+    });
 
     // Wholesale specific progress bar updates
     if (window.currentSaleType === 'wholesale') {
-      const min = 10;
-      const progress = Math.min((totalItems / min) * 100, 100);
-      const remaining = Math.max(min - totalItems, 0);
+      let finalProgress = 0;
+      let msg = "";
+      
+      if (totalItems < 10) {
+          finalProgress = (totalItems / 10) * 20;
+          msg = `Faltam <b>${10 - totalItems}</b> itens para liberar o Atacado`;
+      } else if (totalItems < 30) {
+          finalProgress = 20 + ((totalItems - 10) / 20) * 40;
+          msg = `Faltam <b>${30 - totalItems}</b> itens para <b>5% de Desconto</b>`;
+      } else if (totalItems < 50) {
+          finalProgress = 60 + ((totalItems - 30) / 20) * 40;
+          msg = `🎉 5% OFF Ativado! Faltam <b>${50 - totalItems}</b> para <b>Frete Grátis</b>`;
+      } else {
+          finalProgress = 100;
+          msg = `🔥 Frete Grátis e 5% OFF Ativados! Boas compras.`;
+      }
 
-      if (progressFill) progressFill.style.width = `${progress}%`;
-      if (progressPercent) progressPercent.textContent = `${Math.floor(progress)}%`;
+      // Toggle glow animation at 30+
+      if (progressFill) {
+        progressFill.style.width = `${finalProgress}%`;
+        if (totalItems >= 30) progressFill.classList.add('glow');
+        else progressFill.classList.remove('glow');
+      }
 
-      if (remaining > 0) {
-        if (progressText) progressText.innerHTML = `Faltam <b>${remaining}</b> itens para o mínimo`;
+      if (progressPercent) progressPercent.textContent = `${Math.floor(Math.min((totalItems/50)*100, 100))}%`;
+      if (progressText) progressText.innerHTML = msg;
+
+      if (totalItems < 10) {
         if (checkoutBtn) checkoutBtn.classList.add('disabled');
       } else {
-        if (progressText) progressText.innerHTML = `<span style="color: #00ff88;">✓ Mínimo atingido!</span>`;
         if (checkoutBtn) checkoutBtn.classList.remove('disabled');
       }
+
+      // Sticky Up-sell Bar
+      const stickyBar = document.getElementById('stickyUpsellBar');
+      const stickyMsg = document.getElementById('upsellMessage');
+      const stickyFill = document.getElementById('upsellProgressFill');
+      
+      if (stickyBar && totalItems > 0 && totalItems < 50) {
+          stickyBar.classList.add('active');
+          if (stickyMsg) stickyMsg.innerHTML = msg;
+          if (stickyFill) {
+            stickyFill.style.width = `${finalProgress}%`;
+            if (totalItems >= 30) stickyFill.classList.add('glow');
+            else stickyFill.classList.remove('glow');
+          }
+      } else if (stickyBar && totalItems >= 50) {
+          stickyBar.classList.add('active');
+          if (stickyMsg) stickyMsg.innerHTML = `🔥 50+ unidades — Frete Grátis Ativado!`;
+          if (stickyFill) {
+            stickyFill.style.width = '100%';
+            stickyFill.classList.add('glow');
+          }
+      } else if (stickyBar) {
+          stickyBar.classList.remove('active');
+      }
     }
+
   }
 
   // Exposed globally for sidebar buttons
-  window.updateSidebarQty = (index, delta) => {
-    window.cart[index].quantity += delta;
+  window.updateSidebarQty = (index, delta, manualValue = null) => {
+    if (manualValue !== null) {
+      window.cart[index].quantity = Math.max(1, parseInt(manualValue) || 1);
+    } else {
+      window.cart[index].quantity += delta;
+    }
+
     if (window.cart[index].quantity < 1) {
       removeSidebarItem(index);
     } else {
@@ -1186,7 +1248,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderProducts('all');
     } catch (err) {
       console.warn('Usando dados de fallback (local test ou erro CORS).');
-      allProducts = fallbackProducts;
+      allProducts = window.PRODUCTS_DATA || [];
       renderProducts('all');
     }
   }
@@ -1393,9 +1455,22 @@ document.addEventListener('DOMContentLoaded', () => {
     searchBar.addEventListener('input', (e) => {
       const activeTab = document.querySelector('.tab-btn.active');
       const category = activeTab ? activeTab.dataset.category : 'all';
-      renderProducts(category, e.target.value);
+      const query = e.target.value;
+      
+      renderProducts(category, query);
+
+      // Scroll to products when typing starts
+      if (query.trim().length > 0) {
+        const target = document.getElementById('produtos');
+        if (target) {
+          const headerHeight = document.getElementById('header')?.offsetHeight || 0;
+          const top = target.getBoundingClientRect().top + window.scrollY - headerHeight - 20;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      }
     });
   }
+
 
   loadProducts();
 
@@ -1490,7 +1565,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const orders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+    let orders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+    
+    // Sanitize: Remove any potential mock/ghost orders that might have been left from development
+    const MOCK_ORDER_IDS = ['54321', '12345'];
+    orders = orders.filter(o => !MOCK_ORDER_IDS.includes(String(o.id)));
+    
     if (orders.length === 0) {
       list.innerHTML = '<div class="empty-cart-msg">Você ainda não possui pedidos.</div>';
       return;
@@ -1601,6 +1681,124 @@ document.addEventListener('DOMContentLoaded', () => {
   closeGiftModal?.addEventListener('click', () => window.toggleGiftModal(false));
 
   // Close on overlay click
+
+  // ============================================
+  // PRODUCT CAROUSEL (UP-SELL) FOR PRODUCT PAGE
+  // ============================================
+  window.initProductCarousel = async function(currentBrand = '') {
+    const carousel = document.getElementById('product-upsell-carousel');
+    const prevBtn = document.getElementById('prevBtnProduct');
+    const nextBtn = document.getElementById('nextBtnProduct');
+    
+    if (!carousel) return;
+
+    try {
+      const response = await fetch('products.json?v=' + Date.now());
+      if (!response.ok) throw new Error("Falha ao carregar produtos");
+      const allProducts = await response.json();
+      
+      // Sort: Same brand first
+      const sorted = [...allProducts].sort((a, b) => {
+        const aMatch = (a.brand || '').toLowerCase() === currentBrand.toLowerCase();
+        const bMatch = (b.brand || '').toLowerCase() === currentBrand.toLowerCase();
+        if (aMatch && !bMatch) return -1;
+        if (!aMatch && bMatch) return 1;
+        return 0;
+      });
+
+      renderCarouselItems(carousel, sorted);
+
+      // Update promo text and progress bar (mirror checkout behavior)
+      const promoText = document.getElementById('productUpsellPromoText');
+      const promoFill = document.getElementById('productUpsellProgressFill');
+      const cartItems = JSON.parse(localStorage.getItem('ignite_cart')) || [];
+      const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+      if (promoText && promoFill) {
+        let fillWidth = 0;
+        if (totalItems >= 50) {
+          promoText.innerHTML = '🔥 <strong>50+ unidades — Frete Grátis Ativado!</strong>';
+          fillWidth = 100;
+          promoFill.classList.add('glow');
+        } else if (totalItems >= 30) {
+          promoText.innerHTML = `🎉 <strong>PARABÉNS! Você ganhou 5% de desconto!</strong> Faltam <strong>${50 - totalItems}</strong> para <strong>Frete Grátis</strong>`;
+          fillWidth = 60 + ((totalItems - 30) / 20) * 40;
+          promoFill.classList.add('glow');
+        } else if (totalItems > 0) {
+          const remaining = 30 - totalItems;
+          fillWidth = (totalItems / 30) * 60;
+          promoText.innerHTML = `Faltam <strong>${remaining} unidades</strong> para ganhar <strong>5% de Desconto</strong>!`;
+          promoFill.classList.remove('glow');
+        } else {
+          promoText.innerHTML = 'A partir de 30 unidades ganhe <strong>5% de Desconto</strong>!';
+          fillWidth = 0;
+          promoFill.classList.remove('glow');
+        }
+        promoFill.style.width = `${fillWidth}%`;
+        promoFill.style.transition = 'width 0.6s ease';
+      }
+      
+      // Setup Navigation
+      if (prevBtn && nextBtn) {
+        prevBtn.addEventListener('click', () => {
+          carousel.scrollBy({ left: -carousel.offsetWidth, behavior: 'smooth' });
+        });
+        nextBtn.addEventListener('click', () => {
+          carousel.scrollBy({ left: carousel.offsetWidth, behavior: 'smooth' });
+        });
+      }
+    } catch (error) {
+      console.error("Erro no carrossel:", error);
+      carousel.innerHTML = '<div style="text-align: center; color: #888; width: 100%;">Falha ao carregar sugestões.</div>';
+    }
+  };
+
+  function renderCarouselItems(container, products) {
+    container.innerHTML = '';
+    const cartItems = JSON.parse(localStorage.getItem('ignite_cart')) || [];
+    const totalCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    const hasDiscount = totalCount >= 30;
+
+    products.forEach((p, idx) => {
+      const card = document.createElement('div');
+      card.className = 'product-card animate-in';
+      card.style.animationDelay = `${idx * 0.05}s`;
+      
+      let imgSrc = p.image || 'assets/logo-ignite.png';
+      if (imgSrc && !imgSrc.includes('/') && !imgSrc.startsWith('http')) {
+          imgSrc = 'Images Pods/' + imgSrc;
+      }
+
+      const price = parseFloat(p.price);
+      const discountPrice = price * 0.95;
+      
+      const priceHtml = hasDiscount 
+          ? `<span class="original" style="text-decoration: line-through; color: #888; font-size: 0.8rem; margin-right: 5px;">R$ ${price.toFixed(2).replace('.', ',')}</span> <span class="current" style="color: #ff0b55;">R$ ${discountPrice.toFixed(2).replace('.', ',')}</span>`
+          : `<span class="current">R$ ${price.toFixed(2).replace('.', ',')}</span>`;
+
+      card.innerHTML = `
+          <div class="product-image" onclick="window.location.href='product.html?id=${p.id}'" style="cursor: pointer;">
+              <img src="${imgSrc}" alt="${p.name}" class="product-img-real" onerror="this.src='assets/logo-ignite.png'">
+          </div>
+          <div class="product-info">
+              <div class="product-brand">${p.brand || 'Olimpo'}</div>
+              <div class="product-name" onclick="window.location.href='product.html?id=${p.id}'" style="cursor: pointer;">${p.name}</div>
+              <div class="product-footer">
+                  <div class="product-price">
+                      ${priceHtml}
+                  </div>
+                  <button class="add-cart-btn" onclick="window.location.href='product.html?id=${p.id}'">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M12 5v14M5 12h14"></path>
+                      </svg>
+                  </button>
+              </div>
+          </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
   giftModal?.addEventListener('click', (e) => {
     if (e.target === giftModal) window.toggleGiftModal(false);
   });

@@ -21,6 +21,7 @@
   "homepage": "https://github.com/kaiqueczz/Olimpods#readme",
   "dependencies": {
     "correios-brasil": "^3.0.6",
-    "nodemailer": "^8.0.3"
+    "nodemailer": "^8.0.3",
+    "pdfkit": "^0.18.0"
   }
 }

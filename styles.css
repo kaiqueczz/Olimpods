@@ -6,8 +6,13 @@
 /* ---------- Google Fonts ---------- */
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
-/* ---------- CSS Variables ---------- */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px;
+}
+
 :root {
+  --banner-height: 44px;
   /* Colors — Dark Tech Palette */
   --bg-primary: #0a0a0f;
   --bg-secondary: #111118;
@@ -44,8 +49,26 @@
   --radius-xl: 28px;
 
   /* Transitions */
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-smooth: cubic-bezier(.19,1,.22,1);
   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(13, 13, 18, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  line-height: 1.6;
 }
 
 /* Responsive Utilities */
@@ -198,8 +221,14 @@ input {
   animation: bannerGradient 8s ease infinite;
   padding: 10px 0;
   overflow: hidden;
-  position: relative;
-  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--banner-height);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
 }
 
 @keyframes bannerGradient {
@@ -245,19 +274,45 @@ input {
    HEADER / NAVIGATION
    ============================================ */
 .header {
-  position: sticky;
-  top: 0;
-  z-index: 90;
-  background: rgba(10, 10, 15, 0.75);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  position: fixed;
+  top: var(--banner-height);
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 15px 0;
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);
-  transition: all 0.3s var(--ease-smooth);
+  transition: all 0.4s var(--ease-smooth);
+  will-change: transform, background, backdrop-filter;
+}
+
+body {
+  padding-top: calc(var(--banner-height) + 80px);
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: calc(var(--banner-height) + 70px);
+  }
+}
+
+/* Fix for Account Page: Header should not follow scroll */
+.account-page .header {
+  position: absolute !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  border-bottom: none !important;
 }
 
 .header.scrolled {
-  background: rgba(10, 10, 15, 0.92);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  background: rgba(8, 8, 12, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 10px 0;
+  top: var(--banner-height);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .header-inner {
@@ -283,6 +338,7 @@ input {
 .rotating-logo {
   animation: rotateLogo3D 8s linear infinite;
   transform-style: preserve-3d;
+  will-change: transform;
 }
 
 @keyframes rotateLogo3D {
@@ -646,26 +702,26 @@ input {
 
 .hero-cta {
   display: inline-block;
-  padding: 14px 36px;
-  border-radius: 50px;
-  border: 1px solid var(--border-subtle);
-  background: #1a1a24;
+  padding: 20px 48px;
+  background: var(--accent-primary);
   color: #fff;
-  font-family: var(--font-short);
-  font-size: 0.95rem;
-  font-weight: 600;
   text-decoration: none;
-  letter-spacing: 0.5px;
-  transition: all 0.3s var(--ease-smooth);
-  opacity: 0;
-  animation: fadeInUp 0.8s 0.9s var(--ease-smooth) both;
+  border-radius: 50px;
+  font-weight: 900;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
   position: relative;
-  z-index: 2;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+  box-shadow: 0 10px 40px rgba(255, 11, 85, 0.4);
+  will-change: transform, box-shadow;
 }
 
 .hero-cta:hover {
-  border-color: var(--accent-primary);
-  transform: scale(1.03);
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 20px 60px rgba(255, 11, 85, 0.6);
 }
 
 /* Gradual Spacing */
@@ -695,7 +751,7 @@ input {
   color: var(--accent-primary);
   opacity: 0;
   animation: gsGlitch 0.8s steps(1) forwards;
-  animation-delay: var(--char-delay);
+  /* animation-delay removed */
 }
 
 .gradual-spacing .gs-char.gs-accent {
@@ -840,7 +896,7 @@ input {
   opacity: 0;
   transform: translateX(-80px);
   animation: swooshIn 0.7s var(--ease-bounce) forwards;
-  animation-delay: calc(var(--swoosh-i, 0) * 0.1s + 1.2s);
+  /* animation-delay: calc(var(--swoosh-i, 0) * 0.1s + 1.2s); Removed */
   transition: all 0.3s var(--ease-smooth);
 }
 
@@ -1122,7 +1178,7 @@ input {
   z-index: 20;
   transition: all 0.4s var(--ease-smooth);
   cursor: pointer;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(6px); /* Reduced from 10px */
   -webkit-backdrop-filter: blur(10px);
 }
 
@@ -1298,10 +1354,18 @@ input {
   margin-bottom: 16px;
 }
 
+.reveal {
+  opacity: 1;
+}
+
+.reveal.animate-in {
+  opacity: 1;
+}
+
 .story-visual {
   position: relative;
-  opacity: 0;
-  transform: translateX(30px);
+  /* opacity: 0; */ /* Removed for default visibility */
+  /* transform: translateX(30px); */ /* Removed for default visibility */
   transition: all 0.6s 0.2s var(--ease-smooth);
 }
 
@@ -1446,51 +1510,497 @@ input {
   box-shadow: 0 4px 20px var(--accent-glow);
 }
 
-/* Gradual Spacing Glitch */
-.gradual-spacing {
+/* ============================================
+   MULTI-TIER UP-SELL SYSTEM
+   ============================================ */
+
+/* Multi-stage Progress Bar (Sidebar) */
+.minimum-progress-container {
+  margin-bottom: 24px;
+  padding: 0 4px;
+}
+
+.progress-header {
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+#progressText {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+#progressPercent {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--accent-neon);
+}
+
+.progress-track {
+  position: relative;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  overflow: visible; /* To allow milestone markers to show */
+  margin-bottom: 25px;
+}
+
+#progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-neon));
+  border-radius: 10px;
+  width: 0%;
+  transition: width 0.6s var(--ease-bounce);
+  box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.milestones-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.milestone-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: #1a1a24;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  z-index: 2;
+  transition: all 0.3s;
+}
+
+.milestone-marker.reached {
+  background: var(--accent-neon);
+  border-color: #fff;
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.milestone-label {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.milestone-marker.reached .milestone-label {
+  color: var(--accent-neon);
+}
+
+/* Sticky Upsell Bar (Home) */
+.sticky-upsell-bar {
+  position: fixed;
+  bottom: -120px; /* Hidden initially */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 800px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 20px 30px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  z-index: 1000;
+  transition: all 0.8s var(--ease-smooth);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 11, 85, 0.1);
+}
+
+.sticky-upsell-bar::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px; right: -1px; bottom: -1px;
+  border-radius: 24px;
+  padding: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  animation: scan-border 4s linear infinite;
+}
+
+@keyframes scan-border {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.sticky-upsell-bar.active {
+  bottom: 30px;
+}
+
+.upsell-info {
+  flex: 1;
+}
+
+.upsell-message {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.upsell-message b {
+  color: var(--accent-neon);
+}
+
+.upsell-progress-container {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.upsell-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-neon));
+  width: 0%;
+  transition: width 0.6s var(--ease-bounce);
+  border-radius: 10px;
+}
+
+.upsell-progress-fill.glow {
+  animation: progressPulseGlow 1.5s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(255, 11, 85, 0.6), 0 0 24px rgba(255, 11, 85, 0.3);
+}
+
+@keyframes progressPulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(255, 11, 85, 0.4), 0 0 16px rgba(255, 11, 85, 0.2);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(255, 11, 85, 0.8), 0 0 36px rgba(255, 11, 85, 0.4);
+    filter: brightness(1.3);
+  }
+}
+
+.progress-subtext {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 5px;
+  font-style: italic;
+  text-align: right;
+  width: 100%;
+}
+
+.progress-subtext.right {
+  text-align: right;
+  margin-bottom: -5px;
+}
+
+.upsell-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-view-cart {
+  padding: 10px 20px;
+  background: #fff;
+  color: #000;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+
+.btn-view-cart:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 600px) {
+  .sticky-upsell-bar {
+    width: 95%;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+    bottom: -150px;
+    border-radius: 16px;
+  }
+  
+  .sticky-upsell-bar.active {
+    bottom: 12px;
+  }
+  
+  .upsell-info {
+    width: 100%;
+  }
+
+  .upsell-message {
+    font-size: 0.8rem;
+  }
+  
+  .upsell-actions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-view-cart {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+  }
+}
+
+/* High-Impact Glow/Pulse Animation */
+@keyframes upsell-glow-pulse {
+  0% { 
+    box-shadow: 0 0 5px var(--accent-glow); 
+    filter: brightness(1);
+    transform: scaleX(1);
+  }
+  50% { 
+    box-shadow: 0 0 30px var(--accent-neon), 0 0 60px var(--accent-glow); 
+    filter: brightness(1.8);
+    transform: scaleX(1.02);
+  }
+  100% { 
+    box-shadow: 0 0 5px var(--accent-glow); 
+    filter: brightness(1);
+    transform: scaleX(1);
+  }
+}
+
+.upsell-progress-static-fill.glow {
+  animation: upsell-glow-pulse 1s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(90deg, #fff, var(--accent-neon), #fff, var(--accent-neon), #fff);
+  background-size: 200% 100%;
+}
+
+/* Checkout Extra Products Section */
+.checkout-extra-products {
+  padding: 80px 0;
+  background: var(--bg-secondary);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: visible;
+}
+
+.checkout-extra-products .container {
+  overflow: visible;
+}
+
+.checkout-extra-products .section-title {
+  text-align: center;
   margin-bottom: 40px;
 }
 
-.gradual-spacing .gs-char {
-  display: inline-block;
+.checkout-extra-products .section-title h2 {
   font-family: var(--font-display);
-  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-size: 2.2rem;
   font-weight: 800;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: var(--accent-primary);
-  /* Red */
+  margin-bottom: 10px;
+}
+
+.checkout-extra-products .section-title p {
+  color: var(--text-muted);
+}
+
+.upsell-products-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 100%; /* Changed from 1200px to fit dashboard-container */
+  margin: 40px auto;
+  padding: 0 40px; /* Reduced side padding slightly */
+  box-sizing: border-box;
+  overflow: visible;
+  will-change: transform; /* Hardware acceleration */
+}
+
+.upsell-products-wrapper .upsell-carousel {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+  overflow-y: visible;
+  gap: 20px; /* Consistent gap */
+  padding: 24px 10px;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  min-height: auto;
+  align-items: stretch;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 10px; /* Ensure snapped cards don't touch edges */
+  will-change: scroll-position;
+}
+
+.upsell-products-wrapper .upsell-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.upsell-products-wrapper .upsell-carousel .product-card {
+  width: calc((100% - 40px) / 3); /* Adjusted for 20px gap */
+  min-width: 200px;
+  max-width: 400px;
+  flex: 0 0 auto;
+  margin: 0;
+  scroll-snap-align: start;
+  transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), 
+              box-shadow 0.5s cubic-bezier(0.19, 1, 0.22, 1), 
+              border-color 0.4s ease;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  will-change: transform, opacity;
+}
+
+.upsell-products-wrapper .carousel-nav-btn {
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--accent-primary);
+  color: #fff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.upsell-products-wrapper .carousel-nav-btn:hover {
+  background: var(--accent-primary);
+  transform: translateY(-50%) scale(1.15) rotate(5deg);
+  box-shadow: 0 0 35px var(--accent-primary);
+}
+
+.upsell-products-wrapper .carousel-nav-btn.prev { left: 0; }
+.upsell-products-wrapper .carousel-nav-btn.next { right: 0; }
+
+.upsell-products-wrapper .carousel-nav-btn.hidden {
   opacity: 0;
-  animation: gsGlitch 0.8s steps(1) forwards;
-  animation-delay: var(--char-delay);
+  pointer-events: none;
+  visibility: hidden;
 }
 
-.gradual-spacing .gs-space {
-  width: 0.4em;
-}
 
-@keyframes blink {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0;
-  }
-}
 
 @media (max-width: 768px) {
-  .section-typewriter {
-    font-size: 1.8rem;
-    margin-bottom: 30px;
+  .upsell-products-wrapper {
+    padding: 0 10px;
+  }
+
+  .upsell-products-wrapper .carousel-nav-btn {
+    display: none;
+  }
+
+  .upsell-products-wrapper .upsell-carousel {
+    padding: 10px 5px;
+    gap: 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .upsell-products-wrapper .upsell-carousel .product-card {
+    width: 75vw;
+    min-width: 240px;
+    max-width: 300px;
+    scroll-snap-align: center;
+  }
+
+  .checkout-extra-products {
+    padding: 40px 0;
+  }
+
+  .checkout-upsell-promo {
+    padding: 0 16px;
+  }
+
+  .checkout-upsell-promo p {
+    font-size: 0.9rem;
   }
 }
+
+
+.checkout-extra-products .products-grid {
+  display: flex;
+  overflow-x: auto;
+  gap: 20px;
+  padding: 20px 0;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+
+/* Checkout Static Up-sell Section */
+.checkout-upsell-promo {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 30px;
+  padding: 0 24px;
+}
+
+.checkout-upsell-promo p {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  font-weight: 500;
+  font-style: italic;
+}
+
+
+.upsell-progress-static {
+  background: rgba(255, 255, 255, 0.05);
+  height: 12px;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  margin: 15px auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.upsell-progress-static-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-gradient);
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+/* Glow for static fill */
+.upsell-progress-static-fill.glow {
+  animation: upsell-glow 1.5s infinite;
+  background: linear-gradient(90deg, #fff, var(--accent-neon), #fff);
+  background-size: 200% 100%;
+}
+
+.upsell-progress-static-text {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-top: 10px;
+  color: #fff;
+}
+
+
 
 /* Products Grid */
 .products-grid {
@@ -1505,9 +2015,21 @@ input {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: all 0.4s var(--ease-smooth);
+  transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
   opacity: 0;
   transform: translateY(30px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  will-change: transform, opacity;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  transition: 0.5s;
+  pointer-events: none;
 }
 
 .product-card.animate-in {
@@ -1516,9 +2038,14 @@ input {
 }
 
 .product-card:hover {
-  border-color: var(--border-accent);
-  transform: translateY(-6px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  border-color: var(--accent-primary);
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 20px 60px rgba(255, 11, 85, 0.2), 0 0 20px rgba(255, 11, 85, 0.1);
+}
+
+.product-card:hover::before {
+  left: 200%;
+  transition: 1.2s var(--ease-smooth);
 }
 
 .product-image {
@@ -1578,7 +2105,7 @@ input {
   width: 36px;
   height: 36px;
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(6px); /* Reduced from 10px */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1659,29 +2186,33 @@ input {
 
 .buy-now-btn,
 .add-cart-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.buy-now-btn,
+.add-cart-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
   background: linear-gradient(135deg, var(--accent-primary), #FF0B55);
-  border-radius: 50%;
   transition: all 0.3s var(--ease-smooth);
   text-decoration: none;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  will-change: transform, box-shadow;
 }
 
 .buy-now-btn:hover,
-.add-cart-btn:hover {
-  transform: scale(1.1);
+.add-cart-btn:hover,
+.hero-cta:hover {
+  transform: scale(1.05);
   box-shadow: 0 4px 20px var(--accent-glow);
-}
-
-.buy-now-btn svg,
-.add-cart-btn svg {
-  width: 20px;
-  height: 20px;
-  color: #fff;
 }
 
 /* ============================================
@@ -2262,16 +2793,17 @@ input {
 
   .hero-cta {
     padding: 12px 28px;
-    /* Thickness -25%, Size -33% */
     border-radius: 50px !important;
     font-size: 0.8rem;
     font-weight: 800;
     width: auto;
     min-width: 160px;
-    /* Size -33% */
     text-align: center;
     display: inline-block;
     margin-top: 10px;
+    background: var(--accent-primary) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 30px rgba(255, 11, 85, 0.4) !important;
   }
 
   .section-title {
@@ -2452,31 +2984,6 @@ input {
   transform: translateY(0);
 }
 
-/* Stagger delays */
-.reveal[data-delay="1"] {
-  transition-delay: 0.1s;
-}
-
-.reveal[data-delay="2"] {
-  transition-delay: 0.2s;
-}
-
-.reveal[data-delay="3"] {
-  transition-delay: 0.3s;
-}
-
-.reveal[data-delay="4"] {
-  transition-delay: 0.4s;
-}
-
-.reveal[data-delay="5"] {
-  transition-delay: 0.5s;
-}
-
-.reveal[data-delay="6"] {
-  transition-delay: 0.6s;
-}
-
 /* ============================================
    11. Cart Sidebar (Drawer)
    ============================================ */
@@ -2572,8 +3079,8 @@ input {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -2691,8 +3198,8 @@ input {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -2961,6 +3468,57 @@ input {
   border: 1px solid var(--border-subtle);
 }
 
+.qty-stepper {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.qty-stepper button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.qty-stepper button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.qty-stepper-val {
+  width: 40px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--border-subtle);
+  color: #fff;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+  -moz-appearance: textfield;
+  appearance: none;
+}
+
+.qty-stepper-val::-webkit-outer-spin-button,
+.qty-stepper-val::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.qty-stepper-val:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.05);
+}
+
 .sidebar-item-img img {
   max-width: 90%;
   max-height: 90%;
@@ -3016,9 +3574,28 @@ input {
 }
 
 .sidebar-qty-val {
-  width: 30px;
+  width: 32px;
   text-align: center;
   font-size: 0.9rem;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 0;
+  -moz-appearance: textfield;
+  appearance: none;
+}
+
+.sidebar-qty-val::-webkit-outer-spin-button,
+.sidebar-qty-val::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.sidebar-qty-val:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .sidebar-item-price {
@@ -3766,4 +4343,287 @@ input {
 
 .hidden {
   display: none;
+}
+/* ============================================
+   MOBILE BRAND CAROUSELS (Product Page)
+   ============================================ */
+@media (max-width: 992px) {
+    .mobile-section-title {
+        font-family: var(--font-display);
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin-bottom: 20px;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .mobile-brand-section {
+        margin-bottom: 30px;
+    }
+
+    .brand-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--accent-primary);
+        margin-bottom: 12px;
+        letter-spacing: 2px;
+    }
+
+    .brand-row-carousel {
+        display: flex;
+        gap: 15px;
+        overflow-x: auto;
+        padding-bottom: 15px;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none; /* Hide scrollbar Firefox */
+    }
+
+    .brand-row-carousel::-webkit-scrollbar {
+        display: none; /* Hide scrollbar Chrome/Safari */
+    }
+
+    .mobile-product-card {
+        flex: 0 0 160px;
+        background: var(--bg-glass);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        scroll-snap-align: start;
+        transition: all 0.3s;
+    }
+
+    .m-card-img {
+        aspect-ratio: 1/1;
+        padding: 15px;
+        background: rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .m-card-img img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .m-card-info {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .m-name {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .m-price {
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: var(--accent-primary);
+    }
+}
+
+/* ============================================
+   MASTER MOBILE REFINEMENT & PARITY
+   Ensures 100% responsiveness and premium look
+   ============================================ */
+@media (max-width: 768px) {
+    /* Header & Navigation */
+    .header {
+        padding: 5px 0 !important;
+    }
+
+    .header-inner {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 8px 16px !important;
+        gap: 10px !important;
+    }
+
+    .logo {
+        height: 55px !important;
+        width: auto !important;
+    }
+
+    .logo img {
+        height: 100% !important;
+        width: auto !important;
+    }
+
+    .header-actions {
+        display: flex !important;
+        gap: 8px !important;
+    }
+
+    .action-btn {
+        width: 38px !important;
+        height: 38px !important;
+    }
+
+    .action-btn svg {
+        width: 20px !important;
+        height: 20px !important;
+    }
+
+    /* Compact Search Bar */
+    .search-container {
+        margin: 0 16px 10px !important;
+    }
+
+    .search-bar {
+        height: 42px !important;
+        background: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    /* FORCE BRAND RED ON HERO BUTTON */
+    .hero-action .btn-primary, 
+    .hero-buttons .btn-primary,
+    .btn-primary {
+        background: #FF0B55 !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 20px rgba(255, 11, 85, 0.4) !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+    }
+
+    /* Category Tabs - Horizontal Scroll */
+    .category-tabs {
+        display: flex !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        padding: 10px 16px !important;
+        gap: 8px !important;
+        scrollbar-width: none !important; /* Firefox */
+        -ms-overflow-style: none !important;  /* IE 10+ */
+    }
+
+    .category-tabs::-webkit-scrollbar {
+        display: none !important; /* Chrome/Safari */
+    }
+
+    .tab-btn {
+        flex: 0 0 auto !important;
+        padding: 8px 16px !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* Forced 2-Column Footer */
+    .footer-section {
+        padding: 40px 16px 20px !important;
+    }
+
+    .footer-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 30px !important;
+    }
+
+    .footer-extra-col {
+        grid-column: span 2 !important;
+        margin-top: 20px !important;
+    }
+
+    .footer-col h4 {
+        font-size: 0.85rem !important;
+        margin-bottom: 15px !important;
+    }
+
+    .footer-links a {
+        font-size: 0.8rem !important;
+        padding: 4px 0 !important;
+    }
+
+    /* Section Spacing */
+    .section-title {
+        font-size: 1.8rem !important;
+        margin-bottom: 25px !important;
+    }
+
+    .padrão-title { /* Handle special chars if used as filter or just selector */
+        font-size: 2rem !important;
+    }
+
+    .hero-content h1 {
+        font-size: 2.2rem !important;
+        line-height: 1.1 !important;
+    }
+
+    /* Sticky Upsell Bar on Mobile - Ensure Visibility & Style */
+    .sticky-upsell-bar {
+        position: fixed !important;
+        bottom: -150px !important; /* Hidden initially */
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 95% !important;
+        z-index: 9999 !important; /* Above everything but cart overlay */
+        padding: 12px 16px !important;
+        border-radius: 16px !important;
+        gap: 12px !important;
+        background: rgba(10, 10, 10, 0.9) !important;
+        border: 1px solid rgba(255, 11, 85, 0.3) !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 15px rgba(255, 11, 85, 0.1) !important;
+    }
+
+    .sticky-upsell-bar.active {
+        bottom: 12px !important;
+    }
+
+    .upsell-message {
+        font-size: 0.75rem !important;
+        margin-bottom: 5px !important;
+    }
+
+    .upsell-progress-container {
+        height: 5px !important;
+    }
+
+    .btn-view-cart {
+        padding: 8px 12px !important;
+        font-size: 0.7rem !important;
+        border-radius: 8px !important;
+    }
+
+    .progress-subtext {
+        font-size: 0.65rem !important;
+        margin-top: 4px !important;
+    }
+
+    /* Compact Mobile Footer Refinement */
+    .footer-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 20px !important;
+        margin-bottom: 30px !important;
+    }
+
+    .footer-col h4 {
+        font-size: 0.9rem !important;
+        margin-bottom: 12px !important;
+    }
+
+    .footer-links li {
+        margin-bottom: 8px !important;
+    }
+
+    .footer-links li a {
+        font-size: 0.8rem !important;
+    }
+
+    .newsletter-box {
+        grid-column: 1 / -1 !important;
+        margin-top: 20px !important;
+        padding-top: 20px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
 }

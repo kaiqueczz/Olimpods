@@ -18,10 +18,12 @@
     <style>
         /* Estilos específicos do Painel (Dashboard) */
         .dashboard-container {
-            max-width: 1000px;
-            margin: 120px auto 60px;
+            max-width: 1200px;
+            margin: 100px auto 60px;
             padding: 0 20px;
+            /* overflow-x: hidden; */ /* Removed to ensure carousel visibility */
         }
+
 
         .dashboard-header {
             margin-bottom: 40px;
@@ -114,6 +116,9 @@
             color: #fff;
             font-weight: 700;
             font-size: 1.1rem;
+            word-break: break-all;
+            display: inline-block;
+            max-width: 100%;
         }
 
         .order-date {
@@ -238,9 +243,26 @@
             background: rgba(255,255,255,0.05);
         }
     </style>
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1423800812314865');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1423800812314865&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
 </head>
 
-<body>
+<body class="account-page">
 
     <!-- ==================== HEADER (Idêntico à Index) ==================== -->
     <header class="header" id="header">
@@ -302,6 +324,7 @@
                         <div style="text-align: center; color: #888; padding: 20px;">Carregando pedidos...</div>
                     </div>
                 </div>
+
             </div>
 
             <!-- Coluna Direita: Ferramentas e Upsell -->
@@ -327,17 +350,38 @@
                     </div>
                 </div>
 
-                <!-- Banner Upsell -->
-                <div class="upsell-banner">
-                    <div class="upsell-content">
-                        <h3>OFERTA ÚNICA!</h3>
-                        <p id="dynamicUpsellText">Somente se você comprar agora será válida as promoções. Adicione produtos ao carrinho e aproveite a oferta oficial.</p>
-                    </div>
-                </div>
+            </div> <!-- End dash-column right -->
+        </div> <!-- End dashboard-grid -->
 
+        <div class="upsell-section-new">
+            <div class="upsell-header-new">
+                <div class="upsell-copy">
+                    <p class="main-msg">Faltam 30 itens para 5% de desconto</p>
+                </div>
+                <div class="upsell-progress-wrapper" id="accountUpsellProgress">
+                    <div class="progress-bar-container">
+                        <div class="upsell-progress-fill" id="accountProgressFill"></div>
+                    </div>
+                    <div class="progress-subtext">50+ unidades frete é grátis.</div>
+                </div>
+            </div>
+            
+            <div class="upsell-products-wrapper">
+                <button class="carousel-nav-btn prev" id="prevBtnAccount" aria-label="Anterior">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <div class="upsell-carousel" id="upsellProductsBar">
+                    <!-- Products injected here -->
+                    <div class="loading-products">Carregando ofertas...</div>
+                </div>
+                <button class="carousel-nav-btn next" id="nextBtnAccount" aria-label="Próximo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
             </div>
         </div>
-    </div>
+    </div> <!-- End dashboard-container -->
+
+
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

@@ -72,28 +72,130 @@
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    white-space: nowrap;
-    /* Garante que fique em uma só linha */
+    /* Removido white-space: nowrap para evitar quebra de layout com nomes longos */
 }
 
-@media (max-width: 380px) {
-    .auth-title {
-        font-size: 1.1rem;
-        /* Reduz um pouco mais em telas muito pequenas */
+/* ... existing styles ... */
+
+/* --- Seção de Upsell (Estilo Index) --- */
+.upsell-section-new {
+    margin-top: 40px;
+    padding: 30px;
+    background: rgba(18, 18, 18, 0.4);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.upsell-header-new {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-bottom: 40px;
+    gap: 20px;
+    text-align: center !important;
+    width: 100%;
+}
+
+.upsell-copy {
+    flex: none !important;
+    text-align: center !important;
+    width: 100%;
+}
+
+.upsell-copy .main-msg {
+    font-size: clamp(0.9rem, 4vw, 1.1rem);
+    color: #fff !important; /* Branco conforme solicitado */
+    font-weight: 700;
+    margin-bottom: 0;
+    white-space: nowrap; /* Uma linha só */
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.upsell-copy .sub-msg {
+    display: none; /* Removido para manter uma linha só */
+}
+
+.upsell-progress-wrapper {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.progress-bar-container {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+    backdrop-filter: blur(5px);
+}
+
+.upsell-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff0b55, #ff5e3a, #ff9a00);
+    width: 0%;
+    transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 20px rgba(255, 11, 85, 0.4);
+    position: relative;
+}
+
+.upsell-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    animation: barShine 2s infinite;
+}
+
+@keyframes barShine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.progress-subtext {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-style: italic;
+    font-weight: 500;
+}
+
+@media (max-width: 480px) {
+    .upsell-copy .main-msg {
+        white-space: normal; /* Permite quebra se for muito pequeno */
+        font-size: 0.85rem;
     }
 }
 
-
-.auth-title.gradual-spacing {
-    display: flex;
-    justify-content: center;
-    flex-wrap: nowrap;
-    /* Não quebra linha */
+/* Garantir que os cards de produto herdam os estilos da main page */
+.upsell-products-track .product-card {
+    margin: 0 !important;
+    width: 100% !important; /* Deixa o grid controlar a largura */
+    min-width: unset !important;
+    transform: none !important; /* Removido scale para não bugar o grid */
 }
 
-.auth-title.gradual-spacing .gs-word {
-    white-space: nowrap;
-    flex-wrap: nowrap;
+.upsell-products-track .product-price .current {
+    font-size: 1.1rem;
 }
 
 .auth-subtitle {
@@ -199,8 +301,10 @@
 
 /* Submit Button */
 .btn-auth {
-    width: 100%;
-    padding: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 32px;
     background: var(--accent-primary);
     color: #fff;
     font-weight: 700;
@@ -211,7 +315,9 @@
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
+    max-width: fit-content;
 }
+
 
 .btn-auth:hover:not(:disabled) {
     background: var(--accent-secondary);
@@ -233,7 +339,7 @@
     background: rgba(0, 0, 0, 0.2);
     padding: 10px 15px;
     border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .password-requirements ul li {

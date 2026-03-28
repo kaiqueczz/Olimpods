@@ -13,6 +13,23 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;900&display=swap"
         rel="stylesheet">
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1423800812314865');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1423800812314865&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
 </head>
 
 <body class="checkout-page">
@@ -232,7 +249,7 @@
                     <h3 class="summary-title">Resumo do Pedido</h3>
                     <p id="free-shipping-notice"
                         style="font-size: 0.75rem; font-weight: 300; font-style: italic; color: #888; margin: -15px 0 15px 0;">
-                        A partir de 2 peças seu frete é grátis</p>
+                        A partir de 50 peças seu frete é grátis</p>
 
                     <div class="cart-items" id="summary-items">
                         <!-- Items will be injected here via JS -->
@@ -264,7 +281,37 @@
         </div>
     </main>
 
+    <!-- ==================== EXTRA PRODUCTS (UP-SELL) ==================== -->
+    <section class="checkout-extra-products">
+        <div class="container">
+            <div class="checkout-upsell-promo">
+                <p>A partir de 30 unidades ganhe <strong>5% de Desconto</strong>!</p>
+                <div class="upsell-info" style="max-width: 600px; margin: 0 auto;">
+                    <div class="upsell-progress-container" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); height: 12px; border-radius: 6px; overflow: hidden;">
+                        <div class="upsell-progress-fill" id="upsellProgressFillCheckout" style="height: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="upsell-products-wrapper">
+                <button class="carousel-nav-btn prev" id="prevBtnCheckout" aria-label="Anterior">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <div class="upsell-carousel" id="checkout-upsell-products">
+                    <!-- Data populated by checkout.js -->
+                    <div style="text-align: center; color: #888; width: 100%;">Carregando o catálogo completo...</div>
+                </div>
+                <button class="carousel-nav-btn next" id="nextBtnCheckout" aria-label="Próximo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+
+
+        </div>
+    </section>
+
+
     <footer class="checkout-mini-footer">
+
         <div class="container" style="text-align: center;">
             <p>&copy; 2026 Olimpo Pods. Todos os direitos reservados.</p>
             <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">R Vinte e Cinco de Março 1015, loja 1 - Centro
@@ -291,6 +338,21 @@
         </div>
     </div>
 
+    <!-- ==================== STICKY UP-SELL BAR ==================== -->
+    <div class="sticky-upsell-bar" id="stickyUpsellBar">
+        <div class="upsell-info">
+            <div class="upsell-message" id="upsellMessage">Adicione mais <b>10 itens</b> para liberar o Atacado!</div>
+            <div class="upsell-progress-container">
+                <div class="upsell-progress-fill" id="upsellProgressFill"></div>
+            </div>
+        </div>
+        <div class="upsell-actions">
+            <!-- No checkout, o botão pode apenas rolar para o topo ou ser informativo -->
+            <button class="btn-view-cart" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Subir para o Carrinho</button>
+        </div>
+    </div>
+
+    <script src="assets/products-data.js"></script>
     <script src="checkout.js"></script>
 </body>
 

@@ -1,1 +1,68 @@
-[]
+[
+    {
+        "id": "e447992ab8cd9bee7519710fd91660987",
+        "date": "26/03/2026",
+        "customer": {
+            "name": "marcos",
+            "email": "conceptsttw@gmail.com",
+            "phone": "(88) 21312-3123"
+        },
+        "shipping": {
+            "cep": "63500-005",
+            "address": "Rua Professor João Coelho",
+            "number": "55",
+            "complement": "",
+            "neighborhood": "Centro",
+            "city": "Iguatu",
+            "state": "CE",
+            "cost": 160,
+            "method": "Loggi"
+        },
+        "items": [
+            {
+                "name": "cartucho p100",
+                "qty": 10,
+                "price": 60,
+                "image": "assets/img/Cartucho_ignite_p100-removebg-preview.png",
+                "flavor": "Watermelon ice"
+            }
+        ],
+        "subtotal": 600,
+        "total": 760,
+        "status": "Aguardando Pagamento",
+        "agency": "Olimpo Pods - Centro"
+    },
+    {
+        "id": "98f70d84-8907-44b7-8cdf-733ee9d1590c",
+        "date": "27/03/2026",
+        "customer": {
+            "name": "marcos",
+            "email": "conceptsstw@gmail.com",
+            "phone": "(81) 23818-3813"
+        },
+        "shipping": {
+            "cep": "63500-555",
+            "address": "Rua Doze de Outubro",
+            "number": "55",
+            "complement": "",
+            "neighborhood": "Paraná",
+            "city": "Iguatu",
+            "state": "CE",
+            "cost": 160,
+            "method": "Loggi"
+        },
+        "items": [
+            {
+                "name": "Elfbar 30k",
+                "qty": 10,
+                "price": 95,
+                "image": "assets/img/Elfbar_30k-removebg-preview.png",
+                "flavor": "Strawberry ice"
+            }
+        ],
+        "subtotal": 950,
+        "total": 1110,
+        "status": "Aguardando Pagamento",
+        "agency": "Olimpo Pods - Centro"
+    }
+]

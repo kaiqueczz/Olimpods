@@ -15,80 +15,155 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.getElementById('refresh-orders').addEventListener('click', fetchData);
-    document.getElementById('logout-btn').addEventListener('click', () => {
-        alert("Logout não implementado - Adicione autenticação de backend.");
+    document.getElementById('refresh-orders')?.addEventListener('click', fetchData);
+    document.getElementById('logout-btn')?.addEventListener('click', () => {
+        localStorage.removeItem('olimpo_admin_pass');
+        window.location.reload();
     });
+
+    let currentData = { users: [], orders: [], products: [] };
+    let orderFilter = 'all'; // 'all' or 'paid'
+    let orderSearchQuery = '';
 
     // --- Data Fetching ---
     async function fetchData() {
-        console.log("Buscando dados...");
-        document.getElementById('refresh-orders').textContent = "Atualizando...";
+        let adminPass = localStorage.getItem('olimpo_admin_pass') || 'olimpo2026';
+        
+        const refreshBtn = document.getElementById('refresh-orders');
+        if (refreshBtn) refreshBtn.textContent = "Atualizando...";
+
         try {
-            const res = await fetch('/api/admin/data');
-            const data = await res.json();
+            const res = await fetch('/api/admin/data', {
+                headers: { 'x-admin-password': adminPass }
+            });
             
+            if(res.status === 401) {
+                const newPass = prompt("Senha administrativa incorreta. Por favor, insira a senha correta:");
+                if (newPass) {
+                    localStorage.setItem('olimpo_admin_pass', newPass);
+                    fetchData();
+                }
+                return;
+            }
+
+            const data = await res.json();
             if(data.status === 'success') {
-                renderLeads(data.users || []);
-                renderOrders(data.orders || []);
-                renderFinance(data.orders || []);
-                renderStock(data.products || [], data.orders || []);
+                currentData = data;
+                applyFiltersAndRender();
                 
                 document.getElementById('total-users-count').textContent = (data.users || []).length;
                 document.getElementById('total-orders-count').textContent = (data.orders || []).length;
-            } else {
-                showToast("Erro ao buscar dados do servidor.", true);
             }
         } catch(e) {
-            console.error(e);
-            showToast("Erro de conexão com a API /api/admin/data", true);
+            console.warn("Soft fetch error:", e);
+            if (currentData.orders.length === 0) {
+                showToast("Erro de conexão com o servidor.", true);
+            }
         } finally {
-            document.getElementById('refresh-orders').textContent = "⟳ Atualizar";
+            if (refreshBtn) refreshBtn.textContent = "⟳ Atualizar";
         }
     }
 
-    // --- Render Leads ---
-    function renderLeads(users) {
-        const tbody = document.getElementById('leads-tbody');
-        tbody.innerHTML = '';
+    function applyFiltersAndRender() {
+        let filteredOrders = currentData.orders || [];
         
+        // Apply Status Filter
+        if (orderFilter === 'paid') {
+            filteredOrders = filteredOrders.filter(o => {
+                const s = (o.status || '').toLowerCase();
+                return s.includes('pago') || s.includes('aprovado') || s.includes('enviado');
+            });
+        }
+
+        // Apply Search Filter (Location, Name, ID)
+        if (orderSearchQuery) {
+            const q = orderSearchQuery.toLowerCase();
+            filteredOrders = filteredOrders.filter(o => {
+                const name = (o.customer?.name || '').toLowerCase();
+                const email = (o.customer?.email || '').toLowerCase();
+                const address = (o.shipping?.address || '').toLowerCase();
+                const neighborhood = (o.shipping?.neighborhood || '').toLowerCase();
+                const city = (o.shipping?.city || '').toLowerCase();
+                const cep = (o.shipping?.cep || '').toLowerCase();
+                const agency = (o.agency || '').toLowerCase();
+                const id = (o.id || '').toLowerCase();
+
+                return name.includes(q) || 
+                       email.includes(q) ||
+                       address.includes(q) || 
+                       neighborhood.includes(q) || 
+                       city.includes(q) || 
+                       cep.includes(q) ||
+                       agency.includes(q) ||
+                       id.includes(q);
+            });
+        }
+
+        renderUsers(currentData.users || []);
+        renderOrders(filteredOrders);
+        renderFinance(currentData.orders || [], currentData.products || []);
+        renderStock(currentData.products || [], currentData.orders || []);
+    }
+
+    // Search Input Listener
+    document.getElementById('order-search-input')?.addEventListener('input', (e) => {
+        orderSearchQuery = e.target.value;
+        applyFiltersAndRender();
+    });
+
+    // Filter Buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            orderFilter = btn.getAttribute('data-filter');
+            applyFiltersAndRender();
+        });
+    });
+
+    // --- Render Users (Leads) ---
+    function renderUsers(users) {
+        const container = document.getElementById('users-table-body');
+        if (!container) return;
+        container.innerHTML = '';
+
         if (users.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 30px; color:#aaa;">Nenhum lead cadastrado ainda.</td></tr>';
+            container.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:#8b949e;">Nenhum lead cadastrado ainda.</td></tr>';
             return;
         }
 
-        // reverse to show newest first
         [...users].reverse().forEach(u => {
-            const dateStr = u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Data Desconhecida';
-            const badge = u.verified ? '<span class="verified-badge">Verificado</span>' : '<span class="unverified-badge">Pendente</span>';
-            
+            const date = u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-BR') : '---';
+            const statusClass = u.verified ? 'verified-badge' : 'unverified-badge';
+            const statusText = u.verified ? 'Verificado' : 'Pendente';
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${dateStr}</td>
-                <td><strong>${u.fullname || u.name || 'Sem Nome'}</strong></td>
+                <td>${date}</td>
+                <td><strong style="color:white;">${u.fullname || u.name || '---'}</strong></td>
                 <td>${u.email}</td>
                 <td>${u.phone || '---'}</td>
-                <td>${badge}</td>
+                <td><span class="${statusClass}">${statusText}</span></td>
             `;
-            tbody.appendChild(tr);
+            container.appendChild(tr);
         });
     }
 
     // --- Render Orders ---
     function renderOrders(orders) {
         const container = document.getElementById('orders-container');
+        if (!container) return;
         container.innerHTML = '';
 
         if (orders.length === 0) {
-            container.innerHTML = '<p style="color:#aaa; padding: 20px;">Nenhum pedido recebido ainda.</p>';
+            container.innerHTML = '<p style="color:#8b949e; padding: 20px;">Nenhum pedido encontrado.</p>';
             return;
         }
 
         [...orders].reverse().forEach(order => {
-            // Group items by brand securely
             const brandMap = {};
             (order.items || []).forEach(item => {
-                let nameLower = item.name.toLowerCase();
+                let nameLower = (item.name || '').toLowerCase();
                 let brand = "OUTROS";
                 if(nameLower.includes("ignite")) brand = "IGNITE";
                 else if(nameLower.includes("elfbar") || nameLower.includes("elf bar")) brand = "ELFBAR";
@@ -108,12 +183,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="brand-group">
                         <div class="brand-name">${brand}</div>
                         <ul class="brand-items">
-                            ${items.map(i => `
-                                <li>
-                                    <span>${i.qty}x ${i.name} ${i.flavor ? '<span style="font-size:0.75rem; color:#888;">('+i.flavor+')</span>' : ''}</span>
-                                    <span class="item-qty">${i.qty}</span>
-                                </li>
-                            `).join('')}
+                            ${items.map(i => {
+                                const qty = i.qty || i.quantity || 0;
+                                return `
+                                    <li>
+                                        <span>${qty}x ${i.name} ${i.flavor ? '<span style="font-size:0.75rem; color:#8b949e;">('+i.flavor+')</span>' : ''}</span>
+                                        <span class="item-qty">${qty}</span>
+                                    </li>
+                                `;
+                            }).join('')}
                         </ul>
                     </div>
                 `;
@@ -121,7 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let statusClass = "status-pending";
             let statusText = order.status || "Aguardando Pagamento";
-            
             const lowerStatus = statusText.toLowerCase();
             if(lowerStatus.includes('pago') || lowerStatus.includes('aprovado')) statusClass = "status-paid";
             if(lowerStatus.includes('enviado') || lowerStatus.includes('despachado')) statusClass = "status-dispatched";
@@ -130,28 +207,152 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const card = document.createElement('div');
             card.className = 'order-card';
+            const shortId = order.id.length > 8 ? order.id.substring(0, 8) + '...' : order.id;
+            
+            // Format Address for Search
+            const addr = order.shipping;
+            const searchField = addr 
+                ? `${addr.address || ''} ${addr.neighborhood || ''} ${addr.city || ''} ${addr.cep || ''}`
+                : '';
+
             card.innerHTML = `
                 <div class="order-header">
-                    <span class="order-id">#${order.id}</span>
-                    <span class="order-date">${order.date || 'Recente'}</span>
+                    <span class="order-id" title="${order.id}">#${shortId}</span>
                     <span class="status-badge ${statusClass}">${statusText}</span>
+                    <span class="order-date">${order.date || 'Recente'}</span>
                 </div>
                 <div class="order-body">
-                    <div class="customer-info">
-                        <p><strong>Cliente:</strong> ${order.customer?.name || 'Vazio'}</p>
-                        <p><strong>Contato:</strong> ${order.customer?.phone || 'Vazio'} • ${order.customer?.email || ''}</p>
-                        <p><strong>Entrega:</strong> ${order.shipping?.method || 'Padrão'} (${order.shipping?.cep})</p>
-                        <p style="font-size:0.8rem; margin-top:5px; color:#888;">${order.shipping?.address}, ${order.shipping?.number} - ${order.shipping?.city}/${order.shipping?.state}</p>
+                    <div class="info-grid">
+                        <div class="info-col">
+                            <p><strong>Cliente:</strong> ${order.customer?.name || '---'}</p>
+                            <p><strong>Número:</strong> ${order.customer?.phone || '---'}</p>
+                            <p><strong>Email:</strong> ${order.customer?.email || '---'}</p>
+                        </div>
+                        <div class="info-col delivery-col">
+                            <p><strong>CEP:</strong> ${addr?.cep || '---'}</p>
+                            <p><strong>Bairro:</strong> ${addr?.neighborhood || '---'}</p>
+                            <p><strong>Cidade; Número:</strong> ${addr?.city || '---'}; ${addr?.number || '---'}</p>
+                        </div>
                     </div>
-
-                    <div class="packing-list">
-                        ${packingHtml}
-                    </div>
+                    <div class="packing-list">${packingHtml}</div>
                 </div>
                 <div class="order-footer">
                     <span class="order-total">R$ ${(order.total || 0).toFixed(2).replace('.',',')}</span>
-                    <button class="btn-ready" onclick="openTrackingModal('${order.id}', '${order.customer?.name}', '${order.customer?.email}')" ${isDispatched ? 'disabled' : ''}>
-                        ${isDispatched ? '✔ E-mail Enviado' : 'Pedido Pronto'}
+                    <div class="footer-actions">
+                        ${order.status === 'Pago' 
+                            ? `<a href="/api/orders/${order.id}/pdf?t=${Date.now()}" target="_blank" class="btn-pdf" title="Ver PDF">PDF</a>`
+                            : `<a href="/api/orders/${order.id}/pdf?t=${Date.now()}" target="_blank" class="btn-pdf" title="Gerar PDF">PDF</a>`
+                        }
+                        <button class="btn-ready" onclick="openTrackingModal('${order.id}', '${order.customer?.name || ''}', '${order.customer?.email || ''}')" ${isDispatched ? 'disabled' : ''}>
+                            ${isDispatched ? 'Enviado' : 'Confirmar pedido'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // --- Render Finance ---
+    function renderFinance(orders, products = []) {
+        const tbody = document.getElementById('finance-tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        let totalRev = 0, pendingRev = 0, totalCost = 0;
+        let approvedCount = 0, pendingCount = 0;
+
+        const productCosts = {};
+        products.forEach(p => productCosts[p.id] = parseFloat(p.cost || 0));
+
+        [...orders].reverse().forEach(o => {
+            const val = parseFloat(o.total || 0);
+            const status = (o.status || '').toLowerCase();
+            const isApproved = status.includes('pago') || status.includes('aprovado') || status.includes('enviado');
+
+            if (isApproved) {
+                totalRev += val; approvedCount++;
+                (o.items || []).forEach(item => {
+                    const cost = productCosts[item.id] || 0;
+                    const qty = item.qty || item.quantity || 0;
+                    totalCost += cost * qty;
+                });
+            } else {
+                pendingRev += val; pendingCount++;
+            }
+
+            const tr = document.createElement('tr');
+            const shortId = o.id.length > 8 ? o.id.substring(0, 8) + '...' : o.id;
+            tr.innerHTML = `
+                <td>${o.date || '---'}</td>
+                <td title="${o.id}"><strong>#${shortId}</strong></td>
+                <td>${o.customer?.name || '---'}</td>
+                <td style="color:#00ff88; font-weight:700;">R$ ${val.toFixed(2).replace('.',',')}</td>
+                <td><span class="status-badge ${isApproved ? 'status-paid' : 'status-pending'}">${o.status}</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        const netProfit = totalRev - totalCost;
+        const margin = totalRev > 0 ? (netProfit / totalRev) * 100 : 0;
+
+        document.getElementById('total-revenue').textContent = 'R$ ' + totalRev.toFixed(2).replace('.',',');
+        document.getElementById('pending-revenue').textContent = 'R$ ' + pendingRev.toFixed(2).replace('.',',');
+        document.getElementById('net-profit').textContent = 'R$ ' + netProfit.toFixed(2).replace('.',',');
+        document.getElementById('approved-count').textContent = `Aprovados: ${approvedCount}`;
+        document.getElementById('pending-count').textContent = `Aguardando: ${pendingCount}`;
+        document.getElementById('margin-label').textContent = `Margem: ${margin.toFixed(1)}%`;
+    }
+
+    // --- Render Stock ---
+    function renderStock(products, orders) {
+        const container = document.getElementById('stock-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const soldMap = {};
+        orders.forEach(o => {
+            const status = (o.status || '').toLowerCase();
+            if (status.includes('pago') || status.includes('aprovado') || status.includes('enviado')) {
+                (o.items || []).forEach(item => {
+                    soldMap[item.id] = (soldMap[item.id] || 0) + (item.qty || item.quantity || 0);
+                });
+            }
+        });
+
+        products.forEach(p => {
+            const sold = soldMap[p.id] || 0;
+            const currentStock = p.stock || 0;
+            
+            const card = document.createElement('div');
+            card.className = 'order-card';
+            card.innerHTML = `
+                <div class="order-header" style="background:rgba(255,11,85,0.05);">
+                    <span class="order-id">${p.name}</span>
+                    <span class="status-badge status-dispatched">Estoque: ${currentStock}</span>
+                </div>
+                <div class="order-body">
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                        <img src="${p.image}" style="width:40px; height:40px; object-fit:contain; border-radius:6px; background:rgba(255,255,255,0.05);">
+                        <div>
+                            <p style="font-weight:700; color:var(--accent);">${p.brand || '---'}</p>
+                            <p style="font-size:12px; color:var(--text-muted);">Varejo: R$ ${parseFloat(p.price || 0).toFixed(2).replace('.',',')}</p>
+                        </div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; font-size:13px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                            <span>Total Saídas:</span>
+                            <span style="color:#00ff88; font-weight:700;">${sold}</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>Disponível:</span>
+                            <span style="color:${currentStock < 10 ? '#ffb90b' : '#fff'}; font-weight:700;">${currentStock} un</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-footer">
+                    <button class="refresh-btn" style="width:100%;" onclick="openStockModal('${p.id}', '${p.name}', ${currentStock})">
+                        Alterar Estoque
                     </button>
                 </div>
             `;
@@ -159,174 +360,78 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Modal & Dispatch ---
-    const modal = document.getElementById('tracking-modal');
-    const cancelBtn = document.getElementById('cancel-tracking');
-    const confirmBtn = document.getElementById('confirm-tracking');
-    const trackInput = document.getElementById('tracking-code-input');
-    const nameDisplay = document.getElementById('customer-name-display');
-
+    // --- Modals Logic ---
+    const trackModal = document.getElementById('tracking-modal');
+    const stockModal = document.getElementById('stock-modal');
+    const newStockInput = document.getElementById('new-stock-value');
+    
     let currentOrderTarget = null;
-    let currentEmailTarget = null;
+    let currentStockTargetId = null;
 
-    window.openTrackingModal = (orderId, customerName, customerEmail) => {
-        currentOrderTarget = orderId;
-        currentEmailTarget = customerEmail;
-        nameDisplay.textContent = customerName;
-        trackInput.value = '';
-        modal.classList.add('active');
-        trackInput.focus();
+    window.openTrackingModal = (id, name, email) => {
+        currentOrderTarget = id;
+        document.getElementById('customer-name-display').textContent = name;
+        document.getElementById('tracking-code-input').value = '';
+        trackModal.classList.add('active');
     };
 
-    cancelBtn.addEventListener('click', () => {
-        modal.classList.remove('active');
-    });
+    window.openStockModal = (id, name, current) => {
+        currentStockTargetId = id;
+        document.getElementById('stock-modal-product-name').textContent = name;
+        newStockInput.value = current;
+        stockModal.classList.add('active');
+    };
 
-    confirmBtn.addEventListener('click', async () => {
-        const code = trackInput.value.trim();
-        if(!code) {
-            alert("Informe o código de rastreio para continuar.");
-            return;
-        }
+    window.closeTrackingModal = () => trackModal.classList.remove('active');
+    window.closeStockModal = () => stockModal.classList.remove('active');
 
-        confirmBtn.disabled = true;
-        confirmBtn.textContent = 'Enviando E-mail...';
-
+    document.getElementById('confirm-tracking')?.addEventListener('click', async () => {
+        const code = document.getElementById('tracking-code-input').value.trim();
+        if(!code) return alert("Informe o código.");
+        
         try {
             const res = await fetch('/api/admin/dispatch', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    orderId: currentOrderTarget,
-                    trackingCode: code
-                })
+                body: JSON.stringify({ orderId: currentOrderTarget, trackingCode: code })
             });
-            const result = await res.json();
-
-            if (result.status === 'success') {
-                showToast(`E-mail enviado! Pedido #${currentOrderTarget} marcado como Enviado.`);
-                modal.classList.remove('active');
-                fetchData(); // Reload table
-            } else {
-                alert("Erro ao disparar e-mail: " + result.message);
+            if((await res.json()).status === 'success') {
+                showToast("Pedido despachado!");
+                closeTrackingModal();
+                fetchData();
             }
-        } catch(e) {
-            alert("Erro de conexão ao acessar rota de disparo.");
-            console.error(e);
-        } finally {
-            confirmBtn.disabled = false;
-            confirmBtn.textContent = 'Aprovar e Enviar E-mail';
-        }
+        } catch(e) { alert("Erro ao despachar."); }
+    });
+
+    document.getElementById('cancel-tracking')?.addEventListener('click', closeTrackingModal);
+
+    document.getElementById('save-stock-btn')?.addEventListener('click', async () => {
+        const val = newStockInput.value;
+        try {
+            const res = await fetch('/api/admin/products/stock', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-admin-password': localStorage.getItem('olimpo_admin_pass')
+                },
+                body: JSON.stringify({ productId: currentStockTargetId, stock: val })
+            });
+            if((await res.json()).status === 'success') {
+                showToast("Estoque atualizado!");
+                closeStockModal();
+                fetchData();
+            }
+        } catch(e) { alert("Erro ao salvar estoque."); }
     });
 
     function showToast(msg, isError = false) {
         const t = document.getElementById('toast');
+        if(!t) return;
         t.textContent = msg;
-        t.style.background = isError ? '#ff0b55' : '#00ff88';
-        t.style.color = isError ? '#fff' : '#000';
-        t.classList.add('show');
+        t.className = `toast ${isError ? 'error' : ''} show`;
         setTimeout(() => t.classList.remove('show'), 3500);
     }
 
-    // --- Render Finance ---
-    function renderFinance(orders) {
-        const tbody = document.getElementById('finance-tbody');
-        tbody.innerHTML = '';
-
-        let totalRevenue = 0;
-        let pendingRevenue = 0;
-
-        // reverse to show newest first in table
-        [...orders].reverse().forEach(o => {
-            const status = (o.status || 'Aguardando Pagamento').toLowerCase();
-            const val = parseFloat(o.total || 0);
-
-            if (status.includes('pago') || status.includes('aprovado') || status.includes('enviado') || status.includes('despachado')) {
-                totalRevenue += val;
-            } else {
-                pendingRevenue += val;
-            }
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${o.date || 'Recente'}</td>
-                <td><strong>#${o.id}</strong></td>
-                <td>${o.customer?.name || '---'}</td>
-                <td style="color:#00ff88; font-weight:bold;">R$ ${val.toFixed(2).replace('.',',')}</td>
-                <td><span class="status-badge ${status.includes('pago')||status.includes('enviado') ? 'status-paid' : 'status-pending'}">${o.status || 'Aguardando Pagamento'}</span></td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        document.getElementById('total-revenue').textContent = 'R$ ' + totalRevenue.toFixed(2).replace('.',',');
-        document.getElementById('pending-revenue').textContent = 'R$ ' + pendingRevenue.toFixed(2).replace('.',',');
-    }
-
-    // --- Render Stock ---
-    function renderStock(products, orders) {
-        const container = document.getElementById('stock-container');
-        container.innerHTML = '';
-
-        // Calculate sold items
-        const soldMap = {};
-        orders.forEach(o => {
-            const status = (o.status || 'Aguardando Pagamento').toLowerCase();
-            if (status.includes('pago') || status.includes('aprovado') || status.includes('enviado') || status.includes('despachado')) {
-                (o.items || []).forEach(item => {
-                    const key = item.id + (item.flavor ? '-' + item.flavor : '');
-                    soldMap[key] = (soldMap[key] || 0) + item.qty;
-                });
-            }
-        });
-
-        if (products.length === 0) {
-            container.innerHTML = '<p style="color:#aaa;">Catálogo de produtos não encontrado.</p>';
-            return;
-        }
-
-        products.forEach(p => {
-            const flavorsHtml = (p.flavors || []).map(f => {
-                const sold = soldMap[p.id + '-' + f] || 0;
-                return `
-                    <li style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.9rem; color:#ddd;">
-                        <span>${f}</span>
-                        <span class="item-qty" style="background: ${sold > 0 ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.05)'}; color: ${sold > 0 ? '#00ff88' : '#fff'};">${sold} saídas</span>
-                    </li>
-                `;
-            }).join('');
-
-            const totalSoldProd = (p.flavors || []).reduce((sum, f) => sum + (soldMap[p.id + '-' + f] || 0), 0) + (p.flavors?.length ? 0 : (soldMap[p.id] || 0));
-
-            const card = document.createElement('div');
-            card.className = 'order-card';
-            card.innerHTML = `
-                <div class="order-header" style="background:rgba(255,11,85,0.05);">
-                    <span class="order-id">${p.name}</span>
-                    <span class="status-badge status-dispatched">Total Saídas: ${totalSoldProd}</span>
-                </div>
-                <div class="order-body">
-                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-                        <img src="${p.image}" style="width:50px; height:50px; object-fit:contain; background:rgba(255,255,255,0.05); border-radius:8px; padding:5px;">
-                        <div>
-                            <p style="font-weight:bold; color:var(--accent);">${p.brand || '---'}</p>
-                            <p style="font-size:0.85rem; color:#aaa;">R$ ${p.price.toFixed(2).replace('.',',')} (Varejo)</p>
-                        </div>
-                    </div>
-                    <ul class="brand-items" style="background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; max-height: 180px; overflow-y: auto;">
-                        ${p.flavors && p.flavors.length ? flavorsHtml : `
-                        <li style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.9rem; color:#ddd;">
-                            <span>Único</span>
-                            <span class="item-qty" style="background: ${totalSoldProd > 0 ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.05)'}; color: ${totalSoldProd > 0 ? '#00ff88' : '#fff'};">${totalSoldProd} saídas</span>
-                        </li>
-                        `}
-                    </ul>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    // Initial load
     fetchData();
-
+    setInterval(fetchData, 20000);
 });

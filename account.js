@@ -31,6 +31,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (userGreeting) userGreeting.textContent = `Olá, ${capitalizedName}`;
     if (userEmailDisplay) userEmailDisplay.textContent = email;
 
+    // LIMPEZA DE CONTA TESTE (conceptsttw)
+    if (email === 'conceptsttw@gmail.com') {
+        localStorage.removeItem('userOrders');
+        localStorage.removeItem('ignite_cart');
+    }
+
     // 4. Carregar Pedidos Simulados (ou do LocalStorage)
     renderOrders();
 
@@ -38,8 +44,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
-            
-            // Estado de carregamento visual no botão
             const originalText = logoutBtn.textContent;
             logoutBtn.textContent = 'Saindo...';
             logoutBtn.style.opacity = '0.5';
@@ -56,39 +60,160 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('userEmail');
-                window.location.href = 'index.html'; // Volta pra home após deslogar
+                window.location.href = 'index.html'; 
             }
         });
     }
-    // 6. Atualizar Banner de Upsell
-    updateUpsellBanner();
 
+    // 6. Carregar Barra de Upsell
+    renderUpsellProducts();
 });
 
-// Função para dinamicamente alterar o texto do upsell com base no carrinho
-function updateUpsellBanner() {
-    const upsellText = document.getElementById('dynamicUpsellText');
-    if (!upsellText) return;
+// Função para renderizar a barra de produtos com carrossel horizontal premium
+async function renderUpsellProducts() {
+    const barContainer = document.getElementById('upsellProductsBar');
+    const nextBtn = document.getElementById('nextBtnAccount');
+    const prevBtn = document.getElementById('prevBtnAccount');
+    if (!barContainer) return;
 
-    let cart = [];
     try {
-        cart = JSON.parse(localStorage.getItem('ignite_cart')) || [];
-    } catch (e) {
-        cart = [];
-    }
-
-    const totalQty = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
-    
-    // Regra provisória de exemplo (meta de peças baseada no feedback do usuário)
-    // Se não tiver nada, incentiva a adicionar. Se tiver algo, calcula o que falta.
-    if (totalQty === 0) {
-        upsellText.innerHTML = 'Somente se você comprar agora será válida a promoção. Adicione produtos ao carrinho e aproveite a oferta oficial.';
-    } else {
-        // Exemplo: se tem peças, calcular falta para um bônus fantasma (ou usar a variação sugerida +15)
-        // Para simular a fala "Se ele tiver colocado 50 peças, a mensagem deve aparecer 'Adicione mais 15 peças'"
-        const bonusTarget = totalQty + 15; // Placeholder lógico (sempre +15 pra simular a oferta da tela do mockup)
+        const response = await fetch('products.json?v=' + Date.now());
+        if (!response.ok) throw new Error();
+        const allProducts = await response.json();
         
-        upsellText.innerHTML = `Você já tem <strong>${totalQty} peças</strong>. Adicione mais <strong>15 peças</strong> e aproveite a oferta exclusiva oficial!`;
+        // 1. Brand Prioritization
+        let cart = [];
+        try { cart = JSON.parse(localStorage.getItem('ignite_cart')) || []; } catch(e) {}
+        const cartBrands = [...new Set(cart.map(item => item.brand || 'Olimpo'))];
+        
+        const sorted = allProducts.sort((a, b) => {
+            const aMatch = cartBrands.includes(a.brand || 'Olimpo');
+            const bMatch = cartBrands.includes(b.brand || 'Olimpo');
+            if (aMatch && !bMatch) return -1;
+            if (!aMatch && bMatch) return 1;
+            return 0;
+        });
+
+        const totalQty = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+        
+        // 2. Update Progress Bar
+        const progressFill = document.getElementById('accountProgressFill');
+        const mainMsg = document.querySelector('.upsell-copy .main-msg');
+        
+        if (progressFill) {
+            let finalProgress = 0;
+            let msg = "";
+            
+            if (totalQty < 30) {
+                finalProgress = (totalQty / 30) * 60;
+                msg = `Faltam <b>${30 - totalQty}</b> itens para 5% de desconto`;
+            } else if (totalQty < 50) {
+                finalProgress = 60 + ((totalQty - 30) / 20) * 40;
+                msg = `🎉 5% OFF Ativado! Faltam <b>${50 - totalQty}</b> para <b>Frete Grátis</b>`;
+            } else {
+                finalProgress = 100;
+                msg = `<span style="color: #00ff88;">🔥 Frete Grátis e 5% OFF Ativados! Nível Máximo Alcançado.</span>`;
+            }
+            
+            progressFill.style.width = `${finalProgress}%`;
+            if (mainMsg) mainMsg.innerHTML = msg;
+        }
+
+        barContainer.innerHTML = '';
+
+        sorted.forEach((product, index) => {
+            const wholesalePrice = parseFloat(product.price);
+            const discountPrice = wholesalePrice * 0.95;
+            const finalPrice = totalQty >= 30 ? discountPrice : wholesalePrice;
+
+            const card = document.createElement('div');
+            card.className = `product-card glow-card animate-in`;
+            card.style.animationDelay = `${index * 0.05}s`;
+
+            card.innerHTML = `
+                <div class="product-image">
+                  <button class="product-wishlist" aria-label="Favoritar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                  </button>
+                  ${(() => {
+                    let imgSrc = product.image || 'assets/logo-ignite.png';
+                    if (imgSrc && !imgSrc.includes('/') && !imgSrc.startsWith('http')) {
+                        imgSrc = 'Images Pods/' + imgSrc;
+                    }
+                    return `<img src="${imgSrc}" alt="${product.name}" class="product-img-real" onerror="this.src='assets/logo-ignite.png'">`;
+                  })()}
+                </div>
+                <div class="product-info">
+                  <div class="product-brand">${product.brand || 'Olimpo'}</div>
+                  <h3 class="product-name">${product.name}</h3>
+                  <div class="product-footer">
+                    <div class="product-price">
+                      <span class="current" style="color: ${totalQty >= 30 ? '#00ff88' : '#fff'}">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+                      ${totalQty >= 30 ? `<span class="original" style="text-decoration: line-through; color: #666; font-size: 0.8rem;">R$ ${wholesalePrice.toFixed(2).replace('.', ',')}</span>` : ''}
+                    </div>
+                    <a href="product.html?id=${product.id}" class="buy-now-btn" aria-label="Ver mais">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                  </div>
+                </div>
+            `;
+            barContainer.appendChild(card);
+        });
+
+        // 2. Carousel Advanced Controls
+        const updateArrows = () => {
+            const scrollLeft = barContainer.scrollLeft;
+            const maxScroll = barContainer.scrollWidth - barContainer.clientWidth;
+            
+            if (prevBtn) {
+                if (scrollLeft <= 10) prevBtn.classList.add('hidden');
+                else prevBtn.classList.remove('hidden');
+            }
+            if (nextBtn) {
+                if (scrollLeft >= maxScroll - 10) nextBtn.classList.add('hidden');
+                else nextBtn.classList.remove('hidden');
+            }
+        };
+
+        const getScrollAmount = () => {
+            const firstCard = barContainer.querySelector('.product-card');
+            if (!firstCard) return 300;
+            const cardWidth = firstCard.offsetWidth;
+            const style = window.getComputedStyle(barContainer);
+            const gap = parseInt(style.gap) || 20;
+            return cardWidth + gap;
+        };
+
+        if (nextBtn) {
+            nextBtn.onclick = () => {
+                const amount = getScrollAmount();
+                barContainer.scrollBy({ left: amount, behavior: 'smooth' });
+                // Usando active check para botões mais responsivos
+                requestAnimationFrame(() => {
+                    setTimeout(updateArrows, 500);
+                });
+            };
+        }
+        if (prevBtn) {
+            prevBtn.onclick = () => {
+                const amount = getScrollAmount();
+                barContainer.scrollBy({ left: -amount, behavior: 'smooth' });
+                requestAnimationFrame(() => {
+                    setTimeout(updateArrows, 500);
+                });
+            };
+        }
+
+        let isScrolling;
+        barContainer.addEventListener('scroll', () => {
+            window.clearTimeout(isScrolling);
+            isScrolling = setTimeout(updateArrows, 100);
+        }, { passive: true });
+        updateArrows(); 
+
+    } catch (e) {
+        console.error('Erro ao carregar produtos para upsell:', e);
+        barContainer.innerHTML = '<p style="color: #666;">Não foi possível carregar as ofertas no momento.</p>';
     }
 }
 
@@ -97,7 +222,6 @@ function renderOrders() {
     const listContainer = document.getElementById('accountOrdersList');
     if (!listContainer) return;
 
-    // Tentar puxar do armazenamento local (se o site salvar pedidos lá)
     let userOrders = [];
     try {
         userOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
@@ -105,7 +229,9 @@ function renderOrders() {
         userOrders = [];
     }
 
-    // Se não houver nenhum pedido salvo, mostramos UI vazia corretamente
+    const MOCK_ORDER_IDS = ['54321', '12345'];
+    userOrders = userOrders.filter(o => !MOCK_ORDER_IDS.includes(String(o.id).replace('ORD-', '')));
+
     if (userOrders.length === 0) {
         listContainer.innerHTML = `
             <div style="text-align: center; color: #888; padding: 40px 20px;">
@@ -113,19 +239,18 @@ function renderOrders() {
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 </svg>
                 <p>Você ainda não possui nenhum pedido concluído na sua conta.</p>
-                <a href="index.html#produtos" class="btn-auth" style="display:inline-block; margin-top: 15px; padding: 10px 20px; text-decoration: none;">Comprar Agora</a>
+                <a href="index.html#produtos" class="btn-auth" style="margin-top: 15px; text-decoration: none;">Comprar Agora</a>
             </div>
         `;
         return;
     }
 
-    listContainer.innerHTML = ''; // Limpa o "Carregando..."
+    listContainer.innerHTML = ''; 
 
     userOrders.forEach(order => {
-        let statusColor = '#00ff88'; // Verde para Entregue por padrão (vamos usar o vermelho se quiser mas verde remete a check)
-        
+        let statusColor = '#00ff88'; 
         if (order.status.toLowerCase().includes('produção') || order.status.toLowerCase().includes('processamento')) {
-            statusColor = '#f39c12'; // Laranja
+            statusColor = '#f39c12';
         }
 
         const orderHtml = `

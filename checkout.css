@@ -82,7 +82,7 @@ body.checkout-page {
 
 /* Main Grid */
 .checkout-main {
-    padding: 40px 0 80px;
+    padding: 40px 0 120px; /* Increased bottom padding to avoid overlap with sticky bars */
 }
 
 .checkout-grid {

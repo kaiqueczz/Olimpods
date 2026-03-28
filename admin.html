@@ -5,8 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Olimpo Admin Dashboard</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css?v=1.1">
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1423800812314865');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1423800812314865&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -27,14 +44,14 @@
     <main class="main-content">
         <header class="topbar">
             <h1 style="color: var(--accent); text-transform: uppercase; font-weight: 900; letter-spacing: 1px; font-size: 2.2rem;">VISÃO GERAL</h1>
-            <div class="stats-row">
-                <div class="stat-card">
-                    <h3>Total de Pedidos</h3>
-                    <p id="total-orders-count">0</p>
+            <div class="stats-grid" style="margin-bottom: 32px;">
+                <div class="premium-card">
+                    <span class="card-label">Total de Pedidos</span>
+                    <p id="total-orders-count" class="card-value">0</p>
                 </div>
-                <div class="stat-card">
-                    <h3>Leads Registrados</h3>
-                    <p id="total-users-count">0</p>
+                <div class="premium-card">
+                    <span class="card-label">Leads Registrados</span>
+                    <p id="total-users-count" class="card-value">0</p>
                 </div>
             </div>
         </header>
@@ -42,7 +59,14 @@
         <div id="orders-view" class="view-section active">
             <div class="section-header">
                 <h2>Controle de pedidos</h2>
-                <button id="refresh-orders" class="refresh-btn">⟳ Atualizar</button>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="order-search-input" class="order-search-input" placeholder="🔍 Buscar por CEP, Rua ou Cidade...">
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-filter="all">Todos</button>
+                        <button class="filter-btn" data-filter="paid">Pagos</button>
+                    </div>
+                    <button id="refresh-orders" class="refresh-btn">⟳ Atualizar</button>
+                </div>
             </div>
             
             <div id="orders-container" class="orders-grid">
@@ -52,16 +76,23 @@
 
         <div id="finance-view" class="view-section">
             <div class="section-header">
-                <h2>Faturamento e Receita</h2>
+                <h2>Gestão Financeira e Lucratividade</h2>
             </div>
-            <div class="stats-row" style="margin-bottom: 30px;">
-                <div class="stat-card" style="border-left: 4px solid #00ff88;">
-                    <h3>Faturamento (Aprovados)</h3>
-                    <p id="total-revenue">R$ 0,00</p>
+            <div class="stats-grid">
+                <div class="premium-card">
+                    <span class="card-label">Vendas aprovadas - Total</span>
+                    <p id="total-revenue" class="card-value">R$ 0,00</p>
+                    <span class="card-sub-label success" id="approved-count">Aprovados: 0</span>
                 </div>
-                <div class="stat-card" style="border-left: 4px solid #ffaa00;">
-                    <h3>Faturamento (Pendentes)</h3>
-                    <p id="pending-revenue">R$ 0,00</p>
+                <div class="premium-card profit-card">
+                    <span class="card-label">Lucro Líquido Acumulado</span>
+                    <p id="net-profit" class="card-value primary">R$ 0,00</p>
+                    <span class="card-sub-label success" id="margin-label">Margem: 0%</span>
+                </div>
+                <div class="premium-card">
+                    <span class="card-label">Vendas pendentes - Total</span>
+                    <p id="pending-revenue" class="card-value warning">R$ 0,00</p>
+                    <span class="card-sub-label warning" id="pending-count">Aguardando: 0</span>
                 </div>
             </div>
             <div class="table-card">
@@ -111,8 +142,8 @@
                             <th>Status Verificação</th>
                         </tr>
                     </thead>
-                    <tbody id="leads-tbody">
-                        <!-- Leads will be injected here via JS -->
+                    <tbody id="users-table-body">
+                        <!-- Leads will be injected here via JS (matches admin.js renderUsers) -->
                     </tbody>
                 </table>
             </div>
@@ -120,6 +151,22 @@
     </main>
 
     <!-- Modal Rastreio -->
+    <!-- Modal para Alterar Estoque -->
+    <div id="stock-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Alterar Estoque</h3>
+            <p id="stock-modal-product-name" style="color: var(--accent); font-weight: 700; margin-bottom: 20px;"></p>
+            <div class="input-group">
+                <label>Nova Quantidade em Estoque</label>
+                <input type="number" id="new-stock-value" placeholder="Ex: 50" min="0">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeStockModal()">Cancelar</button>
+                <button class="btn-primary" id="save-stock-btn">Salvar Alteração</button>
+            </div>
+        </div>
+    </div>
+
     <div id="tracking-modal" class="modal-overlay">
         <div class="modal-content">
             <h3>Disparar Pedido Pronto</h3>
@@ -140,6 +187,6 @@
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
-    <script src="admin.js"></script>
+    <script src="admin.js?v=1.1"></script>
 </body>
 </html>

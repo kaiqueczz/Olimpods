@@ -5,10 +5,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description"
-    content="Olimpo Pods — Sua loja online de Ignite, Elfbar, Blacksheep e Adjust. Enviamos para todo o Brasil com desconto via Pix.">
+    content="Olimpo Pods — Sua loja online de Ignite, Elfbar e Blacksheep. Enviamos para todo o Brasil com desconto via Pix.">
   <title>Olimpo Pods — Sua Loja Online</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="assets/logo-ignite.png" type="image/png">
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1423800812314865');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1423800812314865&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
 </head>
 
 <body>
@@ -73,7 +90,6 @@
             <a href="#produtos" class="category-link" data-cat="elfbar">Elfbar</a>
             <a href="#produtos" class="category-link" data-cat="blacksheep">Black Sheep</a>
             <a href="#produtos" class="category-link" data-cat="ignite">Ignite</a>
-            <a href="#produtos" class="category-link" data-cat="adjust">Adjust</a>
             <a href="#produtos" class="category-link" data-cat="all">Todos</a>
           </div>
         </div>
@@ -464,9 +480,6 @@
         <button class="tab-btn" data-category="ignite">Ignite</button>
         <button class="tab-btn" data-category="elfbar">Elfbar</button>
         <button class="tab-btn" data-category="blacksheep">Blacksheep</button>
-        
-        
-        
         <button class="tab-btn" data-category="adjust">Adjust</button>
       </div>
 
@@ -491,7 +504,7 @@
             segmento.</p>
           <p>Cada pedido que enviamos carrega nosso compromisso com
             qualidade, agilidade e transparência. Trabalhamos com as
-            melhores marcas do mercado — Ignite, Elfbar, Blacksheep e Adjust — para garantir que você
+            melhores marcas do mercado — Ignite, Elfbar e Blacksheep — para garantir que você
             tenha sempre as melhores opções.</p>
           <p>Mais do que uma loja, somos uma comunidade. E é a
             confiança de cada cliente que nos motiva a evoluir todos os
@@ -599,16 +612,29 @@
       </button>
     </div>
 
-    <!-- Progress Bar -->
+    <!-- Multi-stage Progress Bar -->
     <div class="minimum-progress-container">
-      <div class="progress-info">
-        <span id="progressText">Faltam <b>10</b> itens para o mínimo</span>
+      <div class="progress-header">
+        <span id="progressText">Faltam <b>30</b> itens para 5% de desconto</span>
         <span id="progressPercent">0%</span>
       </div>
       <div class="progress-track">
-        <div class="progress-fill" id="progressFill"></div>
+        <div id="progressFill"></div>
+        <div class="milestones-container">
+          <div class="milestone-marker" style="left: 20%;" data-goal="10">
+            <span class="milestone-label">Atacado</span>
+          </div>
+          <div class="milestone-marker" style="left: 60%;" data-goal="30">
+            <span class="milestone-label">5% OFF</span>
+          </div>
+          <div class="milestone-marker" style="left: 100%;" data-goal="50">
+            <span class="milestone-label">Frete Grátis</span>
+          </div>
+        </div>
       </div>
+      <div class="progress-subtext">50+ unidades frete é grátis.</div>
     </div>
+
 
     <div class="cart-items-list" id="sidebarCartItems">
       <!-- Dynamic Items -->
@@ -682,6 +708,23 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/supabase-config.js"></script>
+  <!-- Smooth Scroll (Lenis) -->
+  <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script> 
+  <!-- ==================== STICKY UP-SELL BAR ==================== -->
+  <div class="sticky-upsell-bar" id="stickyUpsellBar">
+    <div class="upsell-info">
+      <div class="upsell-message" id="upsellMessage">Faltam <b>30 itens</b> para 5% de desconto!</div>
+      <div class="upsell-progress-container">
+        <div class="upsell-progress-fill" id="upsellProgressFill"></div>
+      </div>
+      <div class="progress-subtext right">50+ unidades frete é grátis.</div>
+    </div>
+    <div class="upsell-actions">
+      <button class="btn-view-cart" onclick="toggleCartSidebar(true)">Ver Carrinho</button>
+    </div>
+  </div>
+
+  <script src="assets/products-data.js"></script>
   <script src="script.js"></script>
 </body>
 
