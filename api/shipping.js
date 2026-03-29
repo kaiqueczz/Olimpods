@@ -53,11 +53,17 @@ export default async function handler(req, res) {
 
     const km = haversineKm(ORIGIN.lat, ORIGIN.lon, destCoords.lat, destCoords.lon);
 
-    // Formulas optimized for "Fixed + (Distance * Rate)"
-    const pacPrice = Math.min(35 + (km * 0.05) + (peso * 2), 160);
-    const sedexPrice = Math.min(55 + (km * 0.07) + (peso * 2), 250);
-    const loggiPrice = Math.min(80 + (km * 0.04), 180);
-    const jadlogPrice = Math.min(95 + (km * 0.05), 230);
+    // --- Base Rules (Estimating Real Correios Cost) ---
+    const basePac = 35 + (km * 0.05) + (peso * 2);
+    const baseSedex = 55 + (km * 0.07) + (peso * 2);
+
+    // --- Markup (25%) ---
+    const pacPrice = basePac * 1.25;
+    const sedexPrice = baseSedex * 1.25;
+
+    // --- Fixed Rates ---
+    const loggiPrice = 160.00;
+    const jadlogPrice = 200.00;
 
     const pacDays = Math.max(5, Math.min(15, Math.round(km / 250)));
     const sedexDays = Math.max(2, Math.min(8, Math.round(km / 500)));
@@ -65,10 +71,14 @@ export default async function handler(req, res) {
     const options = [
       { name: 'PAC', price: parseFloat(pacPrice.toFixed(2)), deadline: `${pacDays} dias úteis`, group: 'Correios' },
       { name: 'SEDEX', price: parseFloat(sedexPrice.toFixed(2)), deadline: `${sedexDays} dias úteis`, group: 'Correios' },
-      { name: 'Loggi', price: parseFloat(loggiPrice.toFixed(2)), deadline: '8 dias úteis', group: 'Transportadoras' },
-      { name: 'Jadlog', price: parseFloat(jadlogPrice.toFixed(2)), deadline: '10 dias úteis', group: 'Transportadoras' },
+      { name: 'Loggi', price: loggiPrice, deadline: '2 a 5 dias úteis', group: 'Transportadoras' },
+      { name: 'Jadlog', price: jadlogPrice, deadline: '3 a 7 dias úteis', group: 'Transportadoras' },
     ];
 
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
     res.status(200).json({ status: 'success', options });
   } catch (err) {
     res.status(500).json({ status: 'error', message: err.message });

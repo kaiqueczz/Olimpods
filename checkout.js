@@ -318,11 +318,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (data.status === 'success' && data.options && data.options.length > 0) {
                 // All 4 options come from the server with group info
-                const allOptions = data.options.map(opt => ({
-                    ...opt,
-                    isGroupRecommended: opt.group === 'Transportadoras',
-                    recommended: false
-                }));
+                // Sort by price (Lowest First)
+                allOptions.sort((a, b) => a.price - b.price);
 
                 renderShippingList(allOptions);
             } else {
@@ -332,11 +329,12 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Erro ao carregar frete real, usando fallback:", error);
             // Fallback para não travar o checkout
             const fallbackOptions = [
-                { group: "Correios", isGroupRecommended: false, name: "PAC", price: 70.00, deadline: "10 dias úteis", recommended: false },
-                { group: "Correios", isGroupRecommended: false, name: "SEDEX", price: 100.00, deadline: "6 dias úteis", recommended: false },
-                { group: "Transportadoras", isGroupRecommended: true, name: "Loggi", price: 160.00, deadline: "15 dias úteis", recommended: false },
-                { group: "Transportadoras", isGroupRecommended: true, name: "Jadlog", price: 220.00, deadline: "12 dias úteis", recommended: false },
-            ];
+                { group: "Correios", name: "PAC", price: 85.00, deadline: "10 dias úteis" },
+                { group: "Correios", name: "SEDEX", price: 120.00, deadline: "6 dias úteis" },
+                { group: "Transportadoras", name: "Loggi", price: 160.00, deadline: "2 a 5 dias úteis" },
+                { group: "Transportadoras", name: "Jadlog", price: 200.00, deadline: "3 a 7 dias úteis" },
+            ].sort((a, b) => a.price - b.price);
+            
             renderShippingList(fallbackOptions);
 
         }
@@ -350,23 +348,23 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderShippingList(options) {
         const list = document.getElementById('shipping-methods-list');
         let htmlContent = '';
-        let currentGroup = '';
+        
+        // Use a single generic header for global sorting
+        htmlContent += `<div style="margin-top: 20px; margin-bottom: 20px; font-weight: 700; color: #fff; font-size: 1.15rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+            Opções de Entrega
+            <span style="font-weight: 400; font-size: 0.8rem; color: #888;">Ordenado por menor preço</span>
+        </div>`;
 
         options.forEach(opt => {
-            if (opt.group !== currentGroup) {
-                currentGroup = opt.group;
-                const groupBadge = opt.isGroupRecommended ? `<span style="background: var(--accent-primary); color: #fff; font-size: 0.70rem; font-weight: bold; padding: 4px 8px; border-radius: 4px; margin-left: 10px; text-transform: uppercase; letter-spacing: 0.5px;">* MAIS INDICADO</span>` : '';
-                htmlContent += `<div style="margin-top: 20px; margin-bottom: 12px; font-weight: 700; color: #fff; font-size: 1.15rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; display: flex; align-items: center;">${currentGroup} ${groupBadge}</div>`;
-            }
-
-            const recBadge = opt.recommended ? `<span style="background: var(--accent-primary); color: #fff; font-size: 0.65rem; font-weight: bold; padding: 3px 6px; border-radius: 4px; margin-left: 8px; text-transform: uppercase; letter-spacing: 0.5px;">* Mais indicado</span>` : '';
+            const groupName = opt.group === 'Correios' ? 'Correios' : 'Transportadora';
+            const displayName = `${groupName} - ${opt.name}`;
             
             htmlContent += `
                 <label class="shipping-option" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; cursor:pointer; border:1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; margin-bottom: 10px;">
                     <div style="display:flex; align-items:center; gap:15px;">
                         <input type="radio" name="shippingMethod" value="${opt.price}" data-name="${opt.name}" onchange="updateShippingSelection(this)" style="accent-color: var(--accent-primary); width: 20px; height: 20px; cursor: pointer;">
                         <div class="shipping-info" style="display:flex; flex-direction:column;">
-                            <span class="shipping-name" style="font-weight:600; color:#fff; font-size:1.1rem; display: flex; align-items: center;">${opt.name} ${recBadge}</span>
+                            <span class="shipping-name" style="font-weight:600; color:#fff; font-size:1.1rem; display: flex; align-items: center;">${displayName}</span>
                             <span class="shipping-deadline" style="font-size:0.85rem; color:#aaa; margin-top: 3px;">Entrega em até ${opt.deadline}</span>
                         </div>
                     </div>
