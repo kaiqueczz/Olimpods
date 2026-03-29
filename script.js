@@ -382,7 +382,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!badge || !text) return;
 
     try {
-      const response = await fetch('/api/location');
+      let response = await fetch('/api/location');
+      if (!response.ok) {
+        response = await fetch('pix_proxy.php?action=location');
+      }
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
 
@@ -1270,11 +1273,19 @@ document.addEventListener('DOMContentLoaded', () => {
       submitBtn.textContent = '...';
 
       try {
-        const response = await fetch('/api/newsletter', {
+        let response = await fetch('/api/newsletter', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: emailInput.value })
         });
+        
+        if (!response.ok) {
+          response = await fetch('pix_proxy.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'newsletter', email: emailInput.value })
+          });
+        }
 
         const result = await response.json();
 

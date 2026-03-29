@@ -10,10 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const isNodePort = window.location.port === '3000';
-    
-    // Se estivermos no localhost:3000 ou em qualquer outro domínio (produção), 
-    // usamos caminhos relativos para garantir que o fetch acerte o servidor correto.
     const API_BASE = (isLocalhost && !isNodePort) ? 'http://localhost:3000' : '';
+
+    // DOM Elements - Initialized early to avoid ReferenceErrors
+    const summaryItems = document.getElementById('summary-items');
+    const subtotalEl = document.getElementById('summary-subtotal');
+    const totalEl = document.getElementById('summary-total');
+    const submitBtn = document.getElementById('submit-purchase');
 
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     // const checkoutWrapper = document.getElementById('checkout-wrapper'); 
@@ -400,10 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================
     // 4. Cart Rendering & Validation
     // =========================================
-    const summaryItems = document.getElementById('summary-items');
-    const subtotalEl = document.getElementById('summary-subtotal');
-    const totalEl = document.getElementById('summary-total');
-    const submitBtn = document.getElementById('submit-purchase');
+    // Elements already initialized at the top to prevent ReferenceErrors
 
     // checkoutCart already managed by syncCartFromStorage()
     // currentSubtotal already declared at top level
@@ -726,12 +726,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log(`🔄 PIX: Tentativa ${attempt}/${MAX_RETRIES}...`);
 
                 try {
-                    const apiUrl = `${API_BASE}/api/pix/qrcode`;
-                    const res = await fetch(apiUrl, {
+                    let apiUrl = `${API_BASE}/api/pix/qrcode`;
+                    let fetchOptions = {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(pixPayload)
-                    });
+                    };
+
+                    // Production Fallback: Use PHP Proxy
+                    if (!API_BASE) {
+                        apiUrl = 'pix_proxy.php';
+                        fetchOptions.body = JSON.stringify({ action: 'qrcode', ...pixPayload });
+                    }
+
+                    const res = await fetch(apiUrl, fetchOptions);
 
                     // Robust Check: If not JSON or not OK, inspect body
                     const contentType = res.headers.get('content-type');
@@ -836,12 +844,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Push to Backend
-                const apiUrl = `${API_BASE}/api/orders/new`;
-                fetch(apiUrl, {
+                let apiUrl = `${API_BASE}/api/orders/new`;
+                let fetchOptions = {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(order)
-                }).catch(err => console.error("Admin sync error:", err));
+                };
+
+                // Production Fallback: Use PHP Proxy
+                if (!API_BASE) {
+                    apiUrl = 'pix_proxy.php';
+                    fetchOptions.body = JSON.stringify({ action: 'save_order', order: order });
+                }
+
+                fetch(apiUrl, fetchOptions).catch(err => console.error("Admin sync error:", err));
             }
 
             function handlePixSuccess(data) {
