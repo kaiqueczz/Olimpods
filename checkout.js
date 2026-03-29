@@ -726,18 +726,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log(`🔄 PIX: Tentativa ${attempt}/${MAX_RETRIES}...`);
 
                 try {
-                    let apiUrl = `${API_BASE}/api/pix/qrcode`;
+                    let apiUrl = `/api/pix`;
                     let fetchOptions = {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(pixPayload)
                     };
-
-                    // Production Fallback: Use PHP Proxy
-                    if (!API_BASE) {
-                        apiUrl = 'pix_proxy.php';
-                        fetchOptions.body = JSON.stringify({ action: 'qrcode', ...pixPayload });
-                    }
 
                     const res = await fetch(apiUrl, fetchOptions);
 
@@ -844,18 +838,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Push to Backend
-                let apiUrl = `${API_BASE}/api/orders/new`;
+                let apiUrl = `/api/orders/new`;
                 let fetchOptions = {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(order)
                 };
-
-                // Production Fallback: Use PHP Proxy
-                if (!API_BASE) {
-                    apiUrl = 'pix_proxy.php';
-                    fetchOptions.body = JSON.stringify({ action: 'save_order', order: order });
-                }
 
                 fetch(apiUrl, fetchOptions).catch(err => console.error("Admin sync error:", err));
             }
