@@ -72,7 +72,20 @@
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    /* Removido white-space: nowrap para evitar quebra de layout com nomes longos */
+    
+    /* Override for gradual-spacing to keep text smaller and on one line */
+    --gs-size: clamp(1.8rem, 5vw, 3rem);
+    white-space: nowrap;
+    flex-wrap: nowrap !important;
+}
+
+.auth-title.gradual-spacing {
+    flex-wrap: nowrap !important;
+}
+
+.auth-title.gradual-spacing .gs-word {
+    white-space: nowrap;
+    flex-wrap: nowrap !important;
 }
 
 /* ... existing styles ... */
