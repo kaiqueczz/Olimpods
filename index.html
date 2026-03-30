@@ -7,7 +7,7 @@
   <meta name="description"
     content="Olimpo Pods — Sua loja online de Ignite, Elfbar e Blacksheep. Enviamos para todo o Brasil com desconto via Pix.">
   <title>Olimpo Pods — Sua Loja Online</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2.1">
   <link rel="icon" href="assets/logo-ignite.png" type="image/png">
   <!-- Meta Pixel Code -->
   <script>
@@ -29,6 +29,26 @@
 </head>
 
 <body>
+
+  <!-- =========================================
+       AGE VERIFICATION MODAL
+       ========================================= -->
+  <div class="age-verification-overlay" id="ageVerificationOverlay">
+    <div class="age-verification-card">
+      <div class="age-logo-box">
+        <img src="assets/logo-ignite.png" alt="Olimpo Pods Logo">
+      </div>
+      <h2>Acesso Restrito</h2>
+      <p>Você precisa ter <strong>18 anos ou mais</strong> para acessar nosso site e adquirir nossos produtos.</p>
+      <div class="age-btn-group">
+        <button class="age-confirm-btn" id="ageConfirmBtn">Sim, sou maior de 18 anos</button>
+        <button class="age-deny-btn" id="ageDenyBtn">Não, sou menor de idade</button>
+      </div>
+      <div class="age-legal-msg">
+        O Ministério da Saúde adverte: Este produto destina-se apenas a maiores de idade.
+      </div>
+    </div>
+  </div>
 
   <!-- Announcement Bar -->
   <div class="top-banner">
@@ -707,7 +727,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/supabase-config.js"></script>
+  <script src="assets/supabase-config.js?v=2.1"></script>
   <!-- Smooth Scroll (Lenis) -->
   <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script> 
   <!-- ==================== STICKY UP-SELL BAR ==================== -->
@@ -720,12 +740,12 @@
       <div class="progress-subtext right">50+ unidades frete é grátis.</div>
     </div>
     <div class="upsell-actions">
-      <button class="btn-view-cart" onclick="toggleCartSidebar(true)">Ver Carrinho</button>
+      <button class="btn-view-cart" onclick="window.toggleCartSidebar(true)">Ver Carrinho</button>
     </div>
   </div>
 
-  <script src="assets/products-data.js"></script>
-  <script src="script.js"></script>
+  <script src="assets/products-data.js?v=2.1"></script>
+  <script src="script.js?v=2.1"></script>
 </body>
 
 </html>

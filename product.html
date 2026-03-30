@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Produto — Olimpo Pods</title>
     <link rel="icon" href="assets/logo-ignite.png" type="image/png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=1.1">
     <style>
         /* Specific styles for product page */
         .product-detail-section {
@@ -482,6 +482,26 @@
 </head>
 
 <body>
+
+  <!-- =========================================
+       AGE VERIFICATION MODAL
+       ========================================= -->
+  <div class="age-verification-overlay" id="ageVerificationOverlay">
+    <div class="age-verification-card">
+      <div class="age-logo-box">
+        <img src="assets/logo-ignite.png" alt="Olimpo Pods Logo">
+      </div>
+      <h2>Acesso Restrito</h2>
+      <p>Você precisa ter <strong>18 anos ou mais</strong> para acessar nosso site e adquirir nossos produtos.</p>
+      <div class="age-btn-group">
+        <button class="age-confirm-btn" id="ageConfirmBtn">Sim, sou maior de 18 anos</button>
+        <button class="age-deny-btn" id="ageDenyBtn">Não, sou menor de idade</button>
+      </div>
+      <div class="age-legal-msg">
+        O Ministério da Saúde adverte: Este produto destina-se apenas a maiores de idade.
+      </div>
+    </div>
+  </div>
 
     <!-- Announcement Bar -->
     <div class="top-banner">
@@ -1036,11 +1056,12 @@
                     // Render special mobile brand carousels
                     renderMobileBrandCarousels(products);
                 } else {
-                    document.getElementById('product-detail').innerHTML = '<p>Produto não encontrado.</p>';
+                    document.getElementById('productContent').innerHTML = '<p>Produto não encontrado.</p>';
                 }
             } catch (error) {
                 console.error("Erro ao carregar produto:", error);
-                document.getElementById('product-detail').innerHTML = '<p>Erro ao carregar produto.</p>';
+                const pc = document.getElementById('productContent');
+                if (pc) pc.innerHTML = '<p>Erro ao carregar produto.</p>';
             }
         }
 
@@ -1109,9 +1130,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="assets/supabase-config.js"></script>
-    <script src="assets/products-data.js"></script>
-    <script src="script.js"></script>
+    <script src="assets/supabase-config.js?v=1.1"></script>
+    <script src="assets/products-data.js?v=1.1"></script>
+    <script src="script.js?v=1.1"></script>
 </body>
 
 </html>

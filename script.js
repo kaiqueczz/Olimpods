@@ -1802,4 +1802,49 @@ document.addEventListener('DOMContentLoaded', () => {
   giftModal?.addEventListener('click', (e) => {
     if (e.target === giftModal) window.toggleGiftModal(false);
   });
+  
+  // =========================================
+  // 13. Age Verification Modal
+  // =========================================
+  const ageOverlay = document.getElementById('ageVerificationOverlay');
+  const ageConfirmBtn = document.getElementById('ageConfirmBtn');
+  const ageDenyBtn = document.getElementById('ageDenyBtn');
+
+  if (ageOverlay) {
+    const isVerified = localStorage.getItem('ignite_age_verified') === 'true';
+    
+    if (!isVerified) {
+      // Small delay to allow initial render
+      setTimeout(() => {
+        ageOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+      }, 500);
+    }
+
+    if (ageConfirmBtn) {
+      ageConfirmBtn.addEventListener('click', () => {
+        localStorage.setItem('ignite_age_verified', 'true');
+        ageOverlay.classList.remove('active');
+        document.body.style.overflow = ''; // Restore scrolling
+        
+        // Track age verification if pixel is active
+        if (window.fbq) {
+          fbq('trackCustom', 'AgeVerified');
+        }
+      });
+    }
+
+    if (ageDenyBtn) {
+      ageDenyBtn.addEventListener('click', () => {
+        // Redirect to a safe site or show a stark message
+        document.body.innerHTML = `
+          <div style="height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; color: #fff; text-align: center; padding: 20px;">
+            <h1 style="color: #ff0b55; margin-bottom: 20px;">Acesso Negado</h1>
+            <p>Este site é restrito para maiores de 18 anos.</p>
+          </div>
+        `;
+      });
+    }
+  }
+
 });

@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const totalItems = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
-            const apiUrl = `${API_BASE}/api/shipping`;
+            const apiUrl = `/api/v2/shipping`;
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -317,8 +317,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             if (data.status === 'success' && data.options && data.options.length > 0) {
-                // All 4 options come from the server with group info
-                // Sort by price (Lowest First)
+                // Ensure all options have consistent recommended status for sorting
+                const allOptions = data.options.map(opt => ({
+                    ...opt,
+                    isGroupRecommended: opt.group === 'Transportadoras',
+                    recommended: false
+                }));
+
+                // Global Sort by price (Lowest First)
                 allOptions.sort((a, b) => a.price - b.price);
 
                 renderShippingList(allOptions);
