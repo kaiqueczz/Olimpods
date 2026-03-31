@@ -2164,6 +2164,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .product-price {
@@ -2173,7 +2176,7 @@ body {
 
 .product-price .current {
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.3rem; /* Slightly smaller to fit layout perfectly */
   font-weight: 800;
   color: var(--accent-neon);
 }
@@ -2184,14 +2187,38 @@ body {
   text-decoration: line-through;
 }
 
-.buy-now-btn,
-.add-cart-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+/* Redesigned Action Pill (replaces old circular buy-now-btn) */
+.product-action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  background: rgba(255, 11, 85, 0.1);
+  padding: 8px 14px;
+  border-radius: 50px;
+  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.buy-now-btn,
+.product-action-pill svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.3s;
+}
+
+.product-card:hover .product-action-pill {
+  background: var(--accent-primary);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(255, 11, 85, 0.4);
+}
+
+.product-card:hover .product-action-pill svg {
+  transform: translateX(4px);
+}
+
+/* Preserve add-cart-btn for other parts of the site */
 .add-cart-btn {
   width: 44px;
   height: 44px;
@@ -2208,7 +2235,6 @@ body {
   will-change: transform, box-shadow;
 }
 
-.buy-now-btn:hover,
 .add-cart-btn:hover,
 .hero-cta:hover {
   transform: scale(1.05);

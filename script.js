@@ -1324,6 +1324,14 @@ document.addEventListener('DOMContentLoaded', () => {
       card.style.animationDelay = `${(index % 4) * 0.1}s`;
       if (index === 0) card.classList.add('active'); // First card active by default on mobile
 
+      card.style.cursor = 'pointer';
+      card.onclick = (e) => {
+        // Prevent navigation if the wishlist button was clicked
+        if (!e.target.closest('.product-wishlist')) {
+          window.location.href = `product.html?id=${p.id}`;
+        }
+      };
+
       card.innerHTML = `
         <div class="product-image">
           <button class="product-wishlist" aria-label="Favoritar">
@@ -1338,14 +1346,15 @@ document.addEventListener('DOMContentLoaded', () => {
           <h3 class="product-name">${p.name}</h3>
           <div class="product-footer">
             <div class="product-price">
-              <span class="current">R$ ${((window.currentSaleType === 'retail' ? (p.retail_price ? parseFloat(p.retail_price) : parseFloat(p.price) * 1.4) : parseFloat(p.price)).toFixed(2)).replace('.', ',')}</span>
               ${window.currentSaleType === 'retail' ? `<span class="original">R$ ${(p.retail_price ? parseFloat(p.retail_price) * 1.3 : parseFloat(p.price) * 1.8).toFixed(2).replace('.', ',')}</span>` : ''}
+              <span class="current">R$ ${((window.currentSaleType === 'retail' ? (p.retail_price ? parseFloat(p.retail_price) : parseFloat(p.price) * 1.4) : parseFloat(p.price)).toFixed(2)).replace('.', ',')}</span>
             </div>
-            <a href="product.html?id=${p.id}" class="buy-now-btn" aria-label="Ver mais">
+            <div class="product-action-pill">
+              <span>Ver Detalhes</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M5 12h14M12 5l7 7-7 7"/>
               </svg>
-            </a>
+            </div>
           </div>
         </div>
       `;
