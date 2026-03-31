@@ -1350,7 +1350,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <span class="current">R$ ${((window.currentSaleType === 'retail' ? (p.retail_price ? parseFloat(p.retail_price) : parseFloat(p.price) * 1.4) : parseFloat(p.price)).toFixed(2)).replace('.', ',')}</span>
             </div>
             <div class="product-action-pill">
-              <span>Ver Detalhes</span>
+              <span>COMPRAR</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M5 12h14M12 5l7 7-7 7"/>
               </svg>
