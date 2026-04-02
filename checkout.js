@@ -200,7 +200,104 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     checkoutUpsellGrid.addEventListener('scroll', updateArrows);
-    loadCheckoutUpsellProducts();
+    
+    // Initial Catalog Load
+    async function initCheckoutCatalogs() {
+        try {
+            const response = await fetch('products.json?v=' + Date.now());
+            if (!response.ok) throw new Error("Falha ao carregar produtos");
+            const allProducts = await response.json();
+            
+            // 1. Horizontal Carousel (existing)
+            updateCheckoutUpsell(allProducts);
+            
+            // 2. Bottom Grid Catalog (new)
+            renderFavoritesCarouselCheckout(allProducts);
+            renderFullCatalogCheckout(allProducts);
+            
+        } catch (error) {
+            console.error("Erro ao inicializar catálogos:", error);
+        }
+    }
+
+    function renderFavoritesCarouselCheckout(allProducts) {
+        const container = document.getElementById('favoritesContentCheckout');
+        if (!container) return;
+
+        const favorites = allProducts.slice(0, 4);
+        const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
+        
+        container.innerHTML = `
+            <div class="section-header-pill">🔥 Recomendações Premium</div>
+            <h2 class="catalog-title">Escolhidos por clientes:</h2>
+            <div class="p-grid-catalog">
+                ${favorites.map(p => {
+                    const price = parseFloat(p.price);
+                    const isRetail = saleType === 'retail';
+                    const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : price;
+                    return `
+                        <div class="p-card-mini" onclick="addToCartFromCheckout('${p.id}', '${p.name}', ${finalPrice}, '${p.image || ''}')">
+                            <img src="${p.image && !p.image.includes('/') ? 'Images Pods/' + p.image : p.image || 'assets/logo-ignite.png'}" alt="${p.name}" class="p-mini-img" onerror="this.src='assets/logo-ignite.png'">
+                            <div class="p-mini-info">
+                                <span class="p-mini-name">${p.name}</span>
+                                <span class="p-mini-price">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+                                <span style="font-size: 0.65rem; color: #ff0b55; font-weight: 700;">+ ADICIONAR</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    function renderFullCatalogCheckout(allProducts) {
+        const container = document.getElementById('fullCatalogContentCheckout');
+        if (!container) return;
+
+        const brands = {};
+        allProducts.forEach(p => {
+            const b = p.brand || 'outros';
+            if (!brands[b]) brands[b] = [];
+            brands[b].push(p);
+        });
+
+        const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
+        let html = `
+            <div class="section-header-pill" style="margin-top: 40px;">🛍️ Explore tudo</div>
+            <h2 class="catalog-title">Confira outros produtos</h2>
+        `;
+
+        for (const brand in brands) {
+            const brandProducts = brands[brand];
+            html += `
+                <div class="brand-sub-divider">
+                    <h3>${brand}</h3>
+                </div>
+
+                <div class="p-grid-catalog">
+                    ${brandProducts.map(p => {
+                        const price = parseFloat(p.price);
+                        const isRetail = saleType === 'retail';
+                        const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : price;
+                        return `
+                            <div class="p-card-mini" onclick="addToCartFromCheckout('${p.id}', '${p.name}', ${finalPrice}, '${p.image || ''}')">
+                                <img src="${p.image && !p.image.includes('/') ? 'Images Pods/' + p.image : p.image || 'assets/logo-ignite.png'}" alt="${p.name}" class="p-mini-img" onerror="this.src='assets/logo-ignite.png'">
+                                <div class="p-mini-info">
+                                    <span class="p-mini-name">${p.name}</span>
+                                    <span class="p-mini-price">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+                                    <span style="font-size: 0.65rem; color: #ff0b55; font-weight: 700;">+ ADICIONAR</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
+    initCheckoutCatalogs();
+
 
 
 
@@ -300,52 +397,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container || !list) return;
 
         container.classList.remove('hidden');
-        list.innerHTML = '<p style="color: #888; padding: 10px;">Calculando opções de frete...</p>';
+        list.innerHTML = '<p style="color: #888; padding: 10px; text-align:center;">Calculando frete realista...</p>';
 
         try {
             const totalItems = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
-            const apiUrl = `/api/v2/shipping`;
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    cep: cep,
-                    weight: Math.ceil(totalItems * 0.1) // Estimativa: 100g por pod
-                })
-            });
-
-            const data = await response.json();
             
-            if (data.status === 'success' && data.options && data.options.length > 0) {
-                // Ensure all options have consistent recommended status for sorting
-                const allOptions = data.options.map(opt => ({
-                    ...opt,
-                    isGroupRecommended: opt.group === 'Transportadoras',
-                    recommended: false
-                }));
-
-                // Global Sort by price (Lowest First)
-                allOptions.sort((a, b) => a.price - b.price);
-
-                renderShippingList(allOptions);
+            // Use NEW Advanced Local logic instead of unstable API
+            const options = ShippingCalculator.calculate(cep, totalItems);
+            
+            if (options && options.length > 0) {
+                renderShippingList(options);
+                window.currentCepCalculated = cep;
             } else {
-                throw new Error("Nenhuma opção de frete retornada");
+                throw new Error("Local calculation failed to return options");
             }
         } catch (error) {
-            console.error("Erro ao carregar frete real, usando fallback:", error);
-            // Fallback para não travar o checkout
-            const fallbackOptions = [
-                { group: "Correios", name: "PAC", price: 85.00, deadline: "10 dias úteis" },
-                { group: "Correios", name: "SEDEX", price: 120.00, deadline: "6 dias úteis" },
-                { group: "Transportadoras", name: "Loggi", price: 160.00, deadline: "2 a 5 dias úteis" },
-                { group: "Transportadoras", name: "Jadlog", price: 200.00, deadline: "3 a 7 dias úteis" },
-            ].sort((a, b) => a.price - b.price);
-            
-            renderShippingList(fallbackOptions);
-
+            console.error("Erro ao carregar frete:", error);
+            // Internal logic is robust, but kept as safety
+            list.innerHTML = '<p style="color: #ff0b55; padding: 20px; text-align:center;">Erro ao calcular frete. Verifique o CEP ou tente novamente.</p>';
         }
 
-        // Limpa a seleção forçando o usuário a escolher
+        // Reset previous selection
         window.selectedShippingCost = 0;
         window.selectedShippingMethod = '';
         if (typeof validateWholesale === 'function') validateWholesale();
@@ -353,30 +425,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderShippingList(options) {
         const list = document.getElementById('shipping-methods-list');
+        const totalItems = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
+        const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
+        const isFreeShipping = (saleType === 'wholesale' && totalItems >= 50);
+
         let htmlContent = '';
         
-        // Use a single generic header for global sorting
         htmlContent += `<div style="margin-top: 20px; margin-bottom: 20px; font-weight: 700; color: #fff; font-size: 1.15rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
-            Opções de Entrega
-            <span style="font-weight: 400; font-size: 0.8rem; color: #888;">Ordenado por menor preço</span>
+            Escolha como Deseja Receber
+            <span style="font-weight: 400; font-size: 0.8rem; color: #888;">Simulado em tempo real</span>
         </div>`;
 
         options.forEach(opt => {
-            const groupName = opt.group === 'Correios' ? 'Correios' : 'Transportadora';
-            const displayName = `${groupName} - ${opt.name}`;
+            const isPac = opt.id === 'PAC';
+            const currentPrice = (isFreeShipping && isPac) ? 0 : opt.price;
+            const displayName = `${opt.carrier} - ${opt.type}`;
+            const displayPrice = currentPrice === 0 ? 'GRÁTIS' : `R$ ${currentPrice.toFixed(2).replace('.', ',')}`;
             
+            // Auto-select if it's the only one or if it was re-calculated
+            const isSelected = window.selectedShippingMethod === displayName || (options.length === 1);
+
             htmlContent += `
-                <label class="shipping-option" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; cursor:pointer; border:1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; margin-bottom: 10px;">
+                <label class="shipping-option ${currentPrice === 0 ? 'promo-option' : ''}" style="display:flex; justify-content:space-between; align-items:center; background:${currentPrice === 0 ? 'rgba(255,11,85,0.08)' : 'rgba(255,255,255,0.03)'}; padding:15px; border-radius:8px; cursor:pointer; border:1px solid ${currentPrice === 0 ? 'var(--accent-primary)' : 'rgba(255,255,255,0.1)'}; transition: all 0.3s ease; margin-bottom: 10px;">
                     <div style="display:flex; align-items:center; gap:15px;">
-                        <input type="radio" name="shippingMethod" value="${opt.price}" data-name="${opt.name}" onchange="updateShippingSelection(this)" style="accent-color: var(--accent-primary); width: 20px; height: 20px; cursor: pointer;">
+                        <input type="radio" name="shippingMethod" value="${currentPrice}" data-name="${displayName}" onchange="updateShippingSelection(this)" ${isSelected ? 'checked' : ''} style="accent-color: var(--accent-primary); width: 20px; height: 20px; cursor: pointer;">
                         <div class="shipping-info" style="display:flex; flex-direction:column;">
-                            <span class="shipping-name" style="font-weight:600; color:#fff; font-size:1.1rem; display: flex; align-items: center;">${displayName}</span>
-                            <span class="shipping-deadline" style="font-size:0.85rem; color:#aaa; margin-top: 3px;">Entrega em até ${opt.deadline}</span>
+                            <span class="shipping-name" style="font-weight:600; color:#fff; font-size:1.1rem; display: flex; align-items: center;">
+                                ${displayName}
+                                ${currentPrice === 0 ? ' <span style="background:var(--accent-primary); color:white; font-size:0.6rem; padding:2px 5px; border-radius:4px; margin-left:8px;">LIBERADO</span>' : ''}
+                            </span>
+                            <span class="shipping-deadline" style="font-size:0.85rem; color:#aaa; margin-top: 3px;">Prazo: ${opt.deadlineDays}</span>
+                            <span class="shipping-dates" style="font-size:0.75rem; color:var(--accent-primary); font-style:italic; margin-top: 2px;">📅 Est: ${opt.deadlineDate}</span>
                         </div>
                     </div>
-                    <span class="shipping-price" style="font-weight:700; color:var(--accent-primary); font-size:1.15rem;">R$ ${opt.price.toFixed(2).replace('.', ',')}</span>
+                    <span class="shipping-price" style="font-weight:800; color:${currentPrice === 0 ? 'var(--accent-primary)' : '#fff'}; font-size:1.15rem;">${displayPrice}</span>
                 </label>
             `;
+
+            if (isSelected) {
+                window.selectedShippingCost = currentPrice;
+                window.selectedShippingMethod = displayName;
+            }
         });
 
         list.innerHTML = htmlContent;
@@ -446,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const totalItemsCount = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
         const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
-        const hasDiscount = (saleType === 'wholesale' && totalItemsCount >= 30 && totalItemsCount < 50);
+        const hasDiscount = (saleType === 'wholesale' && totalItemsCount === 30);
 
         checkoutCart.forEach((item, index) => {
             const price = parseFloat(item.price);
@@ -476,18 +565,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="item-info">
                     <span class="item-name">${item.name}</span>
                     <span class="item-flavor">Sabor: ${item.flavor || 'N/A'}</span>
-                    <div class="item-price-unit" style="font-size: 0.85rem; margin-top: 4px;">Preço unit: ${unitPriceHtml}</div>
+                    <div class="item-price-unit" style="font-size: 0.8rem; margin-top: 4px; color: #888;">
+                        ${unitPriceHtml}
+                    </div>
                     <div class="item-controls">
                         <div class="qty-stepper">
-                            <button onclick="updateCheckoutQty(${index}, -1)">-</button>
+                            <button onclick="updateCheckoutQty(${index}, -1)" type="button">−</button>
                             <input type="number" class="qty-stepper-val" value="${item.quantity}" min="1" onchange="updateCheckoutQty(${index}, 0, this.value)">
-                            <button onclick="updateCheckoutQty(${index}, 1)">+</button>
+                            <button onclick="updateCheckoutQty(${index}, 1)" type="button">+</button>
                         </div>
-                        <button class="btn-remove-checkout" onclick="removeCheckoutItem(${index})">Remover</button>
+                        <button class="btn-remove-checkout" onclick="removeCheckoutItem(${index})" type="button">Remover</button>
                     </div>
                 </div>
-                <div class="item-price">${totalItemPriceHtml}</div>
+                <div class="item-price" style="font-weight: 800; color: #fff; font-size: 1rem; text-align: right;">
+                    ${totalItemPriceHtml}
+                </div>
             `;
+
             summaryItems.appendChild(itemEl);
         });
 
@@ -497,7 +591,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         validateWholesale();
     }
-
     window.addressIsComplete = false;
 
     function validateEmail(email) {
@@ -508,117 +601,124 @@ document.addEventListener('DOMContentLoaded', () => {
     function validateWholesale() {
         const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
         const totalItems = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
-        const stickyBar = document.getElementById('stickyUpsellBar');
-        const stickyMsg = document.getElementById('upsellMessage');
-        const stickyFill = document.getElementById('upsellProgressFill');
         const freeShippingNotice = document.getElementById('free-shipping-notice');
-        const staticProgressFill = document.getElementById('upsellProgressFillCheckout');
-        const staticMessage = document.querySelector('.checkout-upsell-promo p');
 
-        // Rewards Logic
+        // Rewards Logic (Standardized - Exclusive Tiers)
         let discount = 0;
         let isFreeShipping = false;
-        let showUpsell = false;
         let finalProgress = 0;
+        
+        // Progress Calculation (Staggered scale: 10=20%, 30=50%, 40=75%, 50=100%)
+        // Linear Proportional Scale (Fixed at 50 units range)
+        finalProgress = Math.min((totalItems / 50) * 100, 100);
+
+
+
         let msg = "";
+        let stage = "1";
 
         if (saleType === 'wholesale') {
-            showUpsell = true;
-            if (totalItems < 10) {
-                finalProgress = (totalItems / 10) * 20;
-                msg = `Faltam <b>${10 - totalItems}</b> itens para liberar o Atacado`;
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.style.opacity = '0.5';
-                    submitBtn.style.cursor = 'not-allowed';
-                }
-            } else {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.style.opacity = '1';
-                    submitBtn.style.cursor = 'pointer';
-                }
-
-                if (totalItems < 30) {
-                    finalProgress = 20 + ((totalItems - 10) / 20) * 40;
-                    msg = `Faltam <b>${30 - totalItems}</b> itens para 5% de desconto`;
-                    if (stickyFill) stickyFill.classList.remove('glow');
-                } else if (totalItems < 50) {
-                    discount = currentSubtotal * 0.05;
-                    finalProgress = 60 + ((totalItems - 30) / 20) * 40;
-                    msg = `🎉 5% OFF Ativado! Faltam <b>${50 - totalItems}</b> para <b>Frete Grátis</b>`;
-                    if (stickyFill) stickyFill.classList.add('glow');
-                } else {
-                    // Stacking Rewards: 5% OFF persists plus Free Shipping
-                    discount = currentSubtotal * 0.05;
-                    isFreeShipping = true;
-                    finalProgress = 100;
-                    msg = `🔥 Frete Grátis e 5% OFF Ativados! Nível Máximo Alcançado.`;
-                    showUpsell = false; 
-                    if (stickyFill) stickyFill.classList.add('glow');
-                }
-
+            // New Exclusive Scaling Logic
+            if (totalItems >= 30 && totalItems < 40) {
+                discount = currentSubtotal * 0.05; // Tier 1: 5% Discount (30-39)
             }
-        } else {
-            // Retail Mode (Varejo)
-            // Rule: 50 items for free shipping
-            showUpsell = false;
-            if (totalItems >= 50) isFreeShipping = true;
-        }
 
-        // Update the textual notice above the items
-        if (freeShippingNotice) {
-            if (isFreeShipping) {
-                freeShippingNotice.textContent = "✓ Você ganhou frete grátis!";
-                freeShippingNotice.style.color = "#ff0b55";
-            } else if (saleType === 'wholesale') {
-                freeShippingNotice.textContent = `Adicione ${50 - totalItems} peças e ganhe frete grátis`;
-                freeShippingNotice.style.color = "#ff0b55";
-            } else {
-                freeShippingNotice.textContent = `Faltam ${50 - totalItems} para Frete Grátis`;
+            if (totalItems < 30) {
+                stage = "1";
+                msg = `Faltam <b>${30 - totalItems}</b> unidades para ativar <b>5% OFF</b>`;
+            } else if (totalItems >= 30 && totalItems < 40) {
+                stage = "2";
+                msg = `<b>Desconto ativado!</b> Você ganhou 5% OFF`;
+            } else if (totalItems >= 40 && totalItems < 50) {
+                stage = "3";
+                msg = `🔥 Meta batida! Você ganhou <b>2 PODS GRÁTIS!</b>`;
+            } else if (totalItems >= 50) {
+                stage = "4";
+                msg = `🚚 <b>50% OFF Frete liberado!</b> (+ 2 PODS)`;
             }
         }
 
-        // Apply visual updates to Sticky Bar (Hidden on checkout, using Static instead)
-        if (stickyBar) {
-            stickyBar.classList.remove('active');
-        }
 
-        // Apply visual updates to Static Bar (Checkout Layout) - Focus on 30 units
+        const calculateDisplaySavings = () => {
+            if (totalItems < 30) return 0;
+            if (totalItems >= 30 && totalItems < 40) return currentSubtotal * 0.05;
+            if (totalItems >= 40 && totalItems < 50) return 300.00; // 2 x Retail Price (R$ 150)
+            if (totalItems >= 50) {
+                const shippingSaving = window.selectedShippingCost ? (window.selectedShippingCost * 0.5) : 30.00; // 50% discount
+                return 300.00 + shippingSaving;
+            }
+            return 0;
+        };
+
+
+        const totalSavedText = `Você já economizou: R$ ${calculateDisplaySavings().toFixed(2).replace('.', ',')}`;
+
+
+        // UI Element Updates
+        const stickyBar = document.getElementById('stickyCheckoutBar');
+        const stickyFill = document.getElementById('upsellProgressFillSticky');
+        const stickyMsg = document.getElementById('upsellMessageSticky');
+        const stickySavings = document.getElementById('stickySavingsText');
+        const upsellProgressFill = document.getElementById('upsellProgressFillCheckout');
+        const staticProgressFill = document.getElementById('staticProgressFill');
+        const staticMessage = document.getElementById('staticMessage');
+
+        const allMarkers = document.querySelectorAll('.milestone-marker');
+
+
         if (staticProgressFill) {
-            const visualProgress = Math.min((totalItems / 30) * 100, 100);
-            staticProgressFill.style.width = `${visualProgress}%`;
-            
-            if (totalItems >= 30) {
-                staticProgressFill.classList.add('glow');
-                if (staticMessage) {
-                    staticMessage.innerHTML = `<span style="font-size: 1.1rem; text-shadow: 0 0 10px rgba(255, 11, 85, 0.5);">🎉 PARABÉNS! Você ganhou 5% de desconto!</span>`;
-                }
-            } else {
-                staticProgressFill.classList.remove('glow');
-                if (staticMessage) {
-                    staticMessage.innerHTML = `Faltam <strong>${30 - totalItems}</strong> peças para ganhar <strong>5% de Desconto</strong>!`;
-                }
-            }
+            staticProgressFill.style.width = `${finalProgress}%`;
+            staticProgressFill.setAttribute('data-stage', stage);
+            if (staticMessage) staticMessage.innerHTML = `${msg} <br> <span class="promo-savings-value" style="font-size: 0.9rem; margin-top: 5px; display: inline-block;">${totalSavedText}</span>`;
         }
 
+        if (upsellProgressFill) {
+            upsellProgressFill.style.width = `${finalProgress}%`;
+        }
 
+        // --- Sticky Bar Update ---
+        if (stickyBar) {
+            if (totalItems > 0) stickyBar.classList.add('active');
+            else stickyBar.classList.remove('active');
 
+            if (stickyFill) stickyFill.style.width = `${finalProgress}%`;
+            if (stickyMsg) stickyMsg.innerHTML = msg;
+            if (stickySavings) stickySavings.textContent = totalSavedText;
+        }
+
+        allMarkers.forEach(m => {
+            const goal = parseInt(m.getAttribute('data-goal'));
+            if (totalItems >= goal) {
+                if (!m.classList.contains('reached')) {
+                    m.classList.add('reached', 'pop-hit');
+                    setTimeout(() => m.classList.remove('pop-hit'), 400);
+                }
+            } else {
+                m.classList.remove('reached');
+            }
+        });
 
         // --- Recalculate Totals & Update UI ---
         const shippingEl = document.querySelector('.shipping-value');
-        let shippingVal = window.addressIsComplete ? (window.selectedShippingCost || 0) : 0;
+        let rawShippingVal = window.addressIsComplete ? (window.selectedShippingCost || 0) : 0;
+        let shippingVal = rawShippingVal;
         
-        if (isFreeShipping && window.addressIsComplete) {
+        const isShippingDiscount = (saleType === 'wholesale' && totalItems >= 50);
+        
+        if (isShippingDiscount && window.addressIsComplete) {
+            shippingVal = rawShippingVal * 0.5; // 50% Discount
             if (shippingEl) {
-                shippingEl.textContent = 'Grátis 🚀';
-                shippingEl.style.color = '#ff0b55';
+                shippingEl.innerHTML = `
+                    <span style="text-decoration: line-through; color: #888; font-size: 0.8rem;">R$ ${rawShippingVal.toFixed(2).replace('.', ',')}</span>
+                    <span style="color: #ff0b55; font-weight: 800;">R$ ${shippingVal.toFixed(2).replace('.', ',')}</span>
+                    <div style="font-size: 0.75rem; color: #ff0b55;">⚡ 50% OFF Ativado</div>
+                `;
             }
-            shippingVal = 0;
         } else if (shippingEl) {
             shippingEl.textContent = window.addressIsComplete ? `R$ ${shippingVal.toFixed(2).replace('.', ',')}` : "Calculando...";
             shippingEl.style.color = "";
         }
+
 
         const discountedSubtotal = currentSubtotal - discount;
         const finalTotal = discountedSubtotal + shippingVal;
@@ -628,7 +728,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 subtotalEl.innerHTML = `
                     <span style="text-decoration: line-through; color: #888; font-size: 0.8rem;">R$ ${currentSubtotal.toFixed(2).replace('.', ',')}</span>
                     <span style="color: #ff0b55;">R$ ${discountedSubtotal.toFixed(2).replace('.', ',')}</span>
-                    <div style="font-size: 0.7rem; color: #ff0b55;">(5% de desconto aplicado)</div>
+                    <div style="font-size: 0.7rem; color: #ff0b55;">Economia de R$ ${discount.toFixed(2).replace('.', ',')} (Desconto Ativado)</div>
                 `;
             } else {
                 subtotalEl.textContent = `R$ ${currentSubtotal.toFixed(2).replace('.', ',')}`;
@@ -636,6 +736,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (totalEl) totalEl.textContent = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
+
+        if (window.currentCepCalculated && !window.isCalculatingShipping) {
+            window.isCalculatingShipping = true;
+            fetchShippingOptions(window.currentCepCalculated).finally(() => {
+                window.isCalculatingShipping = false;
+            });
+        }
+    }
+
+    function calculateCheckoutSavings(cart, totalQty) {
+        if (totalQty < 30 || !cart || cart.length === 0) return 0;
+        
+        let savings = 0;
+        let subtotal = 0;
+        let avgPrice = 0;
+
+        cart.forEach(item => {
+            subtotal += (parseFloat(item.price) || 0) * (item.quantity || 1);
+        });
+        
+        if (totalQty > 0) avgPrice = subtotal / totalQty;
+        
+        if (totalQty >= 30) {
+            savings += subtotal * 0.05;
+        }
+        if (totalQty >= 40) {
+            savings += (avgPrice * 2);
+        }
+        if (totalQty >= 50) {
+            savings += 50; 
+        }
+
+        return savings;
     }
 
 
@@ -696,15 +829,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const cpf = document.getElementById('cpf').value;
             const items = checkoutCart;
             
-            // Re-calcular subtotal com desconto de 5% se total >= 30 (Sincronizado com validateWholesale)
+            // Re-calcular total com base na nova lógica de escala exclusiva
             const baseSubtotal = items.reduce((sum, i) => sum + (parseFloat(i.price) * i.quantity), 0);
             const totalItemsCount = items.reduce((sum, i) => sum + i.quantity, 0);
             let discount = 0;
-            if (totalItemsCount >= 30) {
-                // Discount now persists correctly for all items >= 30
+            
+            // 5% ONLY between 30 and 39
+            if (totalItemsCount >= 30 && totalItemsCount < 40) {
                 discount = baseSubtotal * 0.05;
             }
             const discountedSubtotal = baseSubtotal - discount;
+
 
             // Calculate shipping
             const shippingEl = document.querySelector('.shipping-value');

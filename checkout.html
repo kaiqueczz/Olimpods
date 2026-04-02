@@ -262,13 +262,23 @@
 
             </section>
 
-            <!-- Coluna Direita: Resumo -->
             <aside class="checkout-summary">
                 <div class="summary-card glow-card">
-                    <h3 class="summary-title">Resumo do Pedido</h3>
-                    <p id="free-shipping-notice"
-                        style="font-size: 0.75rem; font-weight: 300; font-style: italic; color: #888; margin: -15px 0 15px 0;">
-                        A partir de 50 peças seu frete é grátis</p>
+                    <h3 class="summary-title" style="margin-bottom: 15px;">Resumo do Pedido</h3>
+                    
+                    <div class="promo-bar-wrapper checkout-promo" id="checkoutPromoBar" style="margin: -10px 0 20px 0;">
+                      <p class="promo-bar-text" id="checkoutStaticMsg">Adicione itens e ganhe <b class="text-red">recompensas!</b></p>
+                      <div class="promo-bar-track">
+                        <div class="promo-bar-fill" id="checkoutStaticProgress">
+                          <div class="promo-bar-energy"></div>
+                        </div>
+                        <div class="promo-bar-markers">
+                          <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
+                          <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
+                          <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
+                        </div>
+                      </div>
+                    </div>
 
                     <div class="cart-items" id="summary-items">
                         <!-- Items will be injected here via JS -->
@@ -284,6 +294,7 @@
                             <span>Subtotal</span>
                             <span id="summary-subtotal">R$ 0,00</span>
                         </div>
+
                         <div class="total-line">
                             <span>Entrega</span>
                             <span class="shipping-value">Calculando...</span>
@@ -304,10 +315,26 @@
     <section class="checkout-extra-products">
         <div class="container">
             <div class="checkout-upsell-promo">
-                <p>A partir de 30 unidades ganhe <strong>5% de Desconto</strong>!</p>
+                <h2 class="upsell-title">Desbloqueie <span>recompensas exclusivas</span> adicionando mais itens!</h2>
+
                 <div class="upsell-info" style="max-width: 600px; margin: 0 auto;">
-                    <div class="upsell-progress-container" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); height: 12px; border-radius: 6px; overflow: hidden;">
-                        <div class="upsell-progress-fill" id="upsellProgressFillCheckout" style="height: 100%;"></div>
+                    <div class="upsell-progress-container">
+                        <div class="upsell-progress-fill" id="upsellProgressFillCheckout"></div>
+                        <div class="milestones-wrapper">
+                            <div class="milestone-marker" style="left: 60%;" data-goal="30" data-label="Desconto">
+                                <span class="milestone-icon">30</span>
+                            </div>
+                            <div class="milestone-marker" style="left: 80%;" data-goal="40" data-label="Bônus">
+                                <span class="milestone-icon">40</span>
+                            </div>
+                            <div class="milestone-marker" style="left: 100%;" data-goal="50">
+                                <span class="milestone-icon">50</span>
+                                <div class="milestone-tooltip" style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); background: #ff0b55; color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; font-weight: 800;">50% OFF FRETE</div>
+                            </div>
+
+
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -328,12 +355,27 @@
         </div>
     </section>
 
+    <!-- ==================== DESKTOP FAVORITES CATALOG ==================== -->
+    <section class="checkout-catalog-section">
+        <div class="container" id="favoritesContentCheckout">
+            <!-- Injected by renderFavoritesCarouselCheckout -->
+        </div>
+    </section>
+
+    <!-- ==================== FULL BRAND CATALOG ==================== -->
+    <section class="checkout-catalog-section full-catalog-bg">
+        <div class="container" id="fullCatalogContentCheckout">
+            <!-- Injected by renderFullCatalogCheckout -->
+        </div>
+    </section>
+
+
 
     <footer class="checkout-mini-footer">
 
         <div class="container" style="text-align: center;">
             <p>&copy; 2026 Olimpo Pods. Todos os direitos reservados.</p>
-            <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">R Vinte e Cinco de Março 1015, loja 1 - Centro
+            <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">R Vinte e Cinco de Março 1020, loja 1 - Centro
             </p>
         </div>
     </footer>
@@ -357,23 +399,41 @@
         </div>
     </div>
 
-    <!-- ==================== STICKY UP-SELL BAR ==================== -->
-    <div class="sticky-upsell-bar" id="stickyUpsellBar">
+    <!-- ==================== REMOVED REDUNDANT STICKY BAR IN CHECKOUT ==================== -->
+    <div class="sticky-upsell-bar" id="stickyCheckoutBar">
         <div class="upsell-info">
-            <div class="upsell-message" id="upsellMessage">Adicione mais <b>10 itens</b> para liberar o Atacado!</div>
+            <div class="upsell-message" id="upsellMessageSticky">Adicione itens e ganhe <b>recompensas!</b></div>
             <div class="upsell-progress-container">
-                <div class="upsell-progress-fill" id="upsellProgressFill"></div>
+                <div class="upsell-progress-fill" id="upsellProgressFillSticky"></div>
+                <div class="milestones-wrapper">
+                    <div class="milestone-marker" style="left: 20%;" data-goal="10">
+                        <span class="milestone-icon">10</span>
+                    </div>
+                    <div class="milestone-marker" style="left: 50%;" data-goal="30">
+                        <span class="milestone-icon">30</span>
+                    </div>
+                    <div class="milestone-marker" style="left: 75%;" data-goal="40">
+                        <span class="milestone-icon">40</span>
+                    </div>
+                    <div class="milestone-marker" style="left: 100%;" data-goal="50">
+                        <span class="milestone-icon">50</span>
+                    </div>
+
+                </div>
             </div>
+            <div class="progress-subtext right sticky-savings-summary" id="stickySavingsText">Você já economizou: R$ 0,00</div>
         </div>
         <div class="upsell-actions">
-            <!-- No checkout, o botão pode apenas rolar para o topo ou ser informativo -->
-            <button class="btn-view-cart" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Subir para o Carrinho</button>
+            <button class="btn-scroll-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Finalizar Pedido</button>
         </div>
     </div>
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/supabase-config.js?v=2.1"></script>
     <script src="assets/products-data.js?v=2.1"></script>
+    <script src="assets/shipping-logic.js?v=2.1"></script>
     <script src="script.js?v=2.1"></script>
     <script src="checkout.js?v=2.1"></script>
 </body>

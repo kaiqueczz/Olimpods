@@ -6,65 +6,132 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Produto — Olimpo Pods</title>
     <link rel="icon" href="assets/logo-ignite.png" type="image/png">
-    <link rel="stylesheet" href="styles.css?v=1.1">
+    <link rel="stylesheet" href="styles.css?v=3.7">
     <style>
-        /* Specific styles for product page */
+        /* Specific styles for product page - ABSOLUTE BLINDAGEM */
+        * { box-sizing: border-box; }
+        html, body { 
+            overflow-x: hidden !important; 
+            width: 100% !important; 
+            max-width: 100% !important;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+
         .product-detail-section {
             padding: 140px 0 80px;
+            overflow: hidden;
         }
 
-        .breadcrumb {
-            margin-bottom: 30px;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .breadcrumb a:hover {
-            color: var(--accent-primary);
-        }
-
+        /* --- DESKTOP GRID & IMAGE FIX (V3.8) --- */
         .product-grid-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 60px;
             align-items: flex-start;
+            margin-top: 20px;
         }
 
         .product-visuals {
             position: sticky;
-            top: 120px;
+            top: 140px;
+            width: 100%;
         }
 
         .main-image-box {
-            background: var(--bg-glass);
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-lg);
             padding: 40px;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 400px;
+            min-height: 500px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.4);
             position: relative;
+            overflow: hidden;
+        }
+
+        .main-image-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255, 11, 85, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .product-img-real {
+            max-width: 100%;
+            max-height: 500px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.4));
+            transition: transform 0.6s var(--ease-smooth);
+            z-index: 2;
+        }
+
+        .main-image-box:hover .product-img-real {
+            transform: scale(1.05) rotate(-1deg);
         }
 
         .product-info-column {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
+            padding-left: 20px;
         }
 
-        .p-brand {
-            color: var(--accent-primary);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
 
-        .p-name {
-            font-size: 3rem;
-            font-family: var(--font-display);
-            line-height: 1.1;
+        /* --- MOBILE AUDIT FIXES (V3.8) --- */
+        @media (max-width: 992px) {
+            .product-detail-section { padding: 15px 0 40px !important; }
+            .product-grid-layout { display: block !important; margin: 0 !important; }
+            .product-visuals { width: 100% !important; margin: 0 !important; position: static !important; }
+            .main-image-box { 
+                min-height: 180px !important; 
+                max-height: 250px !important; 
+                margin-bottom: 5px !important;
+                padding: 0 !important; 
+                background: none !important; 
+                border: none !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                box-shadow: none !important;
+                backdrop-filter: none !important;
+            }
+            .main-image-box::after { display: none; }
+            .product-img-real { 
+                max-height: 240px !important; 
+                width: auto !important; 
+                max-width: 90% !important; 
+                object-fit: contain !important; 
+                filter: none !important;
+            }
+
+            /* HIDE SEARCH COMPLETELY ON MOBILE PRODUCT PAGE */
+            .search-wrapper, .search-container { display: none !important; }
+
+            .p-name { font-size: 1.4rem !important; line-height: 1.2 !important; margin-bottom: 8px !important; }
+            .p-price { font-size: 1.5rem !important; margin-bottom: 15px !important; }
+
+            .action-buttons-group { flex-direction: column; gap: 10px; }
+
+            /* BUTTON TEXT VISIBILITY FIX */
+            .btn-buy-now, .btn-add-cart {
+                color: #ffffff !important;
+                font-size: 0.9rem !important;
+                font-weight: 700 !important;
+                text-transform: uppercase !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                display: block !important;
+                width: 100% !important;
+                text-align: center !important;
+                height: 50px !important;
+            }
+
+            .breadcrumb { font-size: 0.8rem !important; margin-top: 10px !important; }
         }
 
         .p-price {
@@ -72,6 +139,7 @@
             color: var(--accent-primary);
             font-weight: 700;
         }
+
 
         .p-option-label {
             font-weight: 600;
@@ -371,11 +439,15 @@
         }
 
         .shipping-results.active {
-            max-height: 400px;
+            max-height: 600px;
             padding: 20px;
             opacity: 1;
             margin-bottom: 20px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-primary) transparent;
         }
+
 
         .shipping-title {
             font-size: 0.85rem;
@@ -429,39 +501,133 @@
             color: #ff0b55;
         }
 
+        /* --- NEW CATALOG SECTIONS (V4.1) --- */
+        .p-catalog-section {
+            padding: 80px 0;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .section-header-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 11, 85, 0.08);
+            border: 1px solid rgba(255, 11, 85, 0.15);
+            padding: 6px 14px;
+            border-radius: 50px;
+            color: var(--accent-primary);
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: none;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+
+        .catalog-title {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: -0.5px;
+            color: #fff;
+        }
+
+
+        .brand-sub-divider {
+            margin-top: 50px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .brand-sub-divider h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: none;
+            letter-spacing: 1.5px;
+            color: var(--accent-primary);
+            white-space: nowrap;
+            text-shadow: 0 0 10px rgba(255, 11, 85, 0.4);
+        }
+
+
+        .brand-sub-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent);
+        }
+
+        .p-grid-catalog {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        /* Mini Product Card */
+        .p-card-mini {
+            background: rgba(13, 13, 18, 0.6);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 15px;
+            transition: all 0.4s var(--ease-smooth);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .p-card-mini:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            background: rgba(13, 13, 18, 0.8);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        }
+
+        .p-mini-img {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+            transition: transform 0.5s var(--ease-smooth);
+        }
+
+        .p-card-mini:hover .p-mini-img {
+            transform: scale(1.1);
+        }
+
+        .p-mini-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .p-mini-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #eee;
+        }
+
+        .p-mini-price {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--accent-primary);
+        }
+
         @media (max-width: 992px) {
-            .product-grid-layout {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-
-            .product-visuals {
-                position: static;
-            }
-
-            .p-name {
-                font-size: 1.8rem;
-                /* Smaller for mobile */
-            }
-
-            .breadcrumb {
-                font-size: 0.8rem;
-                margin-top: 10px;
-            }
-
-            .action-buttons-group {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .btn-buy-now,
-            .btn-add-cart {
-                width: 100%;
-                flex: none;
-                height: 50px;
-            }
+            .p-catalog-section { padding: 40px 0; }
+            .catalog-title { font-size: 1.8rem; }
+            .p-grid-catalog { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .p-mini-img { height: 140px; }
+            .p-mini-price { font-size: 0.95rem; }
+            .p-mini-name { font-size: 0.85rem; }
         }
     </style>
+
   <!-- Meta Pixel Code -->
   <script>
   !function(f,b,e,v,n,t,s)
@@ -503,22 +669,99 @@
     </div>
   </div>
 
-    <!-- Announcement Bar -->
-    <div class="top-banner">
-        <div class="banner-track">
-            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
-            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
-            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
-            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
-            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
-            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
-            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
-            <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
-        </div>
+  <!-- Announcement Bar -->
+  <div class="top-banner">
+    <div class="banner-track">
+      <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+      <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+      <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+      <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+      <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+      <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+      <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+      <span>📦 FRETE GRÁTIS PARA TODAS AS COMPRAS ACIMA DE 50 PEÇAS</span>
+    </div>
+  </div>
+
+  <!-- Mobile Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Mobile Sidebar -->
+  <aside class="mobile-sidebar" id="mobileSidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <img src="assets/logo-ignite.png" alt="Olimpo Pods Logo">
+      </div>
+      <button class="close-sidebar" id="closeSidebar">&times;</button>
     </div>
 
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <a href="tracking.html" class="sidebar-link">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          Rastreie seu pedido
+        </a>
+        <a href="login.html" class="sidebar-link">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+            <path d="M3 6h18" />
+            <path d="M16 10a4 4 0 0 1-8 0" />
+          </svg>
+          Minhas compras
+        </a>
+      </div>
 
+      <div class="sidebar-divider"></div>
 
+      <div class="sidebar-section">
+        <div class="sidebar-accordion" id="categoryAccordion">
+          <button class="accordion-trigger">
+            <span>Categorias</span>
+            <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          <div class="accordion-content">
+            <a href="index.html#produtos" class="category-link" data-cat="elfbar">Elfbar</a>
+            <a href="index.html#produtos" class="category-link" data-cat="blacksheep">Black Sheep</a>
+            <a href="index.html#produtos" class="category-link" data-cat="ignite">Ignite</a>
+            <a href="index.html#produtos" class="category-link" data-cat="all">Todos</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-contact-links">
+        <a href="https://wa.me/5588988795039" target="_blank" class="contact-pill">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+          </svg>
+          (88) 98879-5039
+        </a>
+        <a href="https://instagram.com/olimpods.digital" target="_blank" class="contact-pill insta-pill">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+          Instagram
+        </a>
+        <a href="mailto:olimpopods22@gmail.com" target="_blank" class="contact-pill email-pill">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+          E-mail
+        </a>
+      </div>
+    </div>
+  </aside>
+  
     <!-- ==================== HEADER ==================== -->
     <header class="header" id="header">
         <div class="header-inner">
@@ -586,31 +829,21 @@
         </div>
     </main>
 
-    <section class="checkout-extra-products">
-        <div class="container">
-            <div class="checkout-upsell-promo">
-                <p id="productUpsellPromoText">A partir de 30 unidades ganhe <strong>5% de Desconto</strong>!</p>
-                <div class="upsell-info" style="max-width: 600px; margin: 0 auto;">
-                    <div class="upsell-progress-container" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); height: 12px; border-radius: 6px; overflow: hidden;">
-                        <div class="upsell-progress-fill" id="productUpsellProgressFill" style="height: 100%;"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="upsell-products-wrapper">
-                <button class="carousel-nav-btn prev" id="prevBtnProduct" aria-label="Anterior">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                </button>
-                <div class="upsell-carousel" id="product-upsell-carousel">
-                    <div style="text-align: center; color: #888; width: 100%;">Carregando sugestões...</div>
-                </div>
-                <button class="carousel-nav-btn next" id="nextBtnProduct" aria-label="Próximo">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
-            </div>
+    <!-- ==================== NEW CATALOG SECTIONS ==================== -->
+    <section class="p-catalog-section" id="catalogFavorites">
+        <div class="container" id="favoritesContent">
+            <!-- Injected by renderFavoritesCarousel -->
+        </div>
+    </section>
+
+    <section class="p-catalog-section" id="catalogOthers">
+        <div class="container" id="fullCatalogContent">
+            <!-- Injected by renderFullCatalog -->
         </div>
     </section>
 
     <!-- ==================== FOOTER ==================== -->
+
     <footer class="footer-section" id="contato">
         <div class="container">
             <div class="footer-grid">
@@ -623,14 +856,14 @@
                     </ul>
                 </div>
                 <div class="footer-col">
-                    <h3>Sua Conta</h3>
+                    <h4>Sua Conta</h4>
                     <ul class="footer-links">
                         <li><a href="login.html">Login / Cadastro</a></li>
                         <li><a href="#" id="ordersLinkFooter">Meus Pedidos</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
-                    <h3>Ajuda</h3>
+                    <h4>Ajuda</h4>
                     <ul class="footer-links">
                         <li><a href="faq.html">Dúvidas Frequentes</a></li>
                         <li><a href="tracking.html">Acompanhar Pedido</a></li>
@@ -641,7 +874,7 @@
                     <div class="contact-info">
                         <p>Olimpopods22@gmail.com</p>
                         <div class="social-links-footer">
-                            <a href="#" class="social-icon" title="Instagram">
+                             <a href="https://instagram.com/olimpods.digital" target="_blank" class="social-icon" title="Instagram">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -649,7 +882,7 @@
                                     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                                 </svg>
                             </a>
-                            <a href="#" class="social-icon" title="WhatsApp">
+                            <a href="https://wa.me/5588988795039" target="_blank" class="social-icon" title="WhatsApp">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round">
                                     <path
@@ -667,15 +900,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="footer-extra-col">
-                    <div class="newsletter-box">
-                        <h4>Junte-se a nós</h4>
-                        <form class="newsletter-form">
-                            <input type="email" placeholder="Seu e-mail aqui" required>
-                            <button type="submit">OK</button>
-                        </form>
-                    </div>
-                </div>
+
             </div>
             <div class="footer-baseline">
                 <p>&copy; 2026 Olimpo Pods. Todos os direitos reservados. CNPJ 57.220.134/0001-35</p>
@@ -787,7 +1012,7 @@
                   <div class="product-info-column">
                     <div class="p-brand" id="prodBrand">${product.brand}</div>
                     <h1 class="p-name" id="prodName">${product.name}</h1>
-                    <div class="div-promo-label" style="display: ${hasBulkDiscount ? 'block' : 'none'}; background: rgba(255, 11, 85, 0.1); color: #ff0b55; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(255, 11, 85, 0.2); margin-bottom: 10px; width: fit-content;">🎉 5% DE DESCONTO ATIVADO</div>
+                    <div class="div-promo-label" style="display: ${hasBulkDiscount ? 'inline-block' : 'none'}; background: rgba(255, 11, 85, 0.15); color: #ff0b55; padding: 4px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; border: 1px solid rgba(255, 11, 85, 0.3); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">DESCONTO EXTRA ATIVADO — Você está economizando!</div>
                     <div class="p-price" id="prodPrice">${priceDisplayHtml}</div>
 
                     <div class="p-options">
@@ -811,7 +1036,7 @@
                         </div>
                         <input type="hidden" id="flavorValue" value="">
                       </div>
-                      ${saleType === 'retail' ? '<p style="font-size: 0.8rem; font-weight: 300; font-style: italic; color: #888; margin-top: 8px;">A partir de 2 peças seu frete é grátis</p>' : ''}
+                      ${saleType === 'retail' ? '<p style="font-size: 0.8rem; font-weight: 300; font-style: italic; color: #888; margin-top: 8px;">Varejo — Compre a partir de 2 peças</p>' : ''}
                     </div>
 
                     ${product.available === false ? `
@@ -879,6 +1104,7 @@
                 options.classList.toggle('show');
             });
 
+
             document.querySelectorAll('.custom-option').forEach(opt => {
                 opt.addEventListener('click', () => {
                     const val = opt.getAttribute('data-value');
@@ -918,57 +1144,91 @@
         }
 
         function simulateShipping() {
-            const cep = document.getElementById('shippingInput').value.replace(/\D/g, "");
+            const cepInput = document.getElementById('shippingInput');
+            if (!cepInput) return;
+            const cep = cepInput.value.replace(/\D/g, "");
             const resultsBox = document.getElementById('shipping-results');
 
             if (cep.length !== 8) {
-                alert("Por favor, insira um CEP válido.");
+                if (window.lastCepSimulated) { 
+                     // Only show alert if it was a manual click or valid CEP previously
+                }
                 return;
             }
 
             const qtyInput = document.getElementById('qtyVal');
-            const qty = parseInt(qtyInput.value) || 1;
+            const qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
+            
+            // Core calculation from logic file
+            const options = ShippingCalculator.calculate(cep, qty);
+            
+            if (!options || options.length === 0) {
+                resultsBox.innerHTML = '<p style="padding:15px; color:#c0c0c0; text-align:center; font-size:0.9rem;">CEP não encontrado para cálculo.</p>';
+                return;
+            }
+
             const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
+            // Free Shipping Logic: Wholesale >= 50 units (Standard PAC)
+            const isFreeShipping = (saleType === 'wholesale' && qty >= 50);
 
-            const isWholesale = saleType === 'wholesale';
-            const isFreePac = (saleType === 'retail' && qty >= 2) || isWholesale;
-            const isFreeSedex = isWholesale; // Wholesale has free SEDEX too
+            const orderMap = { 'JADLOG': 1, 'LOGGI': 2, 'SEDEX': 3, 'PAC': 4 };
+            options.sort((a, b) => (orderMap[a.id] || 99) - (orderMap[b.id] || 99));
 
-            // Simulated prices based on CEP prefix
-            const prefix = parseInt(cep[0]);
-            let basePac = 18.00;
-            let baseSedex = 28.00;
-
-            if (prefix >= 7) { basePac += 15; baseSedex += 25; }
-            else if (prefix >= 4) { basePac += 7; baseSedex += 12; }
-
-            const pacPrice = isFreePac ? "Grátis" : `R$ ${basePac.toFixed(2).replace('.', ',')}`;
-            const sedexPrice = isFreeSedex ? "Grátis" : `R$ ${baseSedex.toFixed(2).replace('.', ',')}`;
-
-            resultsBox.innerHTML = `
-                <span class="shipping-title">Estas são as opções de frete para a sua região:</span>
-                <div class="shipping-option">
-                    <div class="opt-meta">
-                        <span class="opt-name">PAC</span>
-                        <span class="opt-days">Até ${prefix + 5} dias úteis</span>
+            let html = `
+                <div class="shipping-results-header" style="margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; display:flex; flex-direction:column; gap:4px;">
+                    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                        <span class="shipping-title" style="font-weight:700; color:#fff; font-size:1.1rem; letter-spacing: -0.02em;">Simulação de frete</span>
+                        <span style="color:var(--accent-primary); font-size:0.65rem; font-weight:800; padding:4px 10px; border:1px solid var(--accent-primary); border-radius:30px; text-transform:uppercase; letter-spacing:1px; background:rgba(255, 11, 85, 0.05); display:inline-block;">INTELLIGENT</span>
                     </div>
-                    <span class="opt-price ${isFreePac ? 'free' : ''}">${pacPrice}</span>
-                </div>
-                <div class="shipping-option">
-                    <div class="opt-meta">
-                        <span class="opt-name">SEDEX</span>
-                        <span class="opt-days">Até ${Math.max(1, prefix)} dias úteis</span>
-                    </div>
-                    <span class="opt-price ${isFreeSedex ? 'free' : ''}">${sedexPrice}</span>
+                    <span style="font-size:0.8rem; color:#888;">Simulado para ${cep.slice(0,5)}-${cep.slice(5)}</span>
                 </div>
             `;
 
+
+            
+            options.forEach(opt => {
+                const isPac = opt.id === 'PAC';
+                const isCorreios = opt.carrier.toLowerCase().includes('correios');
+                const isRecommended = !isPac && !isCorreios;
+                
+                const currentPrice = isFreeShipping && isPac ? 0 : opt.price;
+                const displayPrice = currentPrice === 0 ? 'GRÁTIS' : `R$ ${currentPrice.toFixed(2).replace('.', ',')}`;
+                
+                html += `
+                <div class="shipping-option-card" style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); border-radius:12px; margin-bottom:10px; transition:all 0.3s ease; position:relative; overflow:hidden;">
+                    ${currentPrice === 0 ? '<div style="position:absolute; top:0; left:0; width:3px; height:100%; background:var(--accent-primary);"></div>' : ''}
+                    <div class="opt-meta" style="display:flex; flex-direction:column; gap:4px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="opt-name" style="font-weight:700; color:#fff; font-size:1rem;">${opt.carrier}</span>
+                            <span class="opt-tag" style="background:rgba(255,255,255,0.1); color:#ccc; font-size:0.65rem; padding:2px 6px; border-radius:4px; font-weight:600; text-transform:uppercase;">${opt.type}</span>
+                            ${isRecommended ? '<span class="opt-tag" style="background:#ff0b55; color:#fff; font-size:0.65rem; padding:2px 8px; border-radius:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.02em;">Mais Indicado</span>' : ''}
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px; margin-top:2px;">
+                            <span class="opt-days" style="font-size:0.85rem; color:#aaa; display:flex; align-items:center; gap:4px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.6;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 
+                                ${opt.deadlineDays}
+                            </span>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <span class="opt-price" style="font-weight:900; font-size:1.15rem; color:${currentPrice === 0 ? 'var(--accent-primary)' : '#fff'};">${displayPrice}</span>
+                        ${currentPrice === 0 ? '<div style="font-size:0.6rem; color:var(--accent-primary); font-weight:700; margin-top:2px;">OFERTA ATIVA</div>' : ''}
+                    </div>
+                </div>`;
+            });
+
+            resultsBox.innerHTML = html;
+            resultsBox.style.padding = '5px';
             resultsBox.classList.add('active');
+            window.lastCepSimulated = cep;
         }
 
         function validateQty(input) {
             if (input.value < 1) input.value = 1;
-            // Opcional: limitar máximo se necessário
+            // Real-time update if shipping was already simulated
+            if (window.lastCepSimulated) {
+                simulateShipping();
+            }
         }
 
         function updateQty(delta) {
@@ -1049,13 +1309,12 @@
 
                 if (product) {
                     renderProduct(product);
-                    // Initialize the carousel with the current product's brand
-                    if (window.initProductCarousel) {
-                        window.initProductCarousel(product.brand || '');
-                    }
-                    // Render special mobile brand carousels
-                    renderMobileBrandCarousels(products);
+                    
+                    // Render new desktop/unified catalog sections
+                    renderFavoritesCarousel(products);
+                    renderFullCatalog(products);
                 } else {
+
                     document.getElementById('productContent').innerHTML = '<p>Produto não encontrado.</p>';
                 }
             } catch (error) {
@@ -1065,48 +1324,78 @@
             }
         }
 
-        function renderMobileBrandCarousels(allProducts) {
-            const container = document.getElementById('mobile-brand-carousels');
+        function renderFavoritesCarousel(allProducts) {
+            const container = document.getElementById('favoritesContent');
+            if (!container) return;
+
+            // Simple "Favorites" logic for now (could be an is_favorite flag in JSON)
+            const favorites = allProducts.slice(0, 4); // Just take the first 4 for now
+
+            const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
+            
+            container.innerHTML = `
+                <div class="section-header-pill">🔥 Recomendações Premium</div>
+                <h2 class="catalog-title">Escolhidos por clientes:</h2>
+                <div class="p-grid-catalog">
+                    ${favorites.map(p => {
+                        const price = parseFloat(p.price);
+                        const isRetail = saleType === 'retail';
+                        const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : price;
+                        return `
+                            <div class="p-card-mini" onclick="window.location.href='product.html?id=${p.id}'">
+                                <img src="${p.image || 'assets/logo-ignite.png'}" alt="${p.name}" class="p-mini-img">
+                                <div class="p-mini-info">
+                                    <span class="p-mini-name">${p.name}</span>
+                                    <span class="p-mini-price">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function renderFullCatalog(allProducts) {
+            const container = document.getElementById('fullCatalogContent');
             if (!container) return;
 
             // Group by brand
             const brands = {};
             allProducts.forEach(p => {
-                if (!brands[p.brand]) brands[p.brand] = [];
-                brands[p.brand].push(p);
+                const b = p.brand || 'outros';
+                if (!brands[b]) brands[b] = [];
+                brands[b].push(p);
             });
 
-            const cartItems = JSON.parse(localStorage.getItem('ignite_cart')) || [];
-            const totalCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-            const hasDiscount = totalCount >= 30;
-
-            let html = '<h3 class="mobile-section-title">Confira outras marcas</h3>';
+            const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
             
+            let html = `
+                <div class="section-header-pill">🛍️ Explore tudo</div>
+                <h2 class="catalog-title">Confira outros produtos</h2>
+            `;
+
             for (const brand in brands) {
                 const brandProducts = brands[brand];
                 html += `
-                    <div class="mobile-brand-section">
-                        <h4 class="brand-title">${brand.toUpperCase()}</h4>
-                        <div class="brand-row-carousel">
-                            ${brandProducts.map(p => {
-                                const price = parseFloat(p.price);
-                                const discPrice = price * 0.95;
-                                const isRetail = localStorage.getItem('ignite_sale_type') === 'retail';
-                                const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : (hasDiscount ? discPrice : price);
-                                
-                                return `
-                                    <div class="mobile-product-card" onclick="window.location.href='product.html?id=${p.id}'">
-                                        <div class="m-card-img">
-                                            <img src="${p.image || 'assets/logo-ignite.png'}" alt="${p.name}">
-                                        </div>
-                                        <div class="m-card-info">
-                                            <span class="m-name">${p.name}</span>
-                                            <span class="m-price">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
-                                        </div>
+                    <div class="brand-sub-divider">
+                        <h3>${brand}</h3>
+                    </div>
+
+                    <div class="p-grid-catalog">
+                        ${brandProducts.map(p => {
+                            const price = parseFloat(p.price);
+                            const isRetail = saleType === 'retail';
+                            const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : price;
+                            return `
+                                <div class="p-card-mini" onclick="window.location.href='product.html?id=${p.id}'">
+                                    <img src="${p.image || 'assets/logo-ignite.png'}" alt="${p.name}" class="p-mini-img">
+                                    <div class="p-mini-info">
+                                        <span class="p-mini-name">${p.name}</span>
+                                        <span class="p-mini-price">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
                                     </div>
-                                `;
-                            }).join('')}
-                        </div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 `;
             }
@@ -1115,24 +1404,112 @@
 
         loadProduct();
     </script>
-    <!-- ==================== STICKY UP-SELL BAR ==================== -->
+
     <div class="sticky-upsell-bar" id="stickyUpsellBar">
         <div class="upsell-info">
-            <div class="upsell-message" id="upsellMessage">Faltam <b>30 itens</b> para 5% de desconto!</div>
+            <div class="upsell-message" id="upsellMessage">Adicione itens e ganhe <b>recompensas!</b></div>
             <div class="upsell-progress-container">
                 <div class="upsell-progress-fill" id="upsellProgressFill"></div>
+                <div class="milestones-wrapper">
+                    <div class="milestone-marker" style="left: 60%;" data-goal="30">
+                        <span class="milestone-icon">30</span>
+                    </div>
+                    <div class="milestone-marker" style="left: 80%;" data-goal="40">
+                        <span class="milestone-icon">40</span>
+                    </div>
+                    <div class="milestone-marker" style="left: 100%;" data-goal="50">
+                        <span class="milestone-icon">50</span>
+                    </div>
+
+                </div>
+
             </div>
-            <div class="progress-subtext right">50+ unidades frete é grátis.</div>
+            <div class="sticky-savings-summary" id="savingsValueSticky">Você já economizou: R$ 0,00</div>
         </div>
         <div class="upsell-actions">
             <button class="btn-view-cart" onclick="window.toggleCartSidebar(true)">Ver Carrinho</button>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="assets/supabase-config.js?v=1.1"></script>
-    <script src="assets/products-data.js?v=1.1"></script>
-    <script src="script.js?v=1.1"></script>
-</body>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/supabase-config.js?v=3.7"></script>
+    <script src="assets/products-data.js?v=3.7"></script>
+    <script src="assets/shipping-logic.js?v=3.7"></script>
+    <script src="script.js?v=3.7"></script>
+
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-sidebar" id="cartSidebar">
+      <div class="cart-header">
+        <h2>Seu Carrinho</h2>
+        <button class="btn-close-cart" id="closeCart" aria-label="Fechar Carrinho">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Rewards Progress Bar -->
+      <div class="promo-bar-wrapper" id="promoBarWrapper">
+        <p class="promo-bar-text" id="promoBarText">Adicione itens e ganhe <b class="text-red">recompensas!</b></p>
+        <div class="promo-bar-track">
+          <div class="promo-bar-fill" id="promoBarFill">
+            <div class="promo-bar-energy"></div>
+          </div>
+          <div class="promo-bar-markers">
+            <div class="milestone-marker" data-goal="30" style="left:60%"><span class="milestone-icon">30</span></div>
+            <div class="milestone-marker" data-goal="40" style="left:80%"><span class="milestone-icon">40</span></div>
+            <div class="milestone-marker" data-goal="50" style="left:100%"><span class="milestone-icon">50</span></div>
+
+          </div>
+
+        </div>
+        <div id="savingsDisplay" class="promo-savings" style="display:none;">
+          <span class="promo-savings-label">Você já economizou:</span>
+          <span class="promo-savings-value" id="savingsValue">R$ 0,00</span>
+        </div>
+      </div>
+
+      <div class="cart-items-list" id="sidebarCartItems">
+        <div class="empty-cart-msg">Seu carrinho está vazio.</div>
+      </div>
+
+      <div class="cart-footer">
+        <div class="cart-total-line">
+          <span>Subtotal</span>
+          <span class="total-val" id="sidebarTotal">R$ 0,00</span>
+        </div>
+        <a href="checkout.html" class="btn-checkout disabled" id="sidebarCheckoutBtn">Finalizar Compra</a>
+      </div>
+    </div>
+
+    <!-- Final logic to ensure sidebar works despite any script.js conflicts -->
+    <script>
+        window.toggleCartSidebar = function(show) {
+            const cs = document.getElementById('cartSidebar');
+            const co = document.getElementById('cartOverlay');
+            if (!cs) return;
+            if (show) {
+                cs.classList.add('active');
+                if (co) co.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                cs.classList.remove('active');
+                if (co) co.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        };
+
+        // Re-bind close button specifically
+        setTimeout(() => {
+            const closeBtn = document.getElementById('closeCart');
+            const overlay = document.getElementById('cartOverlay');
+            if (closeBtn) closeBtn.onclick = () => window.toggleCartSidebar(false);
+            if (overlay) overlay.onclick = () => window.toggleCartSidebar(false);
+        }, 500);
+    </script>
+    </script>
+</body>
 </html>

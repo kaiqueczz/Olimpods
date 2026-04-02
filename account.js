@@ -101,22 +101,55 @@ async function renderUpsellProducts() {
         const mainMsg = document.querySelector('.upsell-copy .main-msg');
         
         if (progressFill) {
-            let finalProgress = 0;
+            let finalProgress = Math.min((totalQty / 50) * 100, 100);
             let msg = "";
+            let stage = "1";
             
             if (totalQty < 30) {
-                finalProgress = (totalQty / 30) * 60;
-                msg = `Faltam <b>${30 - totalQty}</b> itens para 5% de desconto`;
-            } else if (totalQty < 50) {
-                finalProgress = 60 + ((totalQty - 30) / 20) * 40;
-                msg = `🎉 5% OFF Ativado! Faltam <b>${50 - totalQty}</b> para <b>Frete Grátis</b>`;
+                stage = "1";
+                msg = `Faltam <b>${30 - totalQty}</b> unidades para ativar <b>5% OFF</b>`;
+            } else if (totalQty === 30) {
+                stage = "2";
+                msg = `<b>Desconto ativado!</b> Você ganhou 5% OFF`;
+            } else if (totalQty > 30 && totalQty < 40) {
+                stage = "2";
+                msg = `Faltam <b>${40 - totalQty}</b> unidades para ganhar <b>+2 PODS GRÁTIS</b>`;
+            } else if (totalQty === 40) {
+                stage = "3";
+                msg = `🔥 Você desbloqueou <b>2 PODS GRÁTIS!</b>`;
+            } else if (totalQty > 40 && totalQty < 50) {
+                stage = "3";
+                msg = `Faltam <b>${50 - totalQty}</b> unidades para <b>FRETE GRÁTIS</b>`;
             } else {
-                finalProgress = 100;
-                msg = `<span style="color: #00ff88;">🔥 Frete Grátis e 5% OFF Ativados! Nível Máximo Alcançado.</span>`;
+                stage = "4";
+                msg = `🚚 <b>Frete grátis liberado!</b>`;
             }
             
             progressFill.style.width = `${finalProgress}%`;
-            if (mainMsg) mainMsg.innerHTML = msg;
+            progressFill.setAttribute('data-stage', stage);
+            
+            const savings = calculateAccountSavings(cart, totalQty);
+            const savingsHtml = savings > 0 ? `<div class="promo-savings-value" style="font-size: 0.9rem; margin-top: 5px;">Economia: R$ ${savings.toFixed(2).replace('.', ',')}</div>` : "";
+
+            if (mainMsg) {
+                mainMsg.innerHTML = `${msg} ${savingsHtml}`;
+            }
+
+            const promoBarWrapper = document.getElementById('accountPromoBar');
+            if (promoBarWrapper) {
+                const markers = promoBarWrapper.querySelectorAll('.promo-marker');
+                markers.forEach(m => {
+                    const goal = parseInt(m.getAttribute('data-goal'));
+                    if (totalQty >= goal) {
+                        if (!m.classList.contains('reached')) {
+                            m.classList.add('reached', 'pop-hit');
+                            setTimeout(() => m.classList.remove('pop-hit'), 400);
+                        }
+                    } else {
+                        m.classList.remove('reached');
+                    }
+                });
+            }
         }
 
         barContainer.innerHTML = '';
@@ -124,7 +157,7 @@ async function renderUpsellProducts() {
         sorted.forEach((product, index) => {
             const wholesalePrice = parseFloat(product.price);
             const discountPrice = wholesalePrice * 0.95;
-            const finalPrice = totalQty >= 30 ? discountPrice : wholesalePrice;
+            const finalPrice = totalQty === 30 ? discountPrice : wholesalePrice;
 
             const card = document.createElement('div');
             card.className = `product-card glow-card animate-in`;
@@ -215,6 +248,32 @@ async function renderUpsellProducts() {
         console.error('Erro ao carregar produtos para upsell:', e);
         barContainer.innerHTML = '<p style="color: #666;">Não foi possível carregar as ofertas no momento.</p>';
     }
+}
+
+function calculateAccountSavings(cart, totalQty) {
+    if (totalQty < 30 || !cart || cart.length === 0) return 0;
+    
+    let savings = 0;
+    let subtotal = 0;
+    let avgPrice = 0;
+
+    cart.forEach(item => {
+        subtotal += (parseFloat(item.price) || 0) * (item.quantity || 1);
+    });
+    
+    if (totalQty > 0) avgPrice = subtotal / totalQty;
+    
+    if (totalQty >= 30) {
+        savings += subtotal * 0.05;
+    }
+    if (totalQty >= 40) {
+        savings += (avgPrice * 2);
+    }
+    if (totalQty >= 50) {
+        savings += 50; 
+    }
+
+    return savings;
 }
 
 // Função para renderizar histórico de pedidos do usuário

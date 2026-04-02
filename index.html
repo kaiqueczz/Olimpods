@@ -533,18 +533,9 @@
       <div class="story-section">
         <div class="story-content reveal">
           <h3 class="typewriter" data-text="COMO TUDO COMEÇOU"></h3>
-          <p>Há mais de 4 anos, nascemos de uma paixão por trazer ao
-            Brasil produtos de altíssima qualidade com preços
-            acessíveis. O que começou como um pequeno projeto entre
-            amigos se transformou em uma das lojas mais confiáveis do
-            segmento.</p>
-          <p>Cada pedido que enviamos carrega nosso compromisso com
-            qualidade, agilidade e transparência. Trabalhamos com as
-            melhores marcas do mercado — Ignite, Elfbar e Blacksheep — para garantir que você
-            tenha sempre as melhores opções.</p>
-          <p>Mais do que uma loja, somos uma comunidade. E é a
-            confiança de cada cliente que nos motiva a evoluir todos os
-            dias.</p>
+          <p>Um sonho de infância se torna realidade. Um projeto que começou apenas como uma ideia — tomou forma, ganhou estrutura e finalmente se concretizou. O desejo de empreender e construir algo diferente, inovador e acessível, sempre com o objetivo de entregar o melhor ao cliente. Foi assim que nasceu a Olimpo.</p>
+          <p>Depois de muitas noites viradas, construindo cada detalhe, surgiu o que hoje se tornou o atacado número 1 do Brasil no nosso nicho. Começamos como muitos — no varejo, com apenas 10 peças em estoque, sem atalhos, apenas visão e consistência. E hoje, com orgulho, podemos afirmar: nós somos a número 1 do Brasil.</p>
+          <p>Seja bem-vindo a essa história. Mais do que uma loja — somos uma comunidade. E é a confiança de cada cliente que nos impulsiona a evoluir todos os dias.</p>
         </div>
         <div class="story-visual reveal">
           <div class="story-card glow-card">
@@ -590,7 +581,7 @@
           <h4>Atendimento</h4>
           <p class="footer-info-text email">Olimpopods22@gmail.com</p>
           <div class="social-links-footer">
-            <a href="https://www.instagram.com/olim.pods/" class="social-icon" title="Instagram" target="_blank"
+            <a href="https://instagram.com/olimpods.digital" class="social-icon" title="Instagram" target="_blank"
               rel="noopener noreferrer">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                 stroke-linejoin="round">
@@ -599,7 +590,7 @@
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
               </svg>
             </a>
-            <a href="#" class="social-icon" title="WhatsApp">
+            <a href="https://wa.me/5588988795039" class="social-icon" title="WhatsApp" target="_blank">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                 stroke-linejoin="round">
                 <path
@@ -616,15 +607,7 @@
             </a>
           </div>
         </div>
-        <div class="footer-extra-col">
-          <div class="newsletter-box">
-            <h4>Junte-se a nós</h4>
-            <form class="newsletter-form">
-              <input type="email" placeholder="Seu e-mail aqui" required>
-              <button type="submit">OK</button>
-            </form>
-          </div>
-        </div>
+
       </div>
 
       <div class="footer-baseline">
@@ -648,27 +631,23 @@
       </button>
     </div>
 
-    <!-- Multi-stage Progress Bar -->
-    <div class="minimum-progress-container">
-      <div class="progress-header">
-        <span id="progressText">Faltam <b>30</b> itens para 5% de desconto</span>
-        <span id="progressPercent">0%</span>
-      </div>
-      <div class="progress-track">
-        <div id="progressFill"></div>
-        <div class="milestones-container">
-          <div class="milestone-marker" style="left: 20%;" data-goal="10">
-            <span class="milestone-label">Atacado</span>
-          </div>
-          <div class="milestone-marker" style="left: 60%;" data-goal="30">
-            <span class="milestone-label">5% OFF</span>
-          </div>
-          <div class="milestone-marker" style="left: 100%;" data-goal="50">
-            <span class="milestone-label">Frete Grátis</span>
-          </div>
+    <!-- Rewards Progress Bar -->
+    <div class="promo-bar-wrapper" id="promoBarWrapper">
+      <p class="promo-bar-text" id="promoBarText">Adicione itens e ganhe <b class="text-red">recompensas!</b></p>
+      <div class="promo-bar-track">
+        <div class="promo-bar-fill" id="promoBarFill">
+          <div class="promo-bar-energy"></div>
+        </div>
+        <div class="promo-bar-markers">
+          <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
+          <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
+          <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
         </div>
       </div>
-      <div class="progress-subtext">50+ unidades frete é grátis.</div>
+      <div id="savingsDisplay" class="promo-savings" style="display:none;">
+        <span class="promo-savings-label">Você já economizou:</span>
+        <span class="promo-savings-value" id="savingsValue">R$ 0,00</span>
+      </div>
     </div>
 
 
@@ -749,11 +728,17 @@
   <!-- ==================== STICKY UP-SELL BAR ==================== -->
   <div class="sticky-upsell-bar" id="stickyUpsellBar">
     <div class="upsell-info">
-      <div class="upsell-message" id="upsellMessage">Faltam <b>30 itens</b> para 5% de desconto!</div>
-      <div class="upsell-progress-container">
-        <div class="upsell-progress-fill" id="upsellProgressFill"></div>
+      <div class="upsell-message" id="upsellMessage">Adicione itens e ganhe <b class="text-red">recompensas!</b></div>
+      <div class="promo-bar-track sticky-bar-track">
+        <div class="promo-bar-fill" id="stickyPromoFill">
+          <div class="promo-bar-energy"></div>
+        </div>
+        <div class="promo-bar-markers">
+          <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
+          <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
+          <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
+        </div>
       </div>
-      <div class="progress-subtext right">50+ unidades frete é grátis.</div>
     </div>
     <div class="upsell-actions">
       <button class="btn-view-cart" onclick="window.toggleCartSidebar(true)">Ver Carrinho</button>

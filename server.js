@@ -13,9 +13,10 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const PDFDocument = require('pdfkit');
+const nodemailer = require('nodemailer');
 
 // ── Configurações ──
-const PORT = 3000;
+const PORT = 3001;
 const STATIC_DIR = __dirname;
 
 // ── ZuckPay Credentials ──
@@ -49,6 +50,61 @@ const MIME_TYPES = {
     '.mp4': 'video/mp4',
     '.pdf': 'application/pdf',
 };
+
+// ── Nodemailer Transporter ──
+// IMPORTANTE: O usuário deve configurar estas credenciais no arquivo local
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'SEU_EMAIL_AQUI@gmail.com',
+        pass: 'SUA_SENHA_DE_APP_AQUI'
+    }
+});
+
+function getOlimpoEmailWrapper(title, content) {
+    return `
+    <div style="background-color: #050505; padding: 40px 10px; font-family: 'Inter', Arial, sans-serif; color: #ffffff; margin: 0;">
+        <div style="max-width: 600px; margin: 0 auto; background: #0a0a0a; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.05); overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+            <div style="padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); background: linear-gradient(to bottom, rgba(255,11,85,0.05), transparent);">
+                 <div style="font-size: 28px; font-weight: 900; letter-spacing: 4px; color: #ffffff; text-transform: uppercase;">
+                    <span style="color: #ff0b55;">OLIMPO</span> PODS
+                 </div>
+                 <div style="font-size: 10px; color: #666; letter-spacing: 3px; margin-top: 8px; text-transform: uppercase; font-weight: 700;">Premium Vapor Experience</div>
+            </div>
+            <div style="padding: 40px 30px;">
+                <h2 style="color: #ff0b55; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; margin-top: 0; margin-bottom: 25px; text-align: center;">${title}</h2>
+                <div style="font-size: 16px; line-height: 1.6; color: #d0d0d0;">
+                    ${content}
+                </div>
+            </div>
+            <div style="padding: 30px; text-align: center; background: rgba(255, 255, 255, 0.02); font-size: 11px; color: #555; border-top: 1px solid rgba(255, 255, 255, 0.03);">
+                <p style="margin: 0;">&copy; 2026 Olimpo Pods. Todos os direitos reservados.</p>
+                <p style="margin: 5px 0;">R Vinte e Cinco de Março 1020, loja 1 - Centro, São Paulo - SP</p>
+                <div style="margin-top: 15px;">
+                    <a href="https://instagram.com/olimpods.digital" style="color: #ff0b55; text-decoration: none; margin: 0 10px; font-weight: 600;">Instagram</a>
+                    <a href="https://wa.me/5588988795039" style="color: #ff0b55; text-decoration: none; margin: 0 10px; font-weight: 600;">WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </div>`;
+}
+
+async function sendOlimpoEmail(to, subject, title, htmlContent) {
+    const mailOptions = {
+        from: '"Olimpo Pods" <noreply@olimpopodsignite.com>',
+        to,
+        subject,
+        html: getOlimpoEmailWrapper(title, htmlContent)
+    };
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`✉️  E-mail enviado para: ${to}`);
+        return { success: true };
+    } catch (error) {
+        console.error('❌ Erro no envio de e-mail:', error);
+        return { success: false, error };
+    }
+}
 
 // ── Helper: Read request body ──
 function readBody(req) {
@@ -338,29 +394,45 @@ const server = http.createServer(async (req, res) => {
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         }
 
-        // Get destination coords (try 2-digit prefix, then 1-digit)
+        // ── Advanced Integrated Shipping ──
+        const qty = Math.ceil(peso / 0.1) || 1; // Reconstruct quantity from weight (approx)
+        const prefixDigit = parseInt(CEP_DESTINO.substring(0, 1));
+        
+        // Packaging Logic (Same as frontend)
+        const side = Math.ceil(Math.sqrt(qty));
+        const L = side * 5;
+        const W = side * 3;
+        const layers = Math.ceil(qty / (side * side));
+        const H = Math.max(5, Math.ceil(layers / 2) * 5);
+        const cubicWeight = (L * W * H) / 6000;
+        const totalWeight = qty * 0.1;
+        const finalWeight = Math.max(totalWeight, cubicWeight);
+
+        // Distance Simulation
         const prefix2 = CEP_DESTINO.substring(0, 2);
-        const prefix1 = CEP_DESTINO.substring(0, 1);
-        const destCoords = CEP_COORDS_2[prefix2] || CEP_COORDS[prefix1] || { lat: -15.7939, lon: -47.8828 }; // Default: Brasília
-
+        const destCoords = CEP_COORDS_2[prefix2] || CEP_COORDS[prefixDigit] || { lat: -15.7939, lon: -47.8828 };
         const km = haversineKm(ORIGIN.lat, ORIGIN.lon, destCoords.lat, destCoords.lon);
-        console.log(`📦 Frete calculado: CEP ${CEP_DESTINO} → ${Math.round(km)} km, peso ${peso} kg`);
 
-        // ── Custom Shipping Formulas ──
-        const pacPrice = Math.min(50 + (km * 0.06) + (peso * 2), 160);   // teto R$160
-        const sedexPrice = Math.min(60 + (km * 0.06) + (peso * 2), 250); // teto R$250
-        const loggiPrice = 160; // Fixo
-        const jadlogPrice = 220; // Fixo
+        // Base Rules
+        let distanceBase = 25;
+        let distanceMultiplier = 2.5;
 
-        // Prazo estimado baseado na distância
-        const pacDays = Math.max(5, Math.min(20, Math.round(km / 200)));
-        const sedexDays = Math.max(2, Math.min(10, Math.round(km / 400)));
+        if (prefixDigit === parseInt(ORIGIN.prefix)) {
+            distanceBase = 12;
+            distanceMultiplier = 1.2;
+        } else if ([0, 1, 2, 3].includes(prefixDigit)) {
+            distanceBase = 18;
+            distanceMultiplier = 1.8;
+        }
+
+        const calculatedBase = distanceBase + (distanceMultiplier * (km / 100));
+        const freteBase = calculatedBase + (finalWeight * 8);
 
         const options = [
-            { name: 'PAC', price: parseFloat(pacPrice.toFixed(2)), deadline: `${pacDays} dias úteis`, group: 'Correios' },
-            { name: 'SEDEX', price: parseFloat(sedexPrice.toFixed(2)), deadline: `${sedexDays} dias úteis`, group: 'Correios' },
-            { name: 'Loggi', price: loggiPrice, deadline: '15 dias úteis', group: 'Transportadoras' },
-            { name: 'Jadlog', price: jadlogPrice, deadline: '12 dias úteis', group: 'Transportadoras' },
+            { name: 'PAC', price: parseFloat((freteBase * 1.0 * 1.2).toFixed(2)), deadline: '5 dias úteis', group: 'Correios' },
+            { name: 'SEDEX', price: parseFloat((freteBase * 1.4 * 1.2).toFixed(2)), deadline: '2 dias úteis', group: 'Correios' },
+            { name: 'Loggi', price: parseFloat((freteBase * 1.2 * 1.2).toFixed(2)), deadline: '3 dias úteis', group: 'Transportadoras' },
+            { name: 'Jadlog', price: parseFloat((freteBase * 0.95 * 1.2).toFixed(2)), deadline: '4 dias úteis', group: 'Transportadoras' },
         ];
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -421,11 +493,20 @@ const server = http.createServer(async (req, res) => {
         console.log(`Para: ${userData.phone}`);
         console.log(`Mensagem: Seu código de acesso Olimpo Pods é: ${verificationCode}`);
         console.log('────────────────────────────────────────');
-        console.log('📧 [E-MAIL SIMULADO]');
-        console.log(`Para: ${userData.email}`);
-        console.log(`Assunto: Seu código de verificação Olimpo Pods`);
-        console.log(`Código: ${verificationCode}`);
-        console.log('════════════════════════════════════════');
+
+        // Envio Real do E-mail Profissional
+        const emailBody = `
+            <p style="text-align: center;">Olá!</p>
+            <p style="text-align: center; color: #ccc;">Obrigado por se juntar à Olimpo Pods. Use o código abaixo para completar a verificação da sua conta e desbloquear o acesso premium:</p>
+            
+            <div style="background: rgba(255, 11, 85, 0.1); border: 2px dashed #ff0b55; padding: 30px; border-radius: 20px; text-align: center; margin: 30px 0;">
+                <span style="font-size: 42px; font-weight: 900; color: #ff0b55; letter-spacing: 8px;">${verificationCode}</span>
+            </div>
+            
+            <p style="font-size: 13px; color: #666; text-align: center;">Este código é válido por <strong>30 minutos</strong>. Se você não solicitou este cadastro, ignore este e-mail.</p>
+        `;
+
+        await sendOlimpoEmail(userData.email, "Verifique sua conta — Olimpo Pods", "CÓDIGO DE SEGURANÇA", emailBody);
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ status: 'success', message: 'Cadastro realizado! Enviamos o código para seu e-mail e celular.' }));
@@ -462,15 +543,71 @@ const server = http.createServer(async (req, res) => {
             res.end(JSON.stringify({ status: 'error', message: 'E-mail ou senha incorretos.' }));
         } else if (!user.verified) {
             res.writeHead(403, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ status: 'error', message: 'Por favor, verifique seu e-mail antes de logar.' }));
+            res.end(JSON.stringify({ status: 'error', message: 'Conta ainda não verificada. Por favor, verifique seu e-mail.' }));
         } else {
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({
-                status: 'success',
-                message: 'Login realizado!',
-                user: { name: user.fullname, email: user.email }
-            }));
+            res.end(JSON.stringify({ status: 'success', user: { name: user.fullname, email: user.email } }));
         }
+        return;
+    }
+
+    // ── Forgot Password Request ──
+    if (req.method === 'POST' && pathname === '/api/auth/forgot-password') {
+        const body = await readBody(req);
+        const { email } = JSON.parse(body);
+        const users = getUsers();
+        const user = users.find(u => u.email === email);
+
+        if (!user) {
+            // Unify response for security (don't leak if email exists)
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'success', message: 'Se o e-mail existir em nossa base, um link foi enviado.' }));
+            return;
+        }
+
+        const recoveryCode = Math.floor(100000 + Math.random() * 900000).toString();
+        user.recoveryCode = recoveryCode;
+        user.recoveryExpires = Date.now() + (30 * 60 * 1000); // 30 min
+        saveUsers(users);
+
+        const emailBody = `
+            <p style="text-align: center;">Olá <strong>${user.fullname || user.name}</strong>,</p>
+            <p style="text-align: center; color: #ccc;">Recebemos uma solicitação de recuperação de senha para sua conta Olimpo. Use o código abaixo para redefinir sua credencial:</p>
+            
+            <div style="background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 11, 85, 0.5); padding: 30px; border-radius: 20px; text-align: center; margin: 30px 0;">
+                <span style="font-size: 42px; font-weight: 900; color: #ff0b55; letter-spacing: 8px;">${recoveryCode}</span>
+            </div>
+            
+            <p style="font-size: 13px; color: #666; text-align: center;">Se você não solicitou a recuperação, recomendamos que altere sua senha por segurança e ignore este aviso.</p>
+        `;
+
+        await sendOlimpoEmail(user.email, "Recuperação de Senha — Olimpo Pods", "RECUPERAR ACESSO", emailBody);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'success', message: 'E-mail enviado!' }));
+        return;
+    }
+
+    // ── Reset Password Submit ──
+    if (req.method === 'POST' && pathname === '/api/auth/reset-password') {
+        const body = await readBody(req);
+        const { email, code, newPassword } = JSON.parse(body);
+        const users = getUsers();
+        const user = users.find(u => u.email === email);
+
+        if (!user || user.recoveryCode !== code || Date.now() > user.recoveryExpires) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'error', message: 'Código inválido ou expirado.' }));
+            return;
+        }
+
+        user.password = newPassword;
+        delete user.recoveryCode;
+        delete user.recoveryExpires;
+        saveUsers(users);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'success', message: 'Senha alterada com sucesso!' }));
         return;
     }
 
@@ -605,59 +742,39 @@ const server = http.createServer(async (req, res) => {
         order.status = 'Enviado';
         saveOrders(orders);
 
-        // Nodemailer Setup
-        const nodemailer = require('nodemailer');
-        
-        let transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                // To DO: Replace with real credentials inside server.js or .env
-                user: 'SEU_EMAIL_AQUI@gmail.com',
-                pass: 'SUA_SENHA_DE_APP_AQUI'
-            }
-        });
-
         const customerFirstName = (order.customer?.name || 'Cliente').split(' ')[0];
 
-        const mailOptions = {
-            from: 'Olimpo Pods Ignite <noreply@olimpopodsignite.com>',
-            to: order.customer?.email,
-            subject: `Seu pedido #${order.id} foi Despachado! 🚀`,
-            html: `
-                <div style="font-family: 'Inter', Arial, sans-serif; color: #fff; max-width: 600px; margin: 0 auto; background: #0a0a0a; padding: 40px; border-radius: 24px; border: 1px solid rgba(255, 11, 85, 0.2); background-image: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <img src="https://olimpo-pods.digital/assets/logo-ignite.png" alt="Olimpo Pods" style="height: 60px; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(255, 11, 85, 0.5));">
-                        <h1 style="color: #ff0b55; text-transform: uppercase; letter-spacing: 2px; margin: 0; font-size: 24px;">Pedido Despachado!</h1>
-                    </div>
-                    
-                    <p style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Olá ${customerFirstName},</p>
-                    <p style="font-size: 16px; color: #ccc; line-height: 1.6; margin-bottom: 30px;">Grandes notícias! O seu pedido <strong>#${order.id}</strong> já está com a transportadora e a caminho do destino. Prepare o seu setup, a Olimpo está chegando!</p>
-                    
-                    <div style="background: rgba(255, 255, 255, 0.03); padding: 30px; border-radius: 20px; margin: 30px 0; text-align: center; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                        <p style="margin: 0; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">CÓDIGO DE RASTREAMENTO</p>
-                        <p style="margin: 0; font-size: 32px; font-weight: 800; color: #00ff88; letter-spacing: 3px; font-family: monospace;">${trackingCode}</p>
-                    </div>
+        const emailBody = `
+            <p>Olá <strong>${customerFirstName}</strong>,</p>
+            <p style="color: #ccc;">O seu pedido <strong>#${order.id}</strong> já está com a transportadora e a caminho do destino. Prepare o seu setup!</p>
+            
+            <div style="background: rgba(255, 255, 255, 0.03); padding: 30px; border-radius: 20px; margin: 30px 0; text-align: center; border: 1px solid rgba(255, 255, 255, 0.05);">
+                <p style="margin: 0; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">CÓDIGO DE RASTREAMENTO</p>
+                <p style="margin: 0; font-size: 32px; font-weight: 800; color: #00ff88; letter-spacing: 3px; font-family: monospace;">${trackingCode}</p>
+            </div>
 
-                    <div style="text-align: center; margin-top: 30px;">
-                        <a href="https://www.rastreacao.com.br/?p=${trackingCode}" style="background: #ff0b55; color: #fff; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 700; display: inline-block; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s;">Rastrear Pedido Agora</a>
-                    </div>
-                    
-                    <hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.05); margin: 40px 0;">
-                    <p style="font-size: 13px; color: #666; text-align: center; line-height: 1.5;">Olimpo Pods — O melhor do vapor na palma da sua mão.<br>Em caso de dúvidas, responda a este e-mail ou chame no WhatsApp.</p>
-                </div>
-            `
-        };
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="https://www.rastreacao.com.br/?p=${trackingCode}" style="background: #ff0b55; color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 50px; font-weight: 700; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">Rastrear Agora</a>
+            </div>
+            
+            <p style="font-size: 13px; color: #666; text-align: center; margin-top: 40px;">Grandes vapores demandam grandes responsabilidades. Aproveite!</p>
+        `;
 
-        try {
-            await transporter.sendMail(mailOptions);
+        const mailResult = await sendOlimpoEmail(
+            order.customer?.email, 
+            `Seu pedido #${order.id} foi DESPACHADO! 🚀`, 
+            "PRODUTO EM TRÂNSITO", 
+            emailBody
+        );
+
+        if (mailResult.success) {
             console.log(`✉️  E-mail de rastreio Enviado para ${order.customer?.email}`);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ status: 'success', message: 'E-mail enviado e status do pedido atualizado!' }));
-        } catch (err) {
-            console.error('Erro NodeMailer:', err);
-            // Updates locally, but alerts frontend about credentials
+        } else {
+            console.error('Erro NodeMailer no admin/dispatch:', mailResult.error);
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ status: 'success', message: 'Separado com sucesso! Mas o e-mail falhou por causa das credenciais não configuradas (Gmail).' }));
+            res.end(JSON.stringify({ status: 'success', message: 'Separado com sucesso! Mas o e-mail falhou (Credenciais não configuradas).' }));
         }
         return;
     }

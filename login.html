@@ -76,14 +76,29 @@
                     </div>
 
                     <div class="form-helpers">
-                        <a href="#" class="auth-link">Esqueci sua senha?</a>
+                        <a href="#" class="auth-link" id="forgotPasswordBtn">Esqueci minha senha?</a>
                     </div>
 
                     <button type="submit" class="btn-auth">Entrar</button>
                 </form>
+
+                <form class="auth-form" id="recoveryForm" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label" for="recoveryEmail">E-mail da Conta</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="recoveryEmail" class="auth-input" placeholder="seu@email.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-helpers">
+                        <a href="#" class="auth-link" id="backToLoginBtn">Voltar para o login</a>
+                    </div>
+
+                    <button type="submit" class="btn-auth">Recuperar Senha</button>
+                </form>
             </div>
 
-            <div class="auth-footer">
+            <div class="auth-footer" id="authFooter">
                 Não possui uma conta? <a href="signup.html">Cadastre-se aqui</a>
             </div>
         </div>
@@ -93,6 +108,38 @@
     <script src="assets/supabase-config.js"></script>
     <script src="script.js"></script>
     <script>
+        // DOM Elements
+        const loginForm = document.getElementById('loginForm');
+        const recoveryForm = document.getElementById('recoveryForm');
+        const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+        const backToLoginBtn = document.getElementById('backToLoginBtn');
+        const authTitle = document.querySelector('.auth-title');
+        const authSubtitle = document.querySelector('.auth-subtitle');
+        const authFooter = document.getElementById('authFooter');
+
+        // Toggle Logic
+        forgotPasswordBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.style.display = 'none';
+            recoveryForm.style.display = 'flex';
+            recoveryForm.classList.add('fade-in');
+            authTitle.textContent = 'RECUPERAR SENHA';
+            authTitle.setAttribute('data-text', 'RECUPERAR SENHA');
+            authSubtitle.textContent = 'Insira seu e-mail para receber um link de recuperação.';
+            authFooter.style.display = 'none';
+        });
+
+        backToLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            recoveryForm.style.display = 'none';
+            loginForm.style.display = 'flex';
+            loginForm.classList.add('fade-in');
+            authTitle.textContent = 'ACESSE SUA CONTA';
+            authTitle.setAttribute('data-text', 'ACESSE SUA CONTA');
+            authSubtitle.textContent = 'Entre para acompanhar seus pedidos e receber ofertas.';
+            authFooter.style.display = 'block';
+        });
+
         // Specific logic for password toggle
         document.querySelector('.password-toggle').addEventListener('click', function () {
             const input = document.getElementById('password');
@@ -100,39 +147,82 @@
             input.setAttribute('type', type);
         });
 
+        // Login Submit
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const submitBtn = loginForm.querySelector('.btn-auth');
+            const originalBtnText = submitBtn.textContent;
 
             try {
-                if (typeof supabaseClient === 'undefined') {
-                    throw new Error('Supabase não foi carregado. Desative bloqueadores de anúncios (AdBlock) e recarregue a página.');
-                }
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Autenticando...';
 
-                // Supabase Login
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email,
-                    password
+                // Backend Login
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
                 });
 
-                if (error) throw error;
+                const result = await response.json();
 
-                if (data.user && data.session) {
+                if (result.status === 'success') {
                     localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('userEmail', data.user.email);
-                    localStorage.setItem('userName', data.user.user_metadata?.fullname || '');
+                    localStorage.setItem('userEmail', result.user.email);
+                    localStorage.setItem('userName', result.user.name || '');
                     window.location.href = 'index.html?login=success';
+                } else {
+                    throw new Error(result.message || 'Verifique suas credenciais.');
                 }
             } catch (err) {
                 console.error('Login error:', err);
-                let msg = err.message || 'Verifique suas credenciais.';
+                alert('Erro no login: ' + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            }
+        });
 
-                if (msg.includes('Load failed')) {
-                    msg = 'Erro de rede: O carregamento falhou. Verifique bloqueadores de anúncios (AdBlock) ou firewall. Tente acessar via http://localhost:3000.';
+        // Recovery Submit
+        recoveryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('recoveryEmail').value.trim();
+            const submitBtn = recoveryForm.querySelector('.btn-auth');
+            const originalBtnText = submitBtn.textContent;
+
+            try {
+                if (!email) throw new Error('Por favor, informe seu e-mail.');
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Enviando...';
+
+                // Backend Forgot Password
+                const response = await fetch('/api/auth/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    // Save email for reset page
+                    sessionStorage.setItem('resetEmail', email);
+                    alert('Código de recuperação enviado! Verifique sua caixa de entrada.');
+                    // Redirect to reset page
+                    window.location.href = 'reset-password.html';
+                } else {
+                    throw new Error(result.message || 'Falha ao processar solicitação.');
                 }
 
-                alert('Erro no login: ' + msg);
+            } catch (err) {
+                console.error('Recovery error:', err);
+                alert('Erro: ' + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
         });
     </script>

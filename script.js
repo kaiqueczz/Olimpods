@@ -655,7 +655,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (infoText) {
       infoText.textContent = type === 'wholesale'
         ? 'Preços de Atacado (Mínimo 10 peças)'
-        : 'A partir de 2 peças seu frete é grátis';
+        : 'Varejo — Compre a partir de 2 peças';
     }
 
     btns.forEach(btn => {
@@ -749,8 +749,16 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="upsell-message" id="upsellMessage">...</div>
           <div class="upsell-progress-container">
             <div class="upsell-progress-fill" id="upsellProgressFill"></div>
+            <div class="milestones-wrapper">
+                    <div class="milestone-marker" style="left: 60%;" data-goal="30"><span class="milestone-icon">30</span></div>
+                    <div class="milestone-marker" style="left: 80%;" data-goal="40"><span class="milestone-icon">40</span></div>
+                    <div class="milestone-marker" style="left: 100%;" data-goal="50">
+                        <span class="milestone-icon">50</span>
+                        <div class="milestone-tooltip" style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); background: #ff0b55; color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; font-weight: 800;">50% OFF FRETE</div>
+                    </div>
+            </div>
           </div>
-          <div class="progress-subtext right">Acima de 50 itens o frete é grátis.</div>
+          <div id="stickySavingsBadge"></div>
         </div>
         <div class="upsell-actions">
           <button class="btn-view-cart" onclick="window.toggleCartSidebar(true)">Ver Carrinho</button>
@@ -783,7 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
       list.innerHTML = '<div class="empty-cart-msg">Seu carrinho está vazio.</div>';
       if (totalEl) totalEl.textContent = 'R$ 0,00';
       if (progressFill) progressFill.style.width = '0%';
-      if (progressText) progressText.innerHTML = 'Faltam <b>30</b> itens para 5% de desconto';
+      if (progressText) progressText.innerHTML = 'Adicione itens e ganhe <b class="text-red">recompensas!</b>';
       if (progressPercent) progressPercent.textContent = '0%';
 
       if (window.currentSaleType === 'wholesale') {
@@ -838,76 +846,142 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         totalEl.textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
       }
+
     }
 
-    // Milestone markers for visual feedback
-    const milestones = document.querySelectorAll('.milestone-marker');
-    milestones.forEach(m => {
-        const goal = parseInt(m.getAttribute('data-goal'));
-        if (totalItems >= goal) m.classList.add('reached');
-        else m.classList.remove('reached');
-    });
 
     // Wholesale specific progress bar updates
     if (window.currentSaleType === 'wholesale') {
-      let finalProgress = 0;
-      let msg = "";
+      let fillPct = 0;
+      // Linear Proportional Scale (Max at 50 units)
+      fillPct = Math.min((totalItems / 50) * 100, 100);
+
+
+      let stage = "1";
+
+      let msg = '';
       
-      if (totalItems < 10) {
-          finalProgress = (totalItems / 10) * 20;
-          msg = `Faltam <b>${10 - totalItems}</b> itens para liberar o Atacado`;
-      } else if (totalItems < 30) {
-          finalProgress = 20 + ((totalItems - 10) / 20) * 40;
-          msg = `Faltam <b>${30 - totalItems}</b> itens para <b>5% de Desconto</b>`;
-      } else if (totalItems < 50) {
-          finalProgress = 60 + ((totalItems - 30) / 20) * 40;
-          msg = `🎉 5% OFF Ativado! Faltam <b>${50 - totalItems}</b> para <b>Frete Grátis</b>`;
-      } else {
-          finalProgress = 100;
-          msg = `🔥 Frete Grátis e 5% OFF Ativados! Boas compras.`;
+      // Determine stage and copy
+      if (totalItems < 30) {
+          stage = "1";
+          msg = `Faltam <b>${30 - totalItems}</b> unidades para ativar <b>5% OFF</b>`;
+      } else if (totalItems >= 30 && totalItems < 40) {
+          stage = "2";
+          msg = `<b>Desconto ativado!</b> Você ganhou 5% OFF`;
+      } else if (totalItems >= 40 && totalItems < 50) {
+          stage = "3";
+          msg = `🔥 Meta batida! Você ganhou <b>2 PODS GRÁTIS!</b>`;
+      } else if (totalItems >= 50) {
+          stage = "4";
+          msg = `🚚 <b>50% OFF Frete liberado!</b> (+ 2 PODS)`;
       }
 
-      // Toggle glow animation at 30+
+
+
+      // Update Fill Bar & Stages
       if (progressFill) {
-        progressFill.style.width = `${finalProgress}%`;
-        if (totalItems >= 30) progressFill.classList.add('glow');
-        else progressFill.classList.remove('glow');
+          progressFill.style.width = `${fillPct}%`;
+          progressFill.setAttribute('data-stage', stage);
       }
-
-      if (progressPercent) progressPercent.textContent = `${Math.floor(Math.min((totalItems/50)*100, 100))}%`;
+      
       if (progressText) progressText.innerHTML = msg;
 
+      const updateMarkers = () => {
+          const markers = document.querySelectorAll('.milestone-marker');
+          
+          markers.forEach(m => {
+              const goal = parseInt(m.getAttribute('data-goal'));
+              if (totalItems >= goal) {
+                  if (!m.classList.contains('reached')) {
+                      m.classList.add('reached', 'pop-hit');
+                      setTimeout(() => m.classList.remove('pop-hit'), 400);
+                  }
+              } else {
+                  m.classList.remove('reached');
+              }
+          });
+      };
+      
+      updateMarkers();
+
+
+      // Minimum qty for checkout
       if (totalItems < 10) {
         if (checkoutBtn) checkoutBtn.classList.add('disabled');
       } else {
         if (checkoutBtn) checkoutBtn.classList.remove('disabled');
       }
 
-      // Sticky Up-sell Bar
+      // Savings Display
+      const savings = calculateTotalSavings(window.cart, totalItems);
+      const savingsDisplay = document.getElementById('savingsDisplay');
+      const savingsValueEl = document.getElementById('savingsValue');
+      if (savingsDisplay && savingsValueEl) {
+          if (savings > 0) {
+              savingsDisplay.style.display = 'block';
+              savingsValueEl.textContent = `R$ ${savings.toFixed(2).replace('.', ',')}`;
+          } else {
+              savingsDisplay.style.display = 'none';
+          }
+      }
+
+      // Sticky Up-sell Bar updates
       const stickyBar = document.getElementById('stickyUpsellBar');
       const stickyMsg = document.getElementById('upsellMessage');
       const stickyFill = document.getElementById('upsellProgressFill');
+      const stickySavingsVal = document.getElementById('savingsValueSticky');
       
-      if (stickyBar && totalItems > 0 && totalItems < 50) {
+      if (stickyBar && totalItems > 0) {
           stickyBar.classList.add('active');
           if (stickyMsg) stickyMsg.innerHTML = msg;
+          
           if (stickyFill) {
-            stickyFill.style.width = `${finalProgress}%`;
-            if (totalItems >= 30) stickyFill.classList.add('glow');
-            else stickyFill.classList.remove('glow');
+            stickyFill.style.width = `${fillPct}%`;
           }
-      } else if (stickyBar && totalItems >= 50) {
-          stickyBar.classList.add('active');
-          if (stickyMsg) stickyMsg.innerHTML = `🔥 50+ unidades — Frete Grátis Ativado!`;
-          if (stickyFill) {
-            stickyFill.style.width = '100%';
-            stickyFill.classList.add('glow');
+
+          if (stickySavingsVal) {
+            stickySavingsVal.textContent = `Você já economizou: R$ ${savings.toFixed(2).replace('.', ',')}`;
           }
+
+          updateMarkers(stickyBar);
+
+
+          // Full power celebration class
+          if (totalItems >= 50) stickyBar.classList.add('limit-attained');
+          else stickyBar.classList.remove('limit-attained');
       } else if (stickyBar) {
           stickyBar.classList.remove('active');
       }
     }
+  }
 
+  function calculateTotalSavings(cart, totalQty) {
+      if (totalQty < 30 || !cart || cart.length === 0) return 0;
+      
+      let savings = 0;
+      let subtotal = 0;
+      
+      cart.forEach(item => {
+          subtotal += (parseFloat(item.price) || 0) * (item.quantity || 1);
+      });
+      
+      // Tiered Exclusive Rewards (Retail Value Based)
+      if (totalQty >= 30 && totalQty < 40) {
+          // Tier 1: 5% Discount ONLY
+          savings = subtotal * 0.05;
+      } else if (totalQty >= 40) {
+          // Tier 2: 2 Free Pods (Retail Value: R$ 300.00)
+          savings = 300.00; 
+          
+          if (totalItems >= 50) {
+              // Tier 3: Add 50% shipping discount value (avg R$ 30)
+              savings += 30.00;
+          }
+
+      }
+
+      
+      return savings;
   }
 
   // Exposed globally for sidebar buttons
@@ -1725,26 +1799,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (promoText && promoFill) {
         let fillWidth = 0;
+        let promoMsg = '';
         if (totalItems >= 50) {
-          promoText.innerHTML = '🔥 <strong>50+ unidades — Frete Grátis Ativado!</strong>';
+          promoMsg = '<strong>ECONOMIA MÁXIMA!</strong> Frete Grátis + Bônus + Desconto Ativados!';
           fillWidth = 100;
           promoFill.classList.add('glow');
-        } else if (totalItems >= 30) {
-          promoText.innerHTML = `🎉 <strong>PARABÉNS! Você ganhou 5% de desconto!</strong> Faltam <strong>${50 - totalItems}</strong> para <strong>Frete Grátis</strong>`;
-          fillWidth = 60 + ((totalItems - 30) / 20) * 40;
+        } else if (totalItems >= 40) {
+          promoMsg = `<strong>Bônus Garantido!</strong> Faltam só <strong>${50 - totalItems}</strong> para <strong>FRETE GRÁTIS</strong>`;
+          fillWidth = 80 + ((totalItems - 40) / 10) * 20;
           promoFill.classList.add('glow');
+        } else if (totalItems >= 30) {
+          promoMsg = `<strong>Desconto Ativado!</strong> Faltam <strong>${40 - totalItems}</strong> para o <strong>BÔNUS (+2 PODS GRÁTIS)</strong>`;
+          fillWidth = 60 + ((totalItems - 30) / 10) * 20;
+          promoFill.classList.add('glow');
+        } else if (totalItems >= 10) {
+          promoMsg = `<strong>Atacado Liberado!</strong> Faltam <strong>${30 - totalItems}</strong> para liberar um <strong>DESCONTO EXTRA</strong>`;
+          fillWidth = 20 + ((totalItems - 10) / 20) * 40;
+          promoFill.classList.remove('glow');
         } else if (totalItems > 0) {
-          const remaining = 30 - totalItems;
-          fillWidth = (totalItems / 30) * 60;
-          promoText.innerHTML = `Faltam <strong>${remaining} unidades</strong> para ganhar <strong>5% de Desconto</strong>!`;
+          promoMsg = `Faltam apenas <strong>${10 - totalItems}</strong> unidades para liberar o <strong>ATACADO</strong>`;
+          fillWidth = (totalItems / 10) * 20;
           promoFill.classList.remove('glow');
         } else {
-          promoText.innerHTML = 'A partir de 30 unidades ganhe <strong>5% de Desconto</strong>!';
+          promoMsg = 'Desbloqueie <strong>recompensas exclusivas</strong> adicionando itens!';
           fillWidth = 0;
           promoFill.classList.remove('glow');
         }
+        promoText.innerHTML = promoMsg;
         promoFill.style.width = `${fillWidth}%`;
-        promoFill.style.transition = 'width 0.6s ease';
+        promoFill.style.transition = 'width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
       }
       
       // Setup Navigation

@@ -396,6 +396,12 @@
     margin-left: 2px;
 }
 
+
+/* Form Transitions */
+.auth-form.fade-in {
+    animation: authFadeIn 0.5s var(--ease-smooth);
+}
+
 /* Responsive adjustments */
 @media (max-width: 480px) {
     .auth-card {

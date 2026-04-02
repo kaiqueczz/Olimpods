@@ -252,58 +252,29 @@
             }
 
             try {
-                if (typeof supabaseClient === 'undefined') {
-                    throw new Error('Supabase não foi carregado. Desative bloqueadores de anúncios (AdBlock) e recarregue a página.');
-                }
-
                 // Iniciar estado de carregamento
                 submitBtn.disabled = true;
-                submitBtn.textContent = 'Cadastrando...';
+                submitBtn.textContent = 'Enviando código...';
 
-                // Supabase Signup
-                const { data, error } = await supabaseClient.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            fullname: fullname,
-                            phone: phone
-                        }
-                    }
+                // Call Backend Sign-up (handles professional email sending)
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fullname,
+                        email,
+                        phone,
+                        password
+                    })
                 });
 
-                if (error) throw error;
+                const result = await response.json();
 
-                // --- LOCAL LEAD SYNC ---
-                try {
-                    await fetch('/api/auth/signup', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            fullname,
-                            email,
-                            phone,
-                            password: '---', // Don't sync password locally for safety
-                            fromSource: 'SignupPage'
-                        })
-                    });
-                } catch(e) { console.warn('Local lead sync failed, but Supabase succeeded.'); }
-                // -----------------------
-
-                if (data.user && data.session) {
-                    // Se o e-mail não precisar de confirmação, loga direto
-                    alert('Cadastro realizado com sucesso!');
-                    localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('userEmail', data.user.email);
-                    window.location.href = 'index.html?signup=success';
-                } else {
-                    // Se precisar de confirmação (padrão Supabase OTP via Email)
+                if (result.status === 'success') {
                     pendingEmail = email;
                     document.getElementById('sentEmail').textContent = email;
                     signupForm.closest('.auth-container').style.display = 'none';
                     verifyModal.style.display = 'flex';
-                    
-                    // Inicia cronômetro do Reenvio
                     startOtpTimer();
                 }
             } catch (err) {
@@ -379,6 +350,7 @@
                   resendMsg.style.color = "#ff0040";
                   resendMsg.style.display = "block";
                   startOtpTimer(); // Reinicia os 2 minutos
+                  startOtpTimer();
                   
              } catch (err) {
                   console.error("Resend error:", err);
@@ -387,7 +359,7 @@
                   resendMsg.style.display = "block";
                   resendBtn.disabled = false;
                   resendBtn.textContent = "Reenviar código";
-             }
+            }
         });
 
         verifyForm.addEventListener('submit', async (e) => {
@@ -398,33 +370,28 @@
             verifySubmitBtn.textContent = "Verificando...";
 
             try {
-                // Supabase Verify OTP
-                const { data, error } = await supabaseClient.auth.verifyOtp({
-                    email: pendingEmail,
-                    token: code,
-                    type: 'signup'
+                const response = await fetch('/api/auth/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: pendingEmail,
+                        code: code
+                    })
                 });
 
-                if (error) throw error;
+                const result = await response.json();
 
-                if (data.session || data.user) {
-                    // Cadastrado e validado com sucesso
-                    alert('Conta verificada e ativada com sucesso! Bem-vindo(a) à Olimpo Pods.');
+                if (result.status === 'success') {
+                    alert('Conta verificada e ativada com sucesso! Bem-vindo(a) à Olimpo.');
                     localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('userEmail', data.user.email);
+                    localStorage.setItem('userEmail', pendingEmail);
                     window.location.href = 'index.html?signup=success';
+                } else {
+                    throw new Error(result.message || 'Código incorreto.');
                 }
             } catch (err) {
                 console.error('Verification error:', err);
-                
-                let msg = err.message || 'Código inválido ou expirado.';
-                if (msg.includes('Token has expired')) {
-                     msg = 'Este código expirou. Por favor, solicite o reenvio clicando no botão abaixo.';
-                } else if (msg.includes('Invalid Try') || msg.toLowerCase().includes('otp')) {
-                     msg = 'Erro: Código incorreto.';
-                }
-
-                alert('Falha na verificação: ' + msg);
+                alert('Falha na verificação: ' + err.message);
             } finally {
                  verifySubmitBtn.disabled = false;
                  verifySubmitBtn.textContent = oBtnTxt;
@@ -432,5 +399,4 @@
         });
     </script>
 </body>
-
 </html>
