@@ -1,1 +1,11 @@
-[]
+[
+    {
+        "fullname": "marcos",
+        "email": "conceptssttw@gmail.com",
+        "phone": "(66) 45425-2323",
+        "password": "3Xoetvq1@",
+        "verified": false,
+        "verificationCode": "246285",
+        "createdAt": "2026-04-03T13:58:00.036Z"
+    }
+]

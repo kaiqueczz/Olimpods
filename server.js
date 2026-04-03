@@ -63,27 +63,25 @@ const transporter = nodemailer.createTransport({
 
 function getOlimpoEmailWrapper(title, content) {
     return `
-    <div style="background-color: #050505; padding: 40px 10px; font-family: 'Inter', Arial, sans-serif; color: #ffffff; margin: 0;">
-        <div style="max-width: 600px; margin: 0 auto; background: #0a0a0a; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.05); overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
-            <div style="padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); background: linear-gradient(to bottom, rgba(255,11,85,0.05), transparent);">
-                 <div style="font-size: 28px; font-weight: 900; letter-spacing: 4px; color: #ffffff; text-transform: uppercase;">
+    <div style="background-color: #050505; padding: 40px 10px; font-family: Arial, Helvetica, sans-serif; color: #ffffff; margin: 0;">
+        <div style="max-width: 560px; margin: 0 auto; background: #0a0a0a; border-radius: 16px; border: 1px solid #1a1a1a; overflow: hidden;">
+            <!-- Header: Text-only, no logo -->
+            <div style="padding: 35px 20px 25px; text-align: center; border-bottom: 1px solid #1a1a1a;">
+                 <div style="font-size: 26px; font-weight: 900; letter-spacing: 5px; color: #ffffff; text-transform: uppercase;">
                     <span style="color: #ff0b55;">OLIMPO</span> PODS
                  </div>
-                 <div style="font-size: 10px; color: #666; letter-spacing: 3px; margin-top: 8px; text-transform: uppercase; font-weight: 700;">Premium Vapor Experience</div>
             </div>
+            <!-- Body -->
             <div style="padding: 40px 30px;">
-                <h2 style="color: #ff0b55; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; margin-top: 0; margin-bottom: 25px; text-align: center;">${title}</h2>
-                <div style="font-size: 16px; line-height: 1.6; color: #d0d0d0;">
+                <h2 style="color: #ff0b55; font-size: 18px; text-transform: uppercase; letter-spacing: 2px; margin-top: 0; margin-bottom: 25px; text-align: center; font-weight: 800;">${title}</h2>
+                <div style="font-size: 15px; line-height: 1.7; color: #cccccc;">
                     ${content}
                 </div>
             </div>
-            <div style="padding: 30px; text-align: center; background: rgba(255, 255, 255, 0.02); font-size: 11px; color: #555; border-top: 1px solid rgba(255, 255, 255, 0.03);">
+            <!-- Footer -->
+            <div style="padding: 25px; text-align: center; background: #080808; font-size: 11px; color: #555; border-top: 1px solid #1a1a1a;">
                 <p style="margin: 0;">&copy; 2026 Olimpo Pods. Todos os direitos reservados.</p>
-                <p style="margin: 5px 0;">R Vinte e Cinco de Março 1020, loja 1 - Centro, São Paulo - SP</p>
-                <div style="margin-top: 15px;">
-                    <a href="https://instagram.com/olimpods.digital" style="color: #ff0b55; text-decoration: none; margin: 0 10px; font-weight: 600;">Instagram</a>
-                    <a href="https://wa.me/5588988795039" style="color: #ff0b55; text-decoration: none; margin: 0 10px; font-weight: 600;">WhatsApp</a>
-                </div>
+                <p style="margin: 5px 0 0; color: #444;">CNPJ 57.220.134/0001-35</p>
             </div>
         </div>
     </div>`;
@@ -496,14 +494,14 @@ const server = http.createServer(async (req, res) => {
 
         // Envio Real do E-mail Profissional
         const emailBody = `
-            <p style="text-align: center;">Olá!</p>
-            <p style="text-align: center; color: #ccc;">Obrigado por se juntar à Olimpo Pods. Use o código abaixo para completar a verificação da sua conta e desbloquear o acesso premium:</p>
+            <p style="text-align: center; color: #ffffff; font-size: 16px; margin: 0 0 5px;">Obrigado por criar sua conta.</p>
+            <p style="text-align: center; color: #999999; font-size: 14px; margin: 0 0 30px;">Use o código abaixo para verificar seu acesso:</p>
             
-            <div style="background: rgba(255, 11, 85, 0.1); border: 2px dashed #ff0b55; padding: 30px; border-radius: 20px; text-align: center; margin: 30px 0;">
-                <span style="font-size: 42px; font-weight: 900; color: #ff0b55; letter-spacing: 8px;">${verificationCode}</span>
+            <div style="background: #1a0a12; border: 2px solid #ff0b55; padding: 28px; border-radius: 16px; text-align: center; margin: 0 0 25px;">
+                <span style="font-size: 40px; font-weight: 900; color: #ff0b55; letter-spacing: 10px; font-family: monospace;">${verificationCode}</span>
             </div>
             
-            <p style="font-size: 13px; color: #666; text-align: center;">Este código é válido por <strong>30 minutos</strong>. Se você não solicitou este cadastro, ignore este e-mail.</p>
+            <p style="font-size: 12px; color: #666; text-align: center; margin: 0;">Este código expira em <strong style="color: #999;">30 minutos</strong>. Se não solicitou, ignore.</p>
         `;
 
         await sendOlimpoEmail(userData.email, "Verifique sua conta — Olimpo Pods", "CÓDIGO DE SEGURANÇA", emailBody);
