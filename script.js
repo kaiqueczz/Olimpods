@@ -728,11 +728,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderSidebarCart() {
     const list = document.getElementById('sidebarCartItems');
     const totalEl = document.getElementById('sidebarTotal');
-    const progressFill = document.getElementById('progressFill');
-    const progressText = document.getElementById('progressText');
-    const progressPercent = document.getElementById('progressPercent');
-    const checkoutBtn = document.getElementById('sidebarCheckoutBtn');
+    // Select all instances of progress bars and messages
+    const allFills = document.querySelectorAll('.upsell-progress-fill, #progressFill');
+    const allMsgs = document.querySelectorAll('.upsell-message, #progressText, .upsell-progress-message');
+    const allSavingsEls = document.querySelectorAll('#savingsValue, #savingsValueSticky, .sticky-savings-summary');
     const progressBar = document.querySelector('.minimum-progress-container');
+
+
 
     if (!list) return;
 
@@ -744,9 +746,9 @@ document.addEventListener('DOMContentLoaded', () => {
       stickyBar = document.createElement('div');
       stickyBar.id = 'stickyUpsellBar';
       stickyBar.className = 'sticky-upsell-bar';
-      stickyBar.innerHTML = `
+          stickyBar.innerHTML = `
         <div class="upsell-info">
-          <div class="upsell-message" id="upsellMessage">...</div>
+          <div class="upsell-message upsell-progress-message" id="upsellMessage">...</div>
           <div class="upsell-progress-container">
             <div class="upsell-progress-fill" id="upsellProgressFill"></div>
             <div class="milestones-wrapper">
@@ -758,6 +760,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
             </div>
           </div>
+
           <div id="stickySavingsBadge"></div>
         </div>
         <div class="upsell-actions">
@@ -790,9 +793,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.cart.length === 0) {
       list.innerHTML = '<div class="empty-cart-msg">Seu carrinho está vazio.</div>';
       if (totalEl) totalEl.textContent = 'R$ 0,00';
-      if (progressFill) progressFill.style.width = '0%';
-      if (progressText) progressText.innerHTML = 'Adicione itens e ganhe <b class="text-red">recompensas!</b>';
-      if (progressPercent) progressPercent.textContent = '0%';
+      allFills.forEach(f => f.style.width = '0%');
+      allMsgs.forEach(m => m.innerHTML = 'Adicione itens e ganhe <b class="text-red">recompensas!</b>');
+
+
 
       if (window.currentSaleType === 'wholesale') {
         if (checkoutBtn) checkoutBtn.classList.add('disabled');
@@ -878,13 +882,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-      // Update Fill Bar & Stages
-      if (progressFill) {
-          progressFill.style.width = `${fillPct}%`;
-          progressFill.setAttribute('data-stage', stage);
-      }
-      
-      if (progressText) progressText.innerHTML = msg;
+      // Universal Update for all Progress Bars
+      allFills.forEach(f => {
+          f.style.width = `${fillPct}%`;
+          f.setAttribute('data-stage', stage);
+      });
+
+      allMsgs.forEach(m => {
+          m.innerHTML = msg;
+          m.style.color = (totalItems >= 30) ? '#ff0b55' : ''; // Red when active
+      });
+
+      const totalSv = calculateTotalSavings(window.cart, totalItems);
+      allSavingsEls.forEach(s => {
+          s.textContent = `Você já economizou: R$ ${totalSv.toFixed(2).replace('.', ',')}`;
+          s.style.display = (totalSv > 0) ? 'block' : 'none';
+      });
+
+
 
       const updateMarkers = () => {
           const markers = document.querySelectorAll('.milestone-marker');

@@ -1696,22 +1696,24 @@ body {
 
 .upsell-progress-container {
   background: rgba(255, 255, 255, 0.05);
-  height: 8px; /* Slightly thinner for elegance */
+  height: 6px; /* Streamlined for professional look */
   border-radius: 50px;
   position: relative;
   overflow: visible !important;
   width: 100%; /* Take full width of parent flex */
-  margin-top: 8px;
+  margin-top: 4px;
 }
+
 
 
 .upsell-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #ff0b55, #ff4c8a);
+  background: #ff0b55; /* Solid red for maximum visibility */
   border-radius: 50px;
-  box-shadow: 0 0 15px rgba(255, 11, 85, 0.4);
+  box-shadow: 0 0 10px rgba(255, 11, 85, 0.4);
   transition: width 0.8s ease;
 }
+
 
 
 .upsell-progress-fill.glow {
@@ -4461,6 +4463,8 @@ body {
 
     .mobile-product-card {
         flex: 0 0 160px;
+        -webkit-background-clip: padding-box;
+        background-clip: padding-box;
         background: var(--bg-glass);
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-md);
@@ -4658,11 +4662,18 @@ body {
 
     .upsell-message {
         font-size: 0.75rem !important;
-        margin-bottom: 5px !important;
+        color: #ff0b55 !important; /* High-impact red status */
+        font-weight: 800 !important;
+        text-align: left !important; /* Position top-left */
+        text-transform: uppercase !important;
+        margin-bottom: 4px !important;
+        width: 100% !important;
+        display: block !important;
     }
 
+
     .upsell-progress-container {
-        height: 5px !important;
+        height: 6px !important;
     }
 
     .btn-view-cart {
@@ -4695,11 +4706,12 @@ PROMO PROGRESS BAR — ELECTRIC ENERGY DESIGN
     font-size: 0.85rem;
     font-weight: 600;
     color: var(--text-secondary);
-    text-align: left;
+    text-align: left; /* Left align for sidebar text */
     margin: 0 0 12px 0;
     line-height: 1.4;
     width: 100%;
 }
+
 
 
 /* Track */
@@ -5022,7 +5034,9 @@ PROMO PROGRESS BAR — ELECTRIC ENERGY DESIGN
     letter-spacing: 1px;
     background: linear-gradient(180deg, #fff 0%, #aaa 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
+
 }
 
 .age-verification-card p {
