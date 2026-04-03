@@ -702,7 +702,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateCartBadge() {
     const badge = document.getElementById('cartBadge');
     if (badge) {
-      const totalItems = window.cart.reduce((sum, item) => sum + item.quantity, 0);
+      const totalItems = window.cart.reduce((sum, item) => sum + parseInt(item.quantity || 0), 0);
+
       const typeLabel = window.currentSaleType === 'wholesale' ? 'Atacado' : 'Varejo';
       badge.textContent = totalItems;
       badge.style.display = totalItems > 0 ? 'flex' : 'none';
@@ -809,8 +810,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.cart.forEach((item, index) => {
       const itemPrice = parseFloat(item.price);
-      subtotal += itemPrice * item.quantity;
-      totalItems += item.quantity;
+      const itemQty = parseInt(item.quantity || 0);
+      subtotal += itemPrice * itemQty;
+      totalItems += itemQty;
+
 
       const itemCard = document.createElement('div');
       itemCard.className = 'cart-sidebar-item';

@@ -600,17 +600,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function validateWholesale() {
         const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
-        const totalItems = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
+        const totalItems = checkoutCart.reduce((sum, item) => sum + parseInt(item.quantity || 0), 0);
+
         const freeShippingNotice = document.getElementById('free-shipping-notice');
 
         // Rewards Logic (Standardized - Exclusive Tiers)
         let discount = 0;
         let isFreeShipping = false;
-        let finalProgress = 0;
-        
-        // Progress Calculation (Staggered scale: 10=20%, 30=50%, 40=75%, 50=100%)
         // Linear Proportional Scale (Fixed at 50 units range)
         finalProgress = Math.min((totalItems / 50) * 100, 100);
+
 
 
 
@@ -659,22 +658,37 @@ document.addEventListener('DOMContentLoaded', () => {
         const stickyFill = document.getElementById('upsellProgressFillSticky');
         const stickyMsg = document.getElementById('upsellMessageSticky');
         const stickySavings = document.getElementById('stickySavingsText');
-        const upsellProgressFill = document.getElementById('upsellProgressFillCheckout');
-        const staticProgressFill = document.getElementById('staticProgressFill');
+        const staticProgressFill = document.getElementById('upsellProgressFillCheckout');
         const staticMessage = document.getElementById('staticMessage');
+        const staticSavingsSummary = document.getElementById('staticSavingsSummary');
 
         const allMarkers = document.querySelectorAll('.milestone-marker');
-
 
         if (staticProgressFill) {
             staticProgressFill.style.width = `${finalProgress}%`;
             staticProgressFill.setAttribute('data-stage', stage);
-            if (staticMessage) staticMessage.innerHTML = `${msg} <br> <span class="promo-savings-value" style="font-size: 0.9rem; margin-top: 5px; display: inline-block;">${totalSavedText}</span>`;
         }
 
-        if (upsellProgressFill) {
-            upsellProgressFill.style.width = `${finalProgress}%`;
+        if (staticMessage) {
+            staticMessage.innerHTML = msg;
+            staticMessage.style.color = (totalItems >= 30) ? '#ff0b55' : '';
         }
+
+        if (staticSavingsSummary) {
+            staticSavingsSummary.textContent = totalSavedText;
+            staticSavingsSummary.style.display = (calculateDisplaySavings() > 0) ? 'block' : 'none';
+        }
+
+        // --- Marker Synchronization ---
+        allMarkers.forEach(m => {
+            const goal = parseInt(m.getAttribute('data-goal'));
+            if (totalItems >= goal) {
+                m.classList.add('reached');
+            } else {
+                m.classList.remove('reached');
+            }
+        });
+
 
         // --- Sticky Bar Update ---
         if (stickyBar) {
