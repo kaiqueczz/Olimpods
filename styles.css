@@ -4638,54 +4638,8 @@ body {
     }
 
     /* Sticky Upsell Bar on Mobile - Ensure Visibility & Style */
-    .sticky-upsell-bar {
-        position: fixed !important;
-        bottom: 0 !important; /* Force visible */
-        left: 0 !important;
-        transform: none !important;
-        width: 100% !important;
-        z-index: 9999 !important;
-        padding: 10px 16px !important;
-        border-radius: 0 !important; /* Full width look */
-        gap: 12px !important;
-        background: rgba(10, 10, 10, 0.98) !important;
-        backdrop-filter: blur(20px) !important;
-        border-top: 1px solid rgba(255, 11, 85, 0.4) !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-    }
+    /* Removed redundant mobile-only sticky bar definition to use universal global styles below */
 
-    .sticky-upsell-bar.active {
-        bottom: 0 !important;
-    }
-
-    .upsell-message {
-        font-size: 0.75rem !important;
-        color: #ff0b55 !important; /* High-impact red status */
-        font-weight: 800 !important;
-        text-align: left !important; /* Position top-left */
-        text-transform: uppercase !important;
-        margin-bottom: 4px !important;
-        width: 100% !important;
-        display: block !important;
-    }
-
-
-    .upsell-progress-container {
-        height: 6px !important;
-    }
-
-    .btn-view-cart {
-        padding: 8px 12px !important;
-        font-size: 0.7rem !important;
-        border-radius: 8px !important;
-    }
-
-    .progress-subtext {
-        font-size: 0.65rem !important;
-        margin-top: 4px !important;
-    }
 }
 
 /* Utility for red text */
@@ -5094,4 +5048,118 @@ PROMO PROGRESS BAR — ELECTRIC ENERGY DESIGN
     color: #555;
     text-transform: uppercase;
     letter-spacing: 1px;
+}
+/* ============================================
+   UNIVERSAL ELITE STICKY BAR
+   ============================================ */
+
+.sticky-upsell-bar {
+    position: fixed;
+    bottom: -150px; /* Hidden by default */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 900px;
+    background: rgba(10, 10, 10, 0.92);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid rgba(255, 11, 85, 0.3);
+    border-radius: 20px 20px 0 0;
+    padding: 12px 24px;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5), 0 0 20px rgba(255,11,85,0.05);
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.sticky-upsell-bar.active {
+    bottom: 0;
+}
+
+/* Floating Pill Desktop Look */
+@media (min-width: 993px) {
+    .sticky-upsell-bar {
+        bottom: -150px;
+        margin-bottom: 20px;
+        border-radius: 100px;
+        width: calc(100% - 40px);
+        box-shadow: 0 15px 45px rgba(0,0,0,0.8), 0 0 30px rgba(255,11,85,0.15);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .sticky-upsell-bar.active {
+        bottom: 0;
+    }
+}
+
+.sticky-upsell-bar .upsell-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sticky-upsell-bar .upsell-message {
+    color: #ff0b55;
+    font-weight: 800;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.sticky-upsell-bar .upsell-progress-container {
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50px;
+    position: relative;
+    overflow: visible;
+}
+
+.sticky-upsell-bar .upsell-progress-fill {
+    height: 100%;
+    background: #ff0b55;
+    border-radius: 50px;
+    width: 0%;
+    transition: width 0.8s ease;
+    box-shadow: 0 0 12px rgba(255,11,85,0.5);
+}
+
+/* Proportional elements */
+.sticky-upsell-bar .btn-view-cart {
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-weight: 900;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.sticky-upsell-bar .btn-view-cart:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255,255,255,0.3);
+}
+
+/* Mobile specific overrides for proportional look */
+@media (max-width: 768px) {
+    .sticky-upsell-bar {
+        border-radius: 0;
+        padding: 10px 16px;
+        gap: 12px;
+    }
+    .sticky-upsell-bar .upsell-message {
+        font-size: 0.65rem;
+    }
+    .sticky-upsell-bar .btn-view-cart {
+        padding: 5px 10px;
+        font-size: 0.6rem;
+    }
 }
