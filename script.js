@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      // Update dots
+      // Note: Removed 'if (!list) return;' to allow sticky bar injection even on pages without a full sidebar list.
       if (dotsContainer) {
         Array.from(dotsContainer.children).forEach((dot, i) => {
           dot.classList.toggle('active', i === currentIndex);
@@ -737,7 +737,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    if (!list) return;
+    // Universal Update for all Progress Bars (Must run even if sidebar list is missing)
+    let totalItemsValue = window.cart.reduce((sum, item) => sum + parseInt(item.quantity || 0), 0);
+    
+    // Select bar elements again to ensure we catch dynamically injected ones
+    const currentFills = document.querySelectorAll('.upsell-progress-fill, #progressFill');
+    const currentMsgs = document.querySelectorAll('.upsell-message, #progressText, .upsell-progress-message');
+
 
     // Progress Visibility Logic (Always run)
     let stickyBar = document.getElementById('stickyUpsellBar');
@@ -1956,5 +1962,9 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   }
-
+    // Global Initialization: Check cart and show rewards progress bars in all tabs
+    if (typeof updateCartUI === 'function') {
+        updateCartUI();
+    }
 });
+
