@@ -748,27 +748,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Progress Visibility Logic (Always run)
     let stickyBar = document.getElementById('stickyUpsellBar');
     
-    // Inject sticky bar if missing
+    // Inject sticky bar if missing on ANY page
     if (!stickyBar) {
       stickyBar = document.createElement('div');
       stickyBar.id = 'stickyUpsellBar';
       stickyBar.className = 'sticky-upsell-bar';
-          stickyBar.innerHTML = `
+      stickyBar.innerHTML = `
         <div class="upsell-info">
-          <div class="upsell-message upsell-progress-message" id="upsellMessage">...</div>
-          <div class="upsell-progress-container">
-            <div class="upsell-progress-fill" id="upsellProgressFill"></div>
-            <div class="milestones-wrapper">
-                    <div class="milestone-marker" style="left: 60%;" data-goal="30"><span class="milestone-icon">30</span></div>
-                    <div class="milestone-marker" style="left: 80%;" data-goal="40"><span class="milestone-icon">40</span></div>
-                    <div class="milestone-marker" style="left: 100%;" data-goal="50">
-                        <span class="milestone-icon">50</span>
-                        <div class="milestone-tooltip" style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); background: #ff0b55; color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; font-weight: 800;">50% OFF FRETE</div>
-                    </div>
+          <div class="upsell-message" id="upsellMessage">Adicione itens e ganhe <b class="text-red">recompensas!</b></div>
+          <div class="promo-bar-track sticky-bar-track">
+            <div class="promo-bar-fill" id="stickyPromoFill">
+              <div class="promo-bar-energy"></div>
+            </div>
+            <div class="promo-bar-markers">
+              <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
+              <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
+              <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
             </div>
           </div>
-
-          <div id="stickySavingsBadge"></div>
         </div>
         <div class="upsell-actions">
           <button class="btn-view-cart" onclick="window.toggleCartSidebar(true)">Ver Carrinho</button>
@@ -795,16 +792,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    list.innerHTML = '';
+    // Guard: Only manipulate sidebar list if it exists on this page
+    if (list) list.innerHTML = '';
 
     if (window.cart.length === 0) {
-      list.innerHTML = '<div class="empty-cart-msg">Seu carrinho está vazio.</div>';
+      if (list) list.innerHTML = '<div class="empty-cart-msg">Seu carrinho está vazio.</div>';
       if (totalEl) totalEl.textContent = 'R$ 0,00';
       allFills.forEach(f => f.style.width = '0%');
       allMsgs.forEach(m => m.innerHTML = 'Adicione itens e ganhe <b class="text-red">recompensas!</b>');
-
-
-
+      if (stickyBar) stickyBar.classList.remove('active');
       if (window.currentSaleType === 'wholesale') {
         if (checkoutBtn) checkoutBtn.classList.add('disabled');
       }
@@ -843,7 +839,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
       `;
-      list.appendChild(itemCard);
+      if (list) list.appendChild(itemCard);
     });
 
     if (totalEl) {
@@ -996,11 +992,10 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (totalQty >= 40) {
           // Tier 2: 2 Free Pods (Retail Value: R$ 300.00)
           savings = 300.00; 
-          
-          if (totalItems >= 50) {
-              // Tier 3: Add 50% shipping discount value (avg R$ 30)
-              savings += 30.00;
-          }
+          if (totalQty >= 50) {
+               // Tier 3: Add 50% shipping discount value (avg R$ 30)
+               savings += 30.00;
+           }
 
       }
 
