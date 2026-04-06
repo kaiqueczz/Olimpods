@@ -5084,14 +5084,14 @@ PROMO PROGRESS BAR — ELECTRIC ENERGY DESIGN
 @media (min-width: 993px) {
     .sticky-upsell-bar {
         bottom: -150px;
-        margin-bottom: 20px;
+        margin-bottom: 0;
         border-radius: 100px;
         width: calc(100% - 40px);
         box-shadow: 0 15px 45px rgba(0,0,0,0.8), 0 0 30px rgba(255,11,85,0.15);
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .sticky-upsell-bar.active {
-        bottom: 0;
+        bottom: 20px;
     }
 }
 

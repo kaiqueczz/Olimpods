@@ -730,8 +730,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const list = document.getElementById('sidebarCartItems');
     const totalEl = document.getElementById('sidebarTotal');
     // Select all instances of progress bars and messages
-    const allFills = document.querySelectorAll('.upsell-progress-fill, #progressFill');
-    const allMsgs = document.querySelectorAll('.upsell-message, #progressText, .upsell-progress-message');
+    const allFills = document.querySelectorAll('.upsell-progress-fill, #progressFill, #upsellProgressFill, .promo-bar-fill');
+    const allMsgs = document.querySelectorAll('.upsell-message, #progressText, .upsell-progress-message, .promo-bar-text, #promoBarText');
     const allSavingsEls = document.querySelectorAll('#savingsValue, #savingsValueSticky, .sticky-savings-summary');
     const progressBar = document.querySelector('.minimum-progress-container');
 
@@ -741,7 +741,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalItemsValue = window.cart.reduce((sum, item) => sum + parseInt(item.quantity || 0), 0);
     
     // Select bar elements again to ensure we catch dynamically injected ones
-    const currentFills = document.querySelectorAll('.upsell-progress-fill, #progressFill');
+    const currentFills = document.querySelectorAll('.upsell-progress-fill, #progressFill, #upsellProgressFill, .promo-bar-fill');
     const currentMsgs = document.querySelectorAll('.upsell-message, #progressText, .upsell-progress-message');
 
 
@@ -757,7 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="upsell-info">
           <div class="upsell-message" id="upsellMessage">Adicione itens e ganhe <b class="text-red">recompensas!</b></div>
           <div class="promo-bar-track sticky-bar-track">
-            <div class="promo-bar-fill" id="stickyPromoFill">
+            <div class="promo-bar-fill" id="upsellProgressFill">
               <div class="promo-bar-energy"></div>
             </div>
             <div class="promo-bar-markers">
@@ -766,6 +766,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
             </div>
           </div>
+          <div class="sticky-savings-summary" id="savingsValueSticky" style="display:none;"></div>
         </div>
         <div class="upsell-actions">
           <button class="btn-view-cart" onclick="window.toggleCartSidebar(true)">Ver Carrinho</button>
@@ -907,7 +908,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
       const updateMarkers = () => {
-          const markers = document.querySelectorAll('.milestone-marker');
+          // Update both sidebar markers (.promo-marker) and product page markers (.milestone-marker)
+          const markers = document.querySelectorAll('.promo-marker, .milestone-marker');
           
           markers.forEach(m => {
               const goal = parseInt(m.getAttribute('data-goal'));

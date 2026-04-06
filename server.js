@@ -56,10 +56,11 @@ const MIME_TYPES = {
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'SEU_EMAIL_AQUI@gmail.com',
-        pass: 'SUA_SENHA_DE_APP_AQUI'
+        user: 'olimpopods22@gmail.com',
+        pass: '#Xoetvq1@'
     }
 });
+
 
 function getOlimpoEmailWrapper(title, content) {
     return `
