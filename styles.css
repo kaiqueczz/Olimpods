@@ -4661,7 +4661,7 @@ body {
    ============================================ */
 
 .promo-bar-wrapper {
-    padding: 8px 0 2px;
+    padding: 2px 0 2px; /* Reduzindo drasticamente para subir tudo */
     width: 85%;
     margin-left: auto;
     margin-right: auto;
@@ -4677,7 +4677,7 @@ body {
 
 .promo-bar-text {
     position: absolute;
-    bottom: calc(100% + 4px); /* Posição acima da barra */
+    bottom: calc(100% + 10px); /* Aumentando distância da barra para liberar o centro */
     left: 0;
     font-size: 0.65rem;
     font-weight: 700;
@@ -4697,7 +4697,7 @@ body {
     align-items: center;
     position: relative;
     flex: 1;
-    margin-top: 10px; /* Cria espaço visual para a frase flutuante */
+    /* Removido margin-top para garantir que a barra seja a referência de centro */
 }
 
 .promo-bar-main-row {
