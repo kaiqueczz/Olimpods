@@ -6,9 +6,9 @@ const PRODUCTS_DATA = [
     "flavors": [
       "Strawberry ice",
       "Strawberry watermelon ice",
-      "Blueberry sour raspberry",
       "Green apple ice",
-      "Miami mint"
+      "Miami mint",
+      "Blueberry sour raspberry"
     ],
     "price": "95.00",
     "retail_price": "145.00",
@@ -24,33 +24,46 @@ const PRODUCTS_DATA = [
       "Dragon strawnana",
       "Double apple ice",
       "Baja splash",
-      "Summer splash",
-      "Green apple ice",
       "Strawberry ice"
     ],
     "price": "100.00",
-    "retail_price": "150.00",
+    "retail_price": "155.00",
     "image": "assets/img/Elfbar_40k-removebg-preview.png",
     "retail_available": true
   },
   {
-    "id": "elfbar-40k-summer-edition",
+    "id": "elfbar-40k-trio",
     "brand": "elfbar",
-    "name": "Elfbar 40k Summer Edition",
+    "name": "Elfbar 40k Trio",
     "flavors": [
       "Raspberry watermelon",
-      "La grape",
       "Sour strawberry dragon fruit",
       "Black mint",
       "Pomegranate blast",
       "Scary berry",
-      "Cool menthol",
       "Strawberry orange lime",
       "Orange blast"
     ],
-    "price": "100.00",
-    "retail_price": "150.00",
+    "price": "105.00",
+    "retail_price": "160.00",
     "image": "assets/img/Elfbar_40k_summer-removebg-preview.png",
+    "retail_available": true
+  },
+  {
+    "id": "elfbar-45k",
+    "brand": "elfbar",
+    "name": "Elfbar 45k",
+    "flavors": [
+      "Grape ice",
+      "Kiwi passion fruit guava",
+      "Miami mint",
+      "Strawberry ice",
+      "Strawberry kiwi",
+      "Watermelon ice"
+    ],
+    "price": "110.00",
+    "retail_price": "170.00",
+    "image": "assets/img/Elfbar_40k-removebg-preview.png",
     "retail_available": true
   },
   {
@@ -71,8 +84,7 @@ const PRODUCTS_DATA = [
       "Green apple ice",
       "Blueberry pear",
       "Blue razz ice cream",
-      "Pineapple plums lime mint",
-      "Lime grapefruit ice"
+      "Pineapple plums lime mint"
     ],
     "price": "95.00",
     "retail_price": "145.00",
@@ -84,13 +96,17 @@ const PRODUCTS_DATA = [
     "brand": "ignite",
     "name": "Ignite V250",
     "flavors": [
-      "Icy mint",
       "Menthol",
+      "Sweet and sour pomegranate",
+      "Green apple",
+      "Watermelon mix",
+      "Watermelon ice",
+      "Strawberry kiwi",
+      "Strawberry ice",
+      "Strawberry banana",
       "Grape ice",
-      "Strawberry kiwi 25pc🚨",
-      "Strawberry ice 25pc🚨",
-      "Strawberry banana 25pc🚨",
-      "Watermelon ice 25pc🚨"
+      "Blueberry ice",
+      "Banana ice"
     ],
     "price": "93.00",
     "retail_price": "140.00",
@@ -114,14 +130,11 @@ const PRODUCTS_DATA = [
     "brand": "ignite",
     "name": "Ignite V400 mix",
     "flavors": [
-      "Orange - strawberry ice",
       "Pineapple mango - strawberry",
-      "Watermelon grape - açaí ice",
       "Banana - strawberry ice",
       "Grape ice - strawberry",
       "Blueberry - raspberry blackberry",
       "Strawberry watermelon - aloe grape",
-      "Mango ice - passion fruit xguava",
       "Peach watermelon - mango ice",
       "Grape pop - peach ice",
       "Mighty melon - menthol",
@@ -129,7 +142,6 @@ const PRODUCTS_DATA = [
       "Icy mint - peach grape",
       "Strawberry- grape",
       "Peach watermelon- mango ice",
-      "Pineapple-passion fruit sour kiwi",
       "Banana- strawberry mango ice",
       "Cherry ice - watermelon ice",
       "Watermelon ice- grape ice"
@@ -155,7 +167,6 @@ const PRODUCTS_DATA = [
       "Grape peach",
       "Grape",
       "Watermelon",
-      "Pineapple 15pc 🚨",
       "Pineapple kiwi dragon fruit 30pc"
     ],
     "price": "105.00",
@@ -170,13 +181,13 @@ const PRODUCTS_DATA = [
     "flavors": [
       "Sweet and sour pomegranate",
       "Green apple",
+      "Menthol",
       "Watermelon mix",
-      "Aloe grape ice",
       "Strawberry banana",
       "Strawberry ice",
       "Watermelon ice",
-      "Strawberry kiwi",
-      "Dragon fruit watermelon",
+      "Minty melon",
+      "Pineapple ice",
       "Banana ice"
     ],
     "price": "100.00",
@@ -193,7 +204,17 @@ const PRODUCTS_DATA = [
       "Kiwi passion fruit guava",
       "Strawberry ice",
       "Strawberry watermelon ice",
-      "Banana ice 10pc"
+      "Icy mint",
+      "Watermelon ice",
+      "Grape ice",
+      "Menthol",
+      "Watermelon mix",
+      "Banana ice",
+      "Green apple",
+      "Pineapple ice",
+      "Strawberry banana",
+      "Strawberry kiwi",
+      "Watermelon dragon fruit"
     ],
     "price": "83.00",
     "retail_price": "125.00",
@@ -205,24 +226,17 @@ const PRODUCTS_DATA = [
     "brand": "ignite",
     "name": "Ignite V80",
     "flavors": [
-      "Frozen mint",
       "Arctic gum",
       "Spearmint gum",
       "Grape ice",
       "Strawberry kiwi",
       "Menthol",
       "Icy mint",
-      "Blueberry lemon",
       "Frozen mint water",
-      "Grapefruit mint",
-      "Frozen cola",
-      "Açaí ice",
-      "Frozen apple",
+      "Blueberry lemon",
       "Banana ice",
-      "Apple mint",
       "Blueberry ice",
-      "Frozen blueberry",
-      "Passion fruit sour kiwi"
+      "Açaí ice"
     ],
     "price": "77.00",
     "retail_price": "120.00",
@@ -230,63 +244,105 @@ const PRODUCTS_DATA = [
     "retail_available": true
   },
   {
-    "id": "v300-ultra-slim",
-    "brand": "ignite",
-    "name": "V300 ultra slim",
+    "id": "black-sheep-40k",
+    "brand": "blacksheep",
+    "name": "Black Sheep 40k",
     "flavors": [
-      "15 de cada sabor 🚨🚨🚨",
-      "Minty melon",
-      "Watermelon ice",
-      "Cactus lime soda",
-      "Blueberry ice",
-      "Aloe grape ice",
-      "Banana coconut water 10pc"
+      "acai strawberry / acai grape",
+      "blue bubblegum / sour green",
+      "blue grape / cherry berry",
+      "fresh mint / mango orange",
+      "grape mango / fresh mint",
+      "grape / energy drink",
+      "grape / grape mango",
+      "grape / menthol",
+      "grape / passion fruit",
+      "kiwi guava strawberry / acai strawberry",
+      "master grape / grape",
+      "passion fruit / strawberry mango",
+      "strawberry kiwi / coca cola",
+      "strawberry kiwi / fresh mint"
     ],
     "price": "105.00",
     "retail_price": "160.00",
-    "image": "assets/img/Ignite_v300_ultra_thin-removebg-preview.png",
+    "image": "assets/img/blacksheep_30k.webp",
     "retail_available": true
   },
   {
     "id": "black-sheep-30k",
     "brand": "blacksheep",
-    "name": "Black sheep 30k",
+    "name": "Black Sheep 30k",
     "flavors": [
-      "Grape - passion fruit 20pc🚨"
-    ],
-    "price": "93.00",
-    "retail_price": "140.00",
-    "image": "assets/img/Elfbar_30k-removebg-preview-2.png",
-    "retail_available": true
-  },
-  {
-    "id": "p100-kit",
-    "brand": "ignite",
-    "name": "P100 kit",
-    "flavors": [
-      "30pc 🚨🚨🚨",
-      "Green apple",
-      "Menthol"
+      "açaí grape / strawberry kiwi",
+      "açaí morango / grape mango",
+      "açaí strawberry banana / grape",
+      "cherry raspberry / watermelon strawberry",
+      "fresh mint / grape",
+      "fresh mint / water strawberry",
+      "grape / ice master grape",
+      "grape / passion fruit",
+      "grape / strawberry banana",
+      "grape / strawberry kiwi",
+      "grape / watermelon bubblegum",
+      "menthol / fresh mint",
+      "menthol / mango peach watermelon",
+      "menthol / watermelon green apple",
+      "sour green apple / blueberry grape",
+      "strawberry banana / pineapple coconut",
+      "strawberry bubblegum / sour pineapple",
+      "watermelon bubblegum / mango peach"
     ],
     "price": "95.00",
     "retail_price": "145.00",
-    "image": "assets/img/Ignite_p100_kit-removebg-preview.png",
+    "image": "assets/img/blacksheep_30k.webp",
     "retail_available": true
   },
   {
-    "id": "cartucho-p100",
-    "brand": "ignite",
-    "name": "cartucho p100",
+    "id": "black-sheep-25k",
+    "brand": "blacksheep",
+    "name": "Black Sheep 25k",
     "flavors": [
-      "Watermelon ice",
-      "Banana ice",
-      "Grape ice",
-      "Blueberry ice",
-      "Strawberry kiwi"
+      "blueberry bubble",
+      "cola lime",
+      "grape",
+      "mango grape",
+      "mint one",
+      "passion fruit",
+      "sour green apple",
+      "strawberry bubble",
+      "strawberry kiwi"
     ],
-    "price": "60.00",
-    "retail_price": "90.00",
-    "image": "assets/img/Cartucho_ignite_p100-removebg-preview.png",
+    "price": "90.00",
+    "retail_price": "135.00",
+    "image": "assets/img/blacksheep_30k.webp",
+    "retail_available": true
+  },
+  {
+    "id": "lost-mary-20k",
+    "brand": "lostmary",
+    "name": "Lost Mary 20k",
+    "flavors": [
+      "Lime grapefruit",
+      "Icy mint"
+    ],
+    "price": "95.00",
+    "retail_price": "145.00",
+    "image": "assets/img/lostmary_20k.jpg",
+    "retail_available": true
+  },
+  {
+    "id": "lost-mary-35k",
+    "brand": "lostmary",
+    "name": "Lost Mary 35k Dura 🆕",
+    "flavors": [
+      "Grapefruit passion guava",
+      "Miami mint",
+      "Hawaiian juice",
+      "Hawaiian mint"
+    ],
+    "price": "105.00",
+    "retail_price": "160.00",
+    "image": "assets/img/Lostmary_35k.webp",
     "retail_available": true
   }
 ];

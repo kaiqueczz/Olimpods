@@ -2375,9 +2375,28 @@ body {
 .footer-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 30px;
+  gap: 0; /* Gap zero because borders handle spacing */
   margin-bottom: 40px;
-  align-items: start;
+  align-items: stretch;
+}
+
+.footer-col {
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 35px;
+  transition: all 0.3s ease;
+}
+
+.footer-col:first-child {
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-col:hover {
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .footer-main-grid {
@@ -4615,8 +4634,18 @@ body {
 
     .footer-grid {
         display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 30px !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 0 !important;
+    }
+
+    .footer-col {
+        padding: 15px 10px !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .footer-col:first-child {
+        border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
 
 
@@ -4677,7 +4706,7 @@ body {
 
 .promo-bar-text {
     position: absolute;
-    bottom: calc(100% + 10px); /* Aumentando distância da barra para liberar o centro */
+    bottom: calc(100% + 8px); /* Centralizando entre o topo da pill e a trilha */
     left: 0;
     font-size: 0.65rem;
     font-weight: 700;
@@ -4923,8 +4952,8 @@ body {
 
     .footer-grid {
         display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 20px !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 0 !important;
         margin-bottom: 30px !important;
     }
 
@@ -4938,7 +4967,12 @@ body {
     }
 
     .footer-links li a {
-        font-size: 0.8rem !important;
+        font-size: 0.75rem !important;
+    }
+
+    .footer-info-text.email {
+        word-break: break-all !important;
+        font-size: 0.7rem !important;
     }
 
     .newsletter-box {
@@ -5086,7 +5120,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-top: 1px solid rgba(255, 11, 85, 0.3);
     border-radius: 20px 20px 0 0;
-    padding: 12px 24px;
+    padding: 16px 24px; /* Aumentando um pouco a altura da pill cinza */
     z-index: 10000;
     display: flex;
     align-items: center;
