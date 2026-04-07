@@ -132,8 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCheckoutUpsellProducts(products) {
         if (!checkoutUpsellGrid) return;
         checkoutUpsellGrid.innerHTML = '';
-        const totalItemsCount = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
-        const hasDiscount = (totalItemsCount >= 30);
+        const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
 
         products.forEach((p, idx) => {
             const card = document.createElement('div');
@@ -146,11 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const price = parseFloat(p.price);
-            const discountPrice = price * 0.95;
-            
-            const priceHtml = hasDiscount 
-                ? `<span class="original" style="text-decoration: line-through; color: #888; font-size: 0.8rem; margin-right: 5px;">R$ ${price.toFixed(2).replace('.', ',')}</span> <span class="current" style="color: #ff0b55;">R$ ${discountPrice.toFixed(2).replace('.', ',')}</span>`
-                : `<span class="current">R$ ${price.toFixed(2).replace('.', ',')}</span>`;
+            const isRetail = saleType === 'retail';
+            const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : price;
+            const cardId = `upsell-card-${p.id || idx}`;
 
             card.innerHTML = `
                 <div class="product-image">
@@ -159,12 +156,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="product-info">
                     <div class="product-brand">${p.brand || 'Olimpo'}</div>
                     <div class="product-name">${p.name}</div>
-                    <div class="product-footer">
-                        <div class="product-price">
-                            ${priceHtml}
+                    <div class="product-price-row">
+                        <span class="current">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                    <div class="product-add-controls">
+                        <div class="upsell-qty-stepper">
+                            <button type="button" class="upsell-qty-btn" onclick="adjustUpsellQty('${cardId}', -1)">−</button>
+                            <input type="number" class="upsell-qty-val" id="${cardId}-qty" value="10" min="1">
+                            <button type="button" class="upsell-qty-btn" onclick="adjustUpsellQty('${cardId}', 1)">+</button>
                         </div>
-                        <button class="add-cart-btn" onclick="addToCartFromCheckout('${p.id}', '${p.name}', ${parseFloat(p.price)}, '${p.image || ''}')">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <button type="button" class="upsell-add-btn" onclick="addToCartFromCheckout('${p.id}', '${p.name}', ${finalPrice}, '${p.image || ''}', '${cardId}-qty')">
+                            Adicionar
                         </button>
                     </div>
                 </div>
@@ -208,95 +210,78 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error("Falha ao carregar produtos");
             const allProducts = await response.json();
             
-            // 1. Horizontal Carousel (existing)
+            // Single unified carousel with ALL products
             updateCheckoutUpsell(allProducts);
-            
-            // 2. Bottom Grid Catalog (new)
-            renderFavoritesCarouselCheckout(allProducts);
-            renderFullCatalogCheckout(allProducts);
             
         } catch (error) {
             console.error("Erro ao inicializar catálogos:", error);
+            // Fallback to local data
+            updateCheckoutUpsell(window.PRODUCTS_DATA || []);
         }
-    }
-
-    function renderFavoritesCarouselCheckout(allProducts) {
-        const container = document.getElementById('favoritesContentCheckout');
-        if (!container) return;
-
-        const favorites = allProducts.slice(0, 4);
-        const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
-        
-        container.innerHTML = `
-            <div class="section-header-pill">🔥 Recomendações Premium</div>
-            <h2 class="catalog-title">Escolhidos por clientes:</h2>
-            <div class="p-grid-catalog">
-                ${favorites.map(p => {
-                    const price = parseFloat(p.price);
-                    const isRetail = saleType === 'retail';
-                    const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : price;
-                    return `
-                        <div class="p-card-mini" onclick="addToCartFromCheckout('${p.id}', '${p.name}', ${finalPrice}, '${p.image || ''}')">
-                            <img src="${p.image && !p.image.includes('/') ? 'Images Pods/' + p.image : p.image || 'assets/logo-ignite.png'}" alt="${p.name}" class="p-mini-img" onerror="this.src='assets/logo-ignite.png'">
-                            <div class="p-mini-info">
-                                <span class="p-mini-name">${p.name}</span>
-                                <span class="p-mini-price">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
-                                <span style="font-size: 0.65rem; color: #ff0b55; font-weight: 700;">+ ADICIONAR</span>
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-        `;
-    }
-
-    function renderFullCatalogCheckout(allProducts) {
-        const container = document.getElementById('fullCatalogContentCheckout');
-        if (!container) return;
-
-        const brands = {};
-        allProducts.forEach(p => {
-            const b = p.brand || 'outros';
-            if (!brands[b]) brands[b] = [];
-            brands[b].push(p);
-        });
-
-        const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
-        let html = `
-            <div class="section-header-pill" style="margin-top: 40px;">🛍️ Explore tudo</div>
-            <h2 class="catalog-title">Confira outros produtos</h2>
-        `;
-
-        for (const brand in brands) {
-            const brandProducts = brands[brand];
-            html += `
-                <div class="brand-sub-divider">
-                    <h3>${brand}</h3>
-                </div>
-
-                <div class="p-grid-catalog">
-                    ${brandProducts.map(p => {
-                        const price = parseFloat(p.price);
-                        const isRetail = saleType === 'retail';
-                        const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : price;
-                        return `
-                            <div class="p-card-mini" onclick="addToCartFromCheckout('${p.id}', '${p.name}', ${finalPrice}, '${p.image || ''}')">
-                                <img src="${p.image && !p.image.includes('/') ? 'Images Pods/' + p.image : p.image || 'assets/logo-ignite.png'}" alt="${p.name}" class="p-mini-img" onerror="this.src='assets/logo-ignite.png'">
-                                <div class="p-mini-info">
-                                    <span class="p-mini-name">${p.name}</span>
-                                    <span class="p-mini-price">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
-                                    <span style="font-size: 0.65rem; color: #ff0b55; font-weight: 700;">+ ADICIONAR</span>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-        }
-        container.innerHTML = html;
     }
 
     initCheckoutCatalogs();
+
+    // =========================================
+    // addToCartFromCheckout — adds product to checkout cart
+    // =========================================
+    window.addToCartFromCheckout = function(id, name, price, image, qtyInputId) {
+        const qtyInput = qtyInputId ? document.getElementById(qtyInputId) : null;
+        const qty = qtyInput ? Math.max(1, parseInt(qtyInput.value) || 1) : 1;
+
+        const existing = checkoutCart.find(item => item.id === id);
+        if (existing) {
+            existing.quantity += qty;
+        } else {
+            checkoutCart.push({
+                id: id,
+                name: name,
+                price: parseFloat(price),
+                image: image,
+                quantity: qty,
+                flavor: 'Mix Variado'
+            });
+        }
+
+        saveAndRender();
+
+        // Sync to window.cart (for script.js sidebar updates)
+        window.cart = [...checkoutCart];
+        localStorage.setItem('ignite_cart', JSON.stringify(checkoutCart));
+        
+        // Visual feedback
+        if (qtyInput) {
+            const btn = qtyInput.closest('.product-add-controls')?.querySelector('.upsell-add-btn');
+            if (btn) {
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Adicionado!';
+                btn.style.background = '#00cc66';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 1500);
+            }
+        }
+    };
+
+    // Qty stepper for upsell cards
+    window.adjustUpsellQty = function(cardId, delta) {
+        const input = document.getElementById(cardId + '-qty');
+        if (!input) return;
+        let val = parseInt(input.value) || 1;
+        val = Math.max(1, val + delta);
+        input.value = val;
+    };
+
+    // =========================================
+    // Auto-scroll to carousel on page load
+    // =========================================
+    setTimeout(() => {
+        const carouselSection = document.getElementById('carouselSection');
+        if (carouselSection) {
+            carouselSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 800);
 
 
 
@@ -344,6 +329,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         fetchShippingOptions(val);
 
                         // Focus on number field for better UX
+             // Simplified Sticky Up-sell Bar updates (only on pages without carousel)
+      const stickyBar = document.getElementById('stickyUpsellBar');
                         const numInput = document.getElementById('number');
                         if (numInput) setTimeout(() => numInput.focus(), 150);
                     } else {
@@ -437,8 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>`;
 
         options.forEach(opt => {
-            const isPac = opt.id === 'PAC';
-            const currentPrice = (isFreeShipping && isPac) ? 0 : opt.price;
+            const currentPrice = isFreeShipping ? 0 : opt.price;
             const displayName = `${opt.carrier} - ${opt.type}`;
             const displayPrice = currentPrice === 0 ? 'GRÁTIS' : `R$ ${currentPrice.toFixed(2).replace('.', ',')}`;
             
@@ -535,7 +521,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const totalItemsCount = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
         const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
-        const hasDiscount = (saleType === 'wholesale' && totalItemsCount === 30);
+        const hasDiscount = (saleType === 'wholesale' && totalItemsCount > 30);
 
         checkoutCart.forEach((item, index) => {
             const price = parseFloat(item.price);
@@ -608,104 +594,63 @@ document.addEventListener('DOMContentLoaded', () => {
         let discount = 0;
         let isFreeShipping = false;
         // Linear Proportional Scale (Fixed at 50 units range)
-        finalProgress = Math.min((totalItems / 50) * 100, 100);
-
-
-
-
-        let msg = "";
+        let msg = '';
         let stage = "1";
-
-        if (saleType === 'wholesale') {
-            // New Exclusive Scaling Logic
-            if (totalItems >= 30 && totalItems < 40) {
-                discount = currentSubtotal * 0.05; // Tier 1: 5% Discount (30-39)
-            }
-
-            if (totalItems < 30) {
-                stage = "1";
-                msg = `Faltam <b>${30 - totalItems}</b> unidades para ativar <b>5% OFF</b>`;
-            } else if (totalItems >= 30 && totalItems < 40) {
-                stage = "2";
-                msg = `<b>Desconto ativado!</b> Você ganhou 5% OFF`;
-            } else if (totalItems >= 40 && totalItems < 50) {
-                stage = "3";
-                msg = `🔥 Meta batida! Você ganhou <b>2 PODS GRÁTIS!</b>`;
-            } else if (totalItems >= 50) {
-                stage = "4";
-                msg = `🚚 <b>50% OFF Frete liberado!</b> (+ 2 PODS)`;
-            }
+        
+        if (totalItems < 30) {
+            stage = "1";
+            msg = `Faltam <b>${30 - totalItems}</b> unidades para ativar <b>5% OFF</b>`;
+        } else if (totalItems >= 30 && totalItems < 40) {
+            stage = "2";
+            msg = (totalItems === 30) ? `<b>5% OFF ativado!</b> Vale a partir da próxima unidade` : `<b>5% OFF ativo!</b> Faltam <b>${40 - totalItems}</b> para ganhar <b>1 POD GRÁTIS</b>`;
+        } else if (totalItems >= 40 && totalItems < 50) {
+            stage = "3";
+            msg = `🔥 <b>1 POD GRÁTIS</b> garantido! Faltam <b>${50 - totalItems}</b> para <b>FRETE GRÁTIS</b>`;
+        } else if (totalItems >= 50) {
+            stage = "4";
+            msg = `🚚 <b>FRETE GRÁTIS</b> liberado! (+ 1 POD GRÁTIS)`;
         }
-
-
+        
         const calculateDisplaySavings = () => {
-            if (totalItems < 30) return 0;
-            if (totalItems >= 30 && totalItems < 40) return currentSubtotal * 0.05;
-            if (totalItems >= 40 && totalItems < 50) return 300.00; // 2 x Retail Price (R$ 150)
-            if (totalItems >= 50) {
-                const shippingSaving = window.selectedShippingCost ? (window.selectedShippingCost * 0.5) : 30.00; // 50% discount
-                return 300.00 + shippingSaving;
+            if (totalItems <= 30) return 0;
+            const avgPrice = currentSubtotal / totalItems;
+            const discountUnits = Math.min(totalItems - 30, 10);
+            let sv = discountUnits * avgPrice * 0.05;
+
+            if (totalItems >= 40) {
+                const maxWholesalePrice = Math.max(...checkoutCart.map(i => parseFloat(i.price) || 0));
+                sv += maxWholesalePrice;
             }
-            return 0;
+            if (totalItems >= 50) sv += (window.selectedShippingCost || 30.00);
+            return sv;
         };
 
+        const totalSavedVal = calculateDisplaySavings();
+        
+        // Update all bars on checkout
+        const allFills = document.querySelectorAll('.promo-bar-fill, #progressFillCheckout, #progressFillStatic');
+        const allMsgs = document.querySelectorAll('.promo-bar-text, #progressTextCheckout, #progressTextStatic');
+        const allSavingsValues = document.querySelectorAll('.promo-savings-value, #savingsValueCheckout, #savingsValueStatic');
+        const allSavingsWrappers = document.querySelectorAll('.promo-savings, #savingsDisplayCheckout, #savingsDisplayStatic');
+        const allMarkers = document.querySelectorAll('.promo-marker, .milestone-marker');
 
-        const totalSavedText = `Você já economizou: R$ ${calculateDisplaySavings().toFixed(2).replace('.', ',')}`;
-
-
-        // UI Element Updates
-        const stickyBar = document.getElementById('stickyCheckoutBar');
-        const stickyFill = document.getElementById('upsellProgressFillSticky');
-        const stickyMsg = document.getElementById('upsellMessageSticky');
-        const stickySavings = document.getElementById('stickySavingsText');
-        const staticProgressFill = document.getElementById('upsellProgressFillCheckout');
-        const staticMessage = document.getElementById('staticMessage');
-        const staticSavingsSummary = document.getElementById('staticSavingsSummary');
-
-        const allMarkers = document.querySelectorAll('.milestone-marker');
-
-        if (staticProgressFill) {
-            staticProgressFill.style.width = `${finalProgress}%`;
-            staticProgressFill.setAttribute('data-stage', stage);
-        }
-
-        if (staticMessage) {
-            staticMessage.innerHTML = msg;
-            staticMessage.style.color = (totalItems >= 30) ? '#ff0b55' : '';
-        }
-
-        if (staticSavingsSummary) {
-            staticSavingsSummary.textContent = totalSavedText;
-            staticSavingsSummary.style.display = (calculateDisplaySavings() > 0) ? 'block' : 'none';
-        }
-
-        // --- Marker Synchronization ---
-        allMarkers.forEach(m => {
-            const goal = parseInt(m.getAttribute('data-goal'));
-            if (totalItems >= goal) {
-                m.classList.add('reached');
-            } else {
-                m.classList.remove('reached');
-            }
+        allFills.forEach(f => {
+            f.style.width = `${fillPct}%`;
+            f.setAttribute('data-stage', stage);
         });
-
-
-        // --- Sticky Bar Update ---
-        if (stickyBar) {
-            if (totalItems > 0) stickyBar.classList.add('active');
-            else stickyBar.classList.remove('active');
-
-            if (stickyFill) stickyFill.style.width = `${finalProgress}%`;
-            if (stickyMsg) stickyMsg.innerHTML = msg;
-            if (stickySavings) stickySavings.textContent = totalSavedText;
-        }
+        allMsgs.forEach(m => { 
+            m.innerHTML = msg; 
+            m.style.color = (totalItems >= 30) ? '#ff0b55' : '';
+        });
+        
+        allSavingsValues.forEach(s => { s.textContent = `R$ ${totalSavedVal.toFixed(2).replace('.', ',')}`; });
+        allSavingsWrappers.forEach(w => { w.style.display = (totalSavedVal > 0) ? 'flex' : 'none'; });
 
         allMarkers.forEach(m => {
             const goal = parseInt(m.getAttribute('data-goal'));
             if (totalItems >= goal) {
                 if (!m.classList.contains('reached')) {
-                    m.classList.add('reached', 'pop-hit');
-                    setTimeout(() => m.classList.remove('pop-hit'), 400);
+                    m.classList.add('reached');
                 }
             } else {
                 m.classList.remove('reached');
@@ -717,15 +662,15 @@ document.addEventListener('DOMContentLoaded', () => {
         let rawShippingVal = window.addressIsComplete ? (window.selectedShippingCost || 0) : 0;
         let shippingVal = rawShippingVal;
         
-        const isShippingDiscount = (saleType === 'wholesale' && totalItems >= 50);
+        const isShippingFree = (saleType === 'wholesale' && totalItems >= 50);
         
-        if (isShippingDiscount && window.addressIsComplete) {
-            shippingVal = rawShippingVal * 0.5; // 50% Discount
+        if (isShippingFree && window.addressIsComplete) {
+            shippingVal = 0; // 100% Free shipping
             if (shippingEl) {
                 shippingEl.innerHTML = `
                     <span style="text-decoration: line-through; color: #888; font-size: 0.8rem;">R$ ${rawShippingVal.toFixed(2).replace('.', ',')}</span>
-                    <span style="color: #ff0b55; font-weight: 800;">R$ ${shippingVal.toFixed(2).replace('.', ',')}</span>
-                    <div style="font-size: 0.75rem; color: #ff0b55;">⚡ 50% OFF Ativado</div>
+                    <span style="color: #ff0b55; font-weight: 800;">GRÁTIS</span>
+                    <div style="font-size: 0.75rem; color: #ff0b55;">🚚 Frete Grátis Ativado</div>
                 `;
             }
         } else if (shippingEl) {
@@ -760,26 +705,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function calculateCheckoutSavings(cart, totalQty) {
-        if (totalQty < 30 || !cart || cart.length === 0) return 0;
+        if (totalQty <= 30 || !cart || cart.length === 0) return 0;
         
         let savings = 0;
         let subtotal = 0;
-        let avgPrice = 0;
 
         cart.forEach(item => {
             subtotal += (parseFloat(item.price) || 0) * (item.quantity || 1);
         });
-        
-        if (totalQty > 0) avgPrice = subtotal / totalQty;
-        
-        if (totalQty >= 30) {
-            savings += subtotal * 0.05;
-        }
+
+        const avgPrice = totalQty > 0 ? subtotal / totalQty : 0;
+
+        // 5% discount only on units 31-40
+        const discountUnits = Math.min(totalQty - 30, 10);
+        savings = discountUnits * avgPrice * 0.05;
+
+        // At 40+: 1 free pod (most expensive)
         if (totalQty >= 40) {
-            savings += (avgPrice * 2);
+            const maxPrice = Math.max(...cart.map(i => parseFloat(i.price) || 0));
+            savings += maxPrice;
         }
+
+        // At 50+: free shipping
         if (totalQty >= 50) {
-            savings += 50; 
+            savings += window.selectedShippingCost || 30.00;
         }
 
         return savings;
@@ -848,18 +797,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const totalItemsCount = items.reduce((sum, i) => sum + i.quantity, 0);
             let discount = 0;
             
-            // 5% ONLY between 30 and 39
-            if (totalItemsCount >= 30 && totalItemsCount < 40) {
-                discount = baseSubtotal * 0.05;
+            // 5% ONLY on units above 30 (max 10 units, i.e. 31-40)
+            if (totalItemsCount > 30) {
+                const avgPrice = baseSubtotal / totalItemsCount;
+                const extraUnits = Math.min(totalItemsCount - 30, 10);
+                discount = extraUnits * avgPrice * 0.05;
             }
             const discountedSubtotal = baseSubtotal - discount;
 
 
             // Calculate shipping
+            // Calculate shipping - case insensitive check for "Grátis"
             const shippingEl = document.querySelector('.shipping-value');
-            const isFreeShipping = shippingEl?.textContent.includes('Grátis');
-            const shippingVal = isFreeShipping ? 0 : window.selectedShippingCost;
-            const shippingMethod = isFreeShipping ? 'Grátis (Transportadora Padrão)' : (window.selectedShippingMethod || 'Padrão');
+            const isFreeShipping = shippingEl && /Grátis/i.test(shippingEl.textContent);
+            const shippingVal = isFreeShipping ? 0 : (parseFloat(window.selectedShippingCost) || 0);
+            const shippingMethodLabel = isFreeShipping ? 'Grátis (Transportadora Padrão)' : (window.selectedShippingMethod || 'Padrão');
+            
             const finalTotal = parseFloat((discountedSubtotal + shippingVal).toFixed(2));
 
             // PIX via servidor local (proxy para ZuckPay)

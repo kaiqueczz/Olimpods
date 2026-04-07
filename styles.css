@@ -1517,7 +1517,10 @@ body {
 /* Multi-stage Progress Bar (Sidebar) */
 .minimum-progress-container {
   margin-bottom: 24px;
-  padding: 0 4px;
+  padding: 0;
+  width: 85%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .progress-header {
@@ -3502,6 +3505,12 @@ body {
   box-shadow: 0 0 15px var(--accent-primary);
 }
 
+/* Promo bar inside cart sidebar */
+.cart-sidebar .promo-bar-wrapper {
+  padding: 14px 30px 4px;
+  width: 100%;
+}
+
 /* Cart Items List */
 .cart-items-list {
   flex: 1;
@@ -4647,139 +4656,151 @@ body {
     color: #ff0033 !important;
 }
 
-/* ============================================
-PROMO PROGRESS BAR — ELECTRIC ENERGY DESIGN
+/* =====================/* ========================/* ========================/* ============================================
+   REWARDS PROGRESS BAR — BARRINHA IDEAL (PILL)
    ============================================ */
 
-/* Wrapper */
 .promo-bar-wrapper {
-    padding: 14px 0 4px;
+    padding: 8px 0 2px;
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    z-index: 10;
 }
 
-.promo-bar-text {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-align: left; /* Left align for sidebar text */
-    margin: 0 0 12px 0;
-    line-height: 1.4;
+/* Sidebar Override */
+.cart-sidebar .promo-bar-wrapper {
+    padding: 14px 30px 4px;
     width: 100%;
 }
 
+.promo-bar-text {
+    position: absolute;
+    bottom: calc(100% + 4px); /* Posição acima da barra */
+    left: 0;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-align: left;
+    margin: 0;
+    line-height: 1.2;
+    width: max-content;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 5;
+}
 
+.promo-bar-track-group {
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex: 1;
+    margin-top: 10px; /* Cria espaço visual para a frase flutuante */
+}
 
-/* Track */
+.promo-bar-main-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+}
+
 .promo-bar-track {
     position: relative;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.06);
+    height: 8px;
+    background: rgba(255, 255, 255, 0.06); 
     border-radius: 50px;
     overflow: visible;
     border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.sticky-bar-track {
-    height: 7px;
-    margin: 6px 0 0;
+    margin-right: 14px; 
+    flex: 1; /* Aligns side-by-side when in a row */
 }
 
 /* Fill bar */
 .promo-bar-fill {
     height: 100%;
-    border-radius: 50px;
+    border-radius: 50px; /* Pill format */
     width: 0%;
+    background: #ff0033; /* Ideal Base Red */
+    box-shadow: 0 0 10px rgba(255, 0, 51, 0.4);
     transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1);
     position: relative;
     z-index: 2;
-    background: #ff0033;
-    box-shadow: 0 0 6px rgba(255, 0, 51, 0.3);
     overflow: hidden;
 }
 
-/* Energy ray overlay */
+/* Passing Glow */
 .promo-bar-energy {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(255, 77, 141, 0.0) 30%,
-        rgba(255, 77, 141, 0.6) 45%,
-        rgba(255, 255, 255, 0.4) 50%,
-        rgba(255, 77, 141, 0.6) 55%,
-        rgba(255, 77, 141, 0.0) 70%,
+        rgba(255, 255, 255, 0.2) 50%,
         transparent 100%
     );
-    background-size: 200% 100%;
     animation: energy-ray 2s infinite linear;
     border-radius: 50px;
 }
 
 @keyframes energy-ray {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
-/* Intensity stages */
-.promo-bar-fill[data-stage="1"] {
-    background: #ff0033;
-    box-shadow: 0 0 8px rgba(255, 0, 51, 0.3);
-}
-.promo-bar-fill[data-stage="2"] {
-    background: linear-gradient(90deg, #ff0033, #ff1a4d);
-    box-shadow: 0 0 12px rgba(255, 0, 51, 0.5), 0 0 25px rgba(255, 0, 51, 0.15);
-}
-.promo-bar-fill[data-stage="2"] .promo-bar-energy {
-    animation-duration: 1.5s;
-}
-.promo-bar-fill[data-stage="3"] {
-    background: linear-gradient(90deg, #ff0033, #ff4d8d, #ff0033);
-    background-size: 200% 100%;
-    box-shadow: 0 0 16px rgba(255, 0, 51, 0.6), 0 0 35px rgba(255, 77, 141, 0.2);
-    animation: fill-pulse-3 3s infinite ease-in-out;
-}
-.promo-bar-fill[data-stage="3"] .promo-bar-energy {
-    animation-duration: 1.2s;
-}
-@keyframes fill-pulse-3 {
-    0%, 100% { background-position: 0% 0; }
-    50% { background-position: 100% 0; }
-}
-.promo-bar-fill[data-stage="4"] {
-    background: linear-gradient(90deg, #ff0033, #ff4d8d, #fff, #ff4d8d, #ff0033);
-    background-size: 400% 100%;
-    box-shadow: 0 0 20px rgba(255, 0, 51, 0.8), 0 0 50px rgba(255, 77, 141, 0.3), 0 0 80px rgba(255, 0, 51, 0.1);
-    animation: fill-full-power 1.5s infinite linear;
-}
-.promo-bar-fill[data-stage="4"] .promo-bar-energy {
-    animation-duration: 0.8s;
-    background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.0) 25%,
-        rgba(255, 255, 255, 0.7) 45%,
-        rgba(255, 255, 255, 0.9) 50%,
-        rgba(255, 255, 255, 0.7) 55%,
-        rgba(255, 255, 255, 0.0) 75%,
-        transparent 100%
-    );
-    background-size: 200% 100%;
-}
-@keyframes fill-full-power {
-    0% { background-position: 100% 0; }
-    100% { background-position: -300% 0; }
+/* Footer & Button */
+.promo-bar-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    width: 100%;
 }
 
-/* Markers */
+.promo-savings {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.promo-savings-label {
+    opacity: 0.7;
+}
+
+.promo-savings-value {
+    color: #ff0b55;
+    font-weight: 800;
+}
+
+.btn-view-cart-white {
+    background: #fff;
+    color: #111;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-view-cart-white:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+/* Markers (30/40/50 PILL) */
 .promo-bar-markers {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none;
     z-index: 3;
 }
@@ -4804,7 +4825,6 @@ PROMO PROGRESS BAR — ELECTRIC ENERGY DESIGN
     font-size: 9px;
     font-weight: 800;
     color: rgba(255, 255, 255, 0.3);
-    transition: color 0.3s;
 }
 
 .promo-marker.reached {
@@ -5162,4 +5182,142 @@ PROMO PROGRESS BAR — ELECTRIC ENERGY DESIGN
         padding: 5px 10px;
         font-size: 0.6rem;
     }
+}
+
+/* ============================================
+   MOBILE RESPONSIVE — PROMO BAR SYSTEM
+   ============================================ */
+
+/* Cart sidebar promo bar — Mobile */
+@media (max-width: 480px) {
+    .cart-sidebar .promo-bar-wrapper {
+        padding: 12px 20px 4px;
+    }
+
+    .promo-bar-text {
+        font-size: 0.78rem;
+        margin-bottom: 10px;
+    }
+
+    .promo-bar-track {
+        height: 8px;
+        margin-right: 12px;
+    }
+
+    .promo-marker {
+        width: 20px;
+        height: 20px;
+    }
+
+    .promo-marker span {
+        font-size: 7.5px;
+    }
+
+    .promo-savings-value {
+        font-size: 1rem;
+    }
+
+    .promo-savings-label {
+        font-size: 0.68rem;
+    }
+}
+
+/* Sticky bar promo bar — Mobile */
+@media (max-width: 600px) {
+    .sticky-upsell-bar {
+        padding: 8px 12px;
+        gap: 6px;
+    }
+
+    .promo-bar-main-row {
+        gap: 8px;
+    }
+
+    .sticky-upsell-bar .upsell-info {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .sticky-upsell-bar .upsell-message {
+        font-size: 0.72rem;
+        text-align: center;
+    }
+
+    .sticky-upsell-bar .promo-bar-track,
+    .sticky-upsell-bar .sticky-bar-track {
+        margin-right: 12px;
+    }
+
+    .sticky-upsell-bar .promo-marker {
+        width: 18px;
+        height: 18px;
+    }
+
+    .sticky-upsell-bar .promo-marker span {
+        font-size: 7px;
+    }
+
+    .sticky-upsell-bar .upsell-actions {
+        width: 100%;
+    }
+
+    .sticky-upsell-bar .btn-view-cart {
+        width: 100%;
+        text-align: center;
+        padding: 10px 16px;
+        font-size: 0.7rem;
+        border-radius: 8px;
+    }
+
+    .sticky-savings-summary {
+        font-size: 0.65rem;
+        text-align: center;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+    .cart-sidebar .promo-bar-wrapper {
+        padding: 10px 16px 4px;
+    }
+
+    .promo-bar-text {
+        font-size: 0.72rem;
+    }
+
+    .promo-marker {
+        width: 18px;
+        height: 18px;
+    }
+
+    .promo-marker span {
+        font-size: 7px;
+    }
+
+    .promo-bar-track {
+        height: 7px;
+        margin-right: 10px;
+    }
+}
+
+/* Integrated White Button for Static Bars */
+.btn-view-cart-white {
+    background: #fff !important;
+    color: #000 !important;
+    border: none !important;
+    padding: 8px 18px !important;
+    border-radius: 4px !important;
+    font-weight: 900 !important;
+    font-size: 0.65rem !important;
+    text-transform: uppercase !important;
+    cursor: pointer !important;
+    transition: all 0.3s !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+}
+
+.btn-view-cart-white:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 15px rgba(255,255,255,0.4) !important;
+    background: #f0f0f0 !important;
 }

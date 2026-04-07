@@ -715,6 +715,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.getElementById('cartOverlay');
     if (!sidebar || !overlay) return;
     if (open) {
+      // Inject sidebar contents if sidebar is empty (e.g. faq, tracking pages)
+      if (!sidebar.querySelector('.cart-header')) {
+        sidebar.innerHTML = `
+          <div class="cart-header">
+            <h2>Seu Carrinho</h2>
+            <button class="btn-close-cart" id="closeCart" aria-label="Fechar Carrinho">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <div class="promo-bar-wrapper" id="promoBarWrapper">
+            <p class="promo-bar-text" id="promoBarText">Adicione itens e ganhe <b class="text-red">recompensas!</b></p>
+            <div class="promo-bar-track">
+              <div class="promo-bar-fill" id="promoBarFill">
+                <div class="promo-bar-energy"></div>
+              </div>
+              <div class="promo-bar-markers">
+                <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
+                <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
+                <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
+              </div>
+            </div>
+            <div id="savingsDisplay" class="promo-savings" style="display:none;">
+              <span class="promo-savings-label">Você já economizou:</span>
+              <span class="promo-savings-value" id="savingsValue">R$ 0,00</span>
+            </div>
+          </div>
+          <div class="cart-items-list" id="sidebarCartItems">
+            <div class="empty-cart-msg">Seu carrinho está vazio.</div>
+          </div>
+          <div class="cart-footer">
+            <div class="cart-total-line">
+              <span>Subtotal</span>
+              <span class="total-val" id="sidebarTotal">R$ 0,00</span>
+            </div>
+            <a href="checkout.html" class="btn-checkout disabled" id="sidebarCheckoutBtn">Finalizar Compra</a>
+          </div>
+        `;
+        // Re-bind close button
+        document.getElementById('closeCart')?.addEventListener('click', () => toggleCartSidebar(false));
+      }
       sidebar.classList.add('active');
       overlay.classList.add('active');
       document.body.style.overflow = 'hidden';
@@ -729,52 +772,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderSidebarCart() {
     const list = document.getElementById('sidebarCartItems');
     const totalEl = document.getElementById('sidebarTotal');
-    // Select all instances of progress bars and messages
-    const allFills = document.querySelectorAll('.upsell-progress-fill, #progressFill, #upsellProgressFill, .promo-bar-fill');
-    const allMsgs = document.querySelectorAll('.upsell-message, #progressText, .upsell-progress-message, .promo-bar-text, #promoBarText');
-    const allSavingsEls = document.querySelectorAll('#savingsValue, #savingsValueSticky, .sticky-savings-summary');
-    const progressBar = document.querySelector('.minimum-progress-container');
-
-
+    const checkoutBtn = document.getElementById('sidebarCheckoutBtn');
+    
+    // Standardized Selectors for Ideal Bar - Sidebar & Static versions
+    const allFills = document.querySelectorAll('.promo-bar-fill, #progressFill, #progressFillStatic, #progressFillCheckout');
+    const allMsgs = document.querySelectorAll('.promo-bar-text, #progressText, #progressTextStatic, #progressTextCheckout');
+    const allSavingsValues = document.querySelectorAll('.promo-savings-value, #savingsValue, #savingsValueStatic, #savingsValueCheckout');
+    const allSavingsWrappers = document.querySelectorAll('.promo-savings, #savingsDisplay, #savingsDisplayStatic, #savingsDisplayCheckout');
+    const progressBar = document.querySelector('.minimum-progress-container, .promo-bar-wrapper');
 
     // Universal Update for all Progress Bars (Must run even if sidebar list is missing)
-    let totalItemsValue = window.cart.reduce((sum, item) => sum + parseInt(item.quantity || 0), 0);
+    let totalItems = window.cart.reduce((sum, item) => sum + parseInt(item.quantity || 0), 0);
     
-    // Select bar elements again to ensure we catch dynamically injected ones
-    const currentFills = document.querySelectorAll('.upsell-progress-fill, #progressFill, #upsellProgressFill, .promo-bar-fill');
-    const currentMsgs = document.querySelectorAll('.upsell-message, #progressText, .upsell-progress-message');
-
-
-    // Progress Visibility Logic (Always run)
-    let stickyBar = document.getElementById('stickyUpsellBar');
-    
-    // Inject sticky bar if missing on ANY page
-    if (!stickyBar) {
-      stickyBar = document.createElement('div');
-      stickyBar.id = 'stickyUpsellBar';
-      stickyBar.className = 'sticky-upsell-bar';
-      stickyBar.innerHTML = `
-        <div class="upsell-info">
-          <div class="upsell-message" id="upsellMessage">Adicione itens e ganhe <b class="text-red">recompensas!</b></div>
-          <div class="promo-bar-track sticky-bar-track">
-            <div class="promo-bar-fill" id="upsellProgressFill">
-              <div class="promo-bar-energy"></div>
-            </div>
-            <div class="promo-bar-markers">
-              <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
-              <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
-              <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
-            </div>
-          </div>
-          <div class="sticky-savings-summary" id="savingsValueSticky" style="display:none;"></div>
-        </div>
-        <div class="upsell-actions">
-          <button class="btn-view-cart" onclick="window.toggleCartSidebar(true)">Ver Carrinho</button>
-        </div>
-      `;
-      document.body.appendChild(stickyBar);
-    }
-
     // Meta Pixel: InitiateCheckout handler
     const sidebarCheckoutBtn = document.getElementById('sidebarCheckoutBtn');
     if (sidebarCheckoutBtn && !sidebarCheckoutBtn.dataset.pixelTracked) {
@@ -787,11 +796,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.currentSaleType === 'retail') {
       if (progressBar) progressBar.style.display = 'none';
       if (checkoutBtn) checkoutBtn.classList.remove('disabled');
-      if (stickyBar) stickyBar.classList.remove('active');
     } else {
       if (progressBar) progressBar.style.display = 'block';
     }
-
 
     // Guard: Only manipulate sidebar list if it exists on this page
     if (list) list.innerHTML = '';
@@ -801,7 +808,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (totalEl) totalEl.textContent = 'R$ 0,00';
       allFills.forEach(f => f.style.width = '0%');
       allMsgs.forEach(m => m.innerHTML = 'Adicione itens e ganhe <b class="text-red">recompensas!</b>');
-      if (stickyBar) stickyBar.classList.remove('active');
       if (window.currentSaleType === 'wholesale') {
         if (checkoutBtn) checkoutBtn.classList.add('disabled');
       }
@@ -809,14 +815,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let subtotal = 0;
-    let totalItems = 0;
 
     window.cart.forEach((item, index) => {
       const itemPrice = parseFloat(item.price);
       const itemQty = parseInt(item.quantity || 0);
       subtotal += itemPrice * itemQty;
-      totalItems += itemQty;
-
 
       const itemCard = document.createElement('div');
       itemCard.className = 'cart-sidebar-item';
@@ -844,11 +847,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (totalEl) {
-      const hasDiscount = (window.currentSaleType === 'wholesale' && totalItems >= 30);
-      const discount = hasDiscount ? subtotal * 0.05 : 0;
+      const extraUnits = (window.currentSaleType === 'wholesale' && totalItems > 30) ? Math.min(totalItems - 30, 10) : 0;
+      const avgPrice = totalItems > 0 ? subtotal / totalItems : 0;
+      const discount = extraUnits * avgPrice * 0.05;
       const finalSubtotal = subtotal - discount;
 
-      if (hasDiscount) {
+      if (discount > 0) {
         totalEl.innerHTML = `
           <span style="text-decoration: line-through; color: #888; font-size: 0.8rem;">R$ ${subtotal.toFixed(2).replace('.', ',')}</span>
           <span style="color: var(--accent-primary); font-weight: 800;">R$ ${finalSubtotal.toFixed(2).replace('.', ',')}</span>
@@ -856,39 +860,28 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         totalEl.textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
       }
-
     }
-
 
     // Wholesale specific progress bar updates
     if (window.currentSaleType === 'wholesale') {
-      let fillPct = 0;
-      // Linear Proportional Scale (Max at 50 units)
-      fillPct = Math.min((totalItems / 50) * 100, 100);
-
-
+      let fillPct = Math.min((totalItems / 50) * 100, 100);
       let stage = "1";
-
       let msg = '';
       
-      // Determine stage and copy
       if (totalItems < 30) {
           stage = "1";
           msg = `Faltam <b>${30 - totalItems}</b> unidades para ativar <b>5% OFF</b>`;
       } else if (totalItems >= 30 && totalItems < 40) {
           stage = "2";
-          msg = `<b>Desconto ativado!</b> Você ganhou 5% OFF`;
+          msg = (totalItems === 30) ? `<b>5% OFF ativado!</b> Vale a partir da próxima unidade` : `<b>5% OFF ativo!</b> Faltam <b>${40 - totalItems}</b> para ganhar <b>1 POD GRÁTIS</b>`;
       } else if (totalItems >= 40 && totalItems < 50) {
           stage = "3";
-          msg = `🔥 Meta batida! Você ganhou <b>2 PODS GRÁTIS!</b>`;
+          msg = `🔥 <b>1 POD GRÁTIS</b> garantido! Faltam <b>${50 - totalItems}</b> para <b>FRETE GRÁTIS</b>`;
       } else if (totalItems >= 50) {
           stage = "4";
-          msg = `🚚 <b>50% OFF Frete liberado!</b> (+ 2 PODS)`;
+          msg = `🚚 <b>FRETE GRÁTIS</b> liberado! (+ 1 POD GRÁTIS)`;
       }
 
-
-
-      // Universal Update for all Progress Bars
       allFills.forEach(f => {
           f.style.width = `${fillPct}%`;
           f.setAttribute('data-stage', stage);
@@ -896,111 +889,96 @@ document.addEventListener('DOMContentLoaded', () => {
 
       allMsgs.forEach(m => {
           m.innerHTML = msg;
-          m.style.color = (totalItems >= 30) ? '#ff0b55' : ''; // Red when active
+          m.style.color = (totalItems >= 30) ? '#ff0b55' : '';
       });
-
+      
       const totalSv = calculateTotalSavings(window.cart, totalItems);
-      allSavingsEls.forEach(s => {
-          s.textContent = `Você já economizou: R$ ${totalSv.toFixed(2).replace('.', ',')}`;
-          s.style.display = (totalSv > 0) ? 'block' : 'none';
-      });
-
-
+      allSavingsValues.forEach(s => { s.textContent = `R$ ${totalSv.toFixed(2).replace('.', ',')}`; });
+      allSavingsWrappers.forEach(w => { w.style.display = (totalSv > 0) ? 'flex' : 'none'; });
 
       const updateMarkers = () => {
-          // Update both sidebar markers (.promo-marker) and product page markers (.milestone-marker)
-          const markers = document.querySelectorAll('.promo-marker, .milestone-marker');
-          
-          markers.forEach(m => {
+          document.querySelectorAll('.promo-marker, .milestone-marker').forEach(m => {
               const goal = parseInt(m.getAttribute('data-goal'));
               if (totalItems >= goal) {
                   if (!m.classList.contains('reached')) {
                       m.classList.add('reached', 'pop-hit');
                       setTimeout(() => m.classList.remove('pop-hit'), 400);
                   }
-              } else {
-                  m.classList.remove('reached');
-              }
+              } else { m.classList.remove('reached'); }
           });
       };
-      
       updateMarkers();
 
-
-      // Minimum qty for checkout
       if (totalItems < 10) {
         if (checkoutBtn) checkoutBtn.classList.add('disabled');
       } else {
         if (checkoutBtn) checkoutBtn.classList.remove('disabled');
       }
 
-      // Savings Display
-      const savings = calculateTotalSavings(window.cart, totalItems);
-      const savingsDisplay = document.getElementById('savingsDisplay');
-      const savingsValueEl = document.getElementById('savingsValue');
-      if (savingsDisplay && savingsValueEl) {
-          if (savings > 0) {
-              savingsDisplay.style.display = 'block';
-              savingsValueEl.textContent = `R$ ${savings.toFixed(2).replace('.', ',')}`;
-          } else {
-              savingsDisplay.style.display = 'none';
-          }
+      // Re-inject Sticky Bar if missing
+      let stickyBar = document.getElementById('stickyUpsellBar');
+      if (!stickyBar && !document.querySelector('.promo-bar-wrapper-static')) {
+          stickyBar = document.createElement('div');
+          stickyBar.id = 'stickyUpsellBar';
+          stickyBar.className = 'sticky-upsell-bar';
+          stickyBar.innerHTML = `
+            <div class="promo-bar-wrapper">
+                <div class="promo-bar-main-row">
+                    <div class="promo-bar-track-group">
+                        <div class="promo-bar-text">Adicione itens e ganhe recompensas!</div>
+                        <div class="promo-bar-track">
+                            <div class="promo-bar-fill"><div class="promo-bar-energy"></div></div>
+                            <div class="promo-bar-markers">
+                                <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
+                                <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
+                                <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-view-cart-white" onclick="window.toggleCartSidebar(true)">VER CARRINHO</button>
+                </div>
+                <div id="savingsDisplay" class="promo-savings" style="display:none;">
+                    <span class="promo-savings-label">Você já economizou:</span>
+                    <span class="promo-savings-value" id="savingsValue">R$ 0,00</span>
+                </div>
+            </div>
+          `;
+          document.body.appendChild(stickyBar);
       }
 
-      // Sticky Up-sell Bar updates
-      const stickyBar = document.getElementById('stickyUpsellBar');
-      const stickyMsg = document.getElementById('upsellMessage');
-      const stickyFill = document.getElementById('upsellProgressFill');
-      const stickySavingsVal = document.getElementById('savingsValueSticky');
-      
-      if (stickyBar && totalItems > 0) {
-          stickyBar.classList.add('active');
-          if (stickyMsg) stickyMsg.innerHTML = msg;
-          
-          if (stickyFill) {
-            stickyFill.style.width = `${fillPct}%`;
-          }
-
-          if (stickySavingsVal) {
-            stickySavingsVal.textContent = `Você já economizou: R$ ${savings.toFixed(2).replace('.', ',')}`;
-          }
-
-          updateMarkers(stickyBar);
-
-
-          // Full power celebration class
-          if (totalItems >= 50) stickyBar.classList.add('limit-attained');
-          else stickyBar.classList.remove('limit-attained');
-      } else if (stickyBar) {
-          stickyBar.classList.remove('active');
+      if (stickyBar) {
+          if (totalItems > 0) stickyBar.classList.add('active');
+          else stickyBar.classList.remove('active');
       }
     }
   }
 
   function calculateTotalSavings(cart, totalQty) {
-      if (totalQty < 30 || !cart || cart.length === 0) return 0;
+      if (totalQty <= 30 || !cart || cart.length === 0) return 0;
       
       let savings = 0;
-      let subtotal = 0;
+      let totalValueItems = 0;
       
       cart.forEach(item => {
-          subtotal += (parseFloat(item.price) || 0) * (item.quantity || 1);
+          totalValueItems += (parseFloat(item.price) || 0) * (item.quantity || 1);
       });
-      
-      // Tiered Exclusive Rewards (Retail Value Based)
-      if (totalQty >= 30 && totalQty < 40) {
-          // Tier 1: 5% Discount ONLY
-          savings = subtotal * 0.05;
-      } else if (totalQty >= 40) {
-          // Tier 2: 2 Free Pods (Retail Value: R$ 300.00)
-          savings = 300.00; 
-          if (totalQty >= 50) {
-               // Tier 3: Add 50% shipping discount value (avg R$ 30)
-               savings += 30.00;
-           }
 
+      const avgPrice = totalQty > 0 ? totalValueItems / totalQty : 0;
+
+      // 5% discount only on units 31-40
+      const discountUnits = Math.min(totalQty - 30, 10);
+      savings = discountUnits * avgPrice * 0.05;
+
+      // At 40+: add value of 1 free pod (most expensive in cart)
+      if (totalQty >= 40) {
+          const maxWholesalePrice = Math.max(...cart.map(i => parseFloat(i.price) || 0));
+          savings += maxWholesalePrice;
       }
 
+      // At 50+: add shipping cost to savings
+      if (totalQty >= 50) {
+          savings += window.selectedShippingCost || 30.00;
+      }
       
       return savings;
   }
