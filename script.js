@@ -974,7 +974,6 @@ document.addEventListener('DOMContentLoaded', () => {
       stickyBar.className = 'sticky-upsell-bar';
       stickyBar.innerHTML = `
         <div class="promo-bar-wrapper">
-          <div class="reward-fixed-title">Desbloqueie recompensas adicionando mais itens</div>
           <div class="promo-bar-flex-row">
             <div class="reward-pill-container">
               <div class="reward-pill" id="stickyRewardPill">
