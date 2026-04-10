@@ -3039,9 +3039,11 @@ body {
   .products-section .gradual-spacing {
     --gs-size: 1.2rem !important;
     white-space: nowrap !important;
-    justify-content: center;
-    width: 100%;
-    margin-bottom: 20px;
+  /* Main Page specific */
+.main-page-rewards {
+    margin: 60px auto;
+    max-width: var(--container-max);
+}
   }
 
   .gs-char {
@@ -4826,178 +4828,139 @@ body {
     color: #ff0033 !important;
 }
 
-/* =====================/* ========================/* ========================/* ============================================
-   REWARDS PROGRESS BAR — BARRINHA IDEAL (PILL)
-   ============================================ */
+/* =====================/* ========================/* ========================/* =======================/* ============================================
+    PERSUASIVE REWARDS DESIGN — BARRINHA IDEAL
+    ============================================ */
 
 .promo-bar-wrapper {
-    padding: 2px 0 2px; /* Reduzindo drasticamente para subir tudo */
-    width: 85%;
-    margin-left: auto;
-    margin-right: auto;
+    width: 90%;
+    margin: 20px auto;
     position: relative;
     z-index: 10;
 }
 
-/* Sidebar Override */
-.cart-sidebar .promo-bar-wrapper {
-    padding: 14px 30px 4px;
-    width: 100%;
+.reward-fixed-title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-/* Sidebar specific text shift */
-.cart-sidebar .promo-bar-text {
-    left: 25px !important;
+.reward-pill-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 22px;
+}
+
+.reward-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 30px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 50px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    min-height: 42px;
+}
+
+.reward-pill.changing {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+}
+
+.reward-pill.conquest {
+    animation: conquest-flash 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border-color: rgba(255, 11, 85, 0.5);
+    box-shadow: 0 0 25px rgba(255, 11, 85, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+@keyframes conquest-flash {
+    0%, 100% { transform: scale(1); }
+    40% { transform: scale(1.04); }
 }
 
 .promo-bar-text {
-    position: absolute;
-    bottom: calc(100% + 8px); /* Centralizando entre o topo da pill e a trilha */
-    left: 0;
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-    text-align: left;
-    margin: 0;
-    line-height: 1.2;
-    width: max-content;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 400;
+    color: #ffffff;
     white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    z-index: 5;
+    letter-spacing: 0.2px;
+    line-height: 1.4;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.promo-bar-track-group {
-    display: flex;
-    align-items: center;
-    position: relative;
-    flex: 1;
-    /* Removido margin-top para garantir que a barra seja a referência de centro */
-}
-
-.promo-bar-main-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    width: 100%;
-}
-
+/* Redesigned Track */
 .promo-bar-track {
     position: relative;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.06); 
+    height: 12px;
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
     overflow: visible;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    margin-right: 14px; 
-    flex: 1; /* Aligns side-by-side when in a row */
+    margin-bottom: 25px;
 }
 
-/* Fill bar */
+.promo-bar-track.intense-glow {
+    animation: intense-pulse 1.5s infinite alternate;
+}
+
+@keyframes intense-pulse {
+    from { box-shadow: 0 0 5px rgba(255, 11, 85, 0.2); }
+    to { box-shadow: 0 0 20px rgba(255, 11, 85, 0.6); }
+}
+
 .promo-bar-fill {
     height: 100%;
-    border-radius: 50px; /* Pill format */
+    border-radius: 50px;
+    background: linear-gradient(90deg, #FF0B55 0%, #FF4D7F 100%);
     width: 0%;
-    background: #ff0033; /* Ideal Base Red */
-    box-shadow: 0 0 10px rgba(255, 0, 51, 0.4);
     transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1);
     position: relative;
+    box-shadow: 0 0 15px rgba(255, 11, 85, 0.5);
     z-index: 2;
-    overflow: hidden;
 }
 
-/* Passing Glow */
-.promo-bar-energy {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.2) 50%,
-        transparent 100%
-    );
-    animation: energy-ray 2s infinite linear;
-    border-radius: 50px;
+.promo-bar-fill.pulse {
+    animation: bar-pulse 0.4s ease;
 }
 
-@keyframes energy-ray {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+@keyframes bar-pulse {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(1.2); }
 }
 
-/* Footer & Button */
-.promo-bar-footer-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
-    width: 100%;
-}
-
-.promo-savings {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.promo-savings-label {
-    opacity: 0.7;
-}
-
-.promo-savings-value {
-    color: #ff0b55;
-    font-weight: 800;
-}
-
-.btn-view-cart-white {
-    background: #fff;
-    color: #111;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.btn-view-cart-white:hover {
-    background: #f0f0f0;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
-}
-
-/* Markers (30/40/50 PILL) */
+/* Markers States */
 .promo-bar-markers {
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    pointer-events: none;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    transform: translateY(-50%);
     z-index: 3;
+    pointer-events: none;
 }
 
 .promo-marker {
     position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 24px;
-    height: 24px;
-    background: #111;
-    border: 2px solid rgba(255, 255, 255, 0.12);
+    transform: translate(-50%, 0);
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
+    background: #111;
+    border: 2px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    z-index: 5;
-}
-
-.promo-marker span {
-    font-size: 9px;
     font-weight: 800;
     color: rgba(255, 255, 255, 0.3);
 }
@@ -5319,27 +5282,33 @@ body {
     z-index: 10;
 }
 
-/* Floating Pill Desktop Look */
-@media (min-width: 993px) {
-    .sticky-upsell-bar {
-        bottom: -150px;
-        margin-bottom: 0;
-        border-radius: 100px;
-        width: calc(100% - 40px);
-        box-shadow: 0 15px 45px rgba(0,0,0,0.8), 0 0 30px rgba(255,11,85,0.15);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .sticky-upsell-bar.active {
-        bottom: 20px;
-    }
+/* Sticky Bar Layout Optimizations */
+.sticky-upsell-bar .promo-bar-wrapper {
+    width: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
-/* Mobile specific overrides for proportional look */
+.sticky-upsell-bar .promo-bar-flex-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.sticky-upsell-bar .btn-view-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
 @media (max-width: 768px) {
-    .sticky-upsell-bar {
-        border-radius: 0;
-        padding: 10px 16px;
-        gap: 12px;
+    .sticky-upsell-bar .promo-bar-flex-row {
+        flex-direction: column;
+        gap: 15px;
     }
 }
     .sticky-upsell-bar .upsell-message {

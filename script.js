@@ -769,6 +769,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // State trackers for persuasive rewards animations
+  window.lastTotalItems = 0;
+  window.lastStage = "1";
+
   function renderSidebarCart() {
     const list = document.getElementById('sidebarCartItems');
     const totalEl = document.getElementById('sidebarTotal');
@@ -813,7 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (list) list.innerHTML = '<div class="empty-cart-msg">Seu carrinho está vazio.</div>';
       if (totalEl) totalEl.textContent = 'R$ 0,00';
       allFills.forEach(f => f.style.width = '0%');
-      allMsgs.forEach(m => m.innerHTML = 'Adicione itens e ganhe <b class="text-red">recompensas!</b>');
+      allMsgs.forEach(m => m.textContent = 'Adicione itens para desbloquear recompensas');
       if (window.currentSaleType === 'wholesale') {
         if (checkoutBtn) checkoutBtn.classList.add('disabled');
       }
@@ -873,48 +877,72 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================
-    // IDEAL REWARD BAR CALCULATION
+    // PERSUASIVE REWARD BAR CALCULATION
     // =========================================
     let stage = "1";
     let rewardMsg = "";
     let fillPct = Math.min((totalItems / 50) * 100, 100);
+    let nextGoal = 30;
 
     if (totalItems < 30) {
       stage = "1";
-      rewardMsg = `Faltam <b class="text-red">${30 - totalItems}</b> unidades para <b class="text-red">5% OFF</b>`;
+      nextGoal = 30;
+      rewardMsg = `Faltam ${30 - totalItems} unidades para ativar 5% OFF`;
     } else if (totalItems >= 30 && totalItems < 40) {
       stage = "2";
-      rewardMsg = (totalItems === 30) ? "<b class=\"text-red\">5% OFF ATIVADO!</b>" : `Faltam <b class="text-red">${40 - totalItems}</b> para <b class="text-red">1 POD GRÁTIS</b>`;
+      nextGoal = 40;
+      rewardMsg = (totalItems === 30) ? "5% OFF ativado! Continue adicionando" : `Faltam ${40 - totalItems} unidades para ganhar 1 Pod grátis`;
     } else if (totalItems >= 40 && totalItems < 50) {
       stage = "3";
-      rewardMsg = `<b class="text-red">1 POD GRÁTIS!</b> Faltam <b class="text-red">${50 - totalItems}</b> para <b class="text-red">FRETE GRÁTIS</b>`;
+      nextGoal = 50;
+      rewardMsg = `1 Pod grátis desbloqueado! Faltam ${50 - totalItems} para frete grátis`;
     } else {
       stage = "4";
-      rewardMsg = "<b class=\"text-red\">FRETE GRÁTIS LIBERADO!</b> (+ 1 POD GRÁTIS)";
+      nextGoal = 50;
+      rewardMsg = "Frete grátis liberado + 1 Pod grátis";
     }
 
     const totalSavingsValue = calculateTotalSavings(window.cart, totalItems);
+    const isProgress = totalItems > window.lastTotalItems;
+    const isConquest = stage !== window.lastStage && totalItems >= parseInt(nextGoal === 50 ? 50 : (nextGoal === 40 ? 30 : 0)); 
+    // Simplified conquest: if stage changed and item count crossed a threshold
+    const isConquestCrossing = (totalItems >= 30 && window.lastTotalItems < 30) || 
+                               (totalItems >= 40 && window.lastTotalItems < 40) || 
+                               (totalItems >= 50 && window.lastTotalItems < 50);
 
-    // Update all Ideal Bars (Sidebar, Product Page, Sticky)
+    // Update all Ideal Bars (Sidebar, Main Page, Sticky)
+    const allTracks = document.querySelectorAll('.promo-bar-track');
+    const allPills = document.querySelectorAll('.reward-pill');
+
     allFills.forEach(f => {
       f.style.width = `${fillPct}%`;
       f.setAttribute('data-stage', stage);
+      if (isProgress) {
+        f.classList.remove('pulse');
+        void f.offsetWidth; // Trigger reflow
+        f.classList.add('pulse');
+      }
+    });
+
+    allTracks.forEach(t => {
+      const distance = nextGoal - totalItems;
+      t.classList.toggle('intense-glow', distance > 0 && distance <= 5);
     });
     
     allMsgs.forEach(m => {
-      if (m.id === 'mainRewardText' && m.innerHTML !== rewardMsg) {
-        m.classList.add('changing');
+      const pill = m.closest('.reward-pill');
+      if (m.textContent !== rewardMsg) {
+        if (pill) pill.classList.add('changing');
         setTimeout(() => {
-          m.innerHTML = rewardMsg;
-          m.classList.remove('changing');
-          // Add glow to pill if rewards are active
-          const pill = document.getElementById('mainRewardPill');
+          m.textContent = rewardMsg;
           if (pill) {
-            pill.classList.toggle('active-glow', totalItems >= 30);
+            pill.classList.remove('changing');
+            if (isConquestCrossing) {
+              pill.classList.add('conquest');
+              setTimeout(() => pill.classList.remove('conquest'), 800);
+            }
           }
         }, 300);
-      } else {
-        m.innerHTML = rewardMsg;
       }
     });
 
@@ -930,7 +958,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.promo-marker').forEach(m => {
       const goal = parseInt(m.getAttribute('data-goal'));
       m.classList.toggle('reached', totalItems >= goal);
+      // Logic for "Active" marker (the one the user is currently aiming for)
+      m.classList.toggle('active', totalItems < goal && (goal === 30 || (goal === 40 && totalItems >= 30) || (goal === 50 && totalItems >= 40)));
     });
+
+    // Update state trackers
+    window.lastTotalItems = totalItems;
+    window.lastStage = stage;
 
     // Re-inject Sticky Bar (Ideal Promo Bar) if missing
     let stickyBar = document.getElementById('stickyUpsellBar');
@@ -940,17 +974,24 @@ document.addEventListener('DOMContentLoaded', () => {
       stickyBar.className = 'sticky-upsell-bar';
       stickyBar.innerHTML = `
         <div class="promo-bar-wrapper">
-          <p class="promo-bar-text">Adicione itens e ganhe <b class="text-red">recompensas!</b></p>
+          <div class="reward-fixed-title">Desbloqueie recompensas adicionando mais itens</div>
           <div class="promo-bar-flex-row">
+            <div class="reward-pill-container">
+              <div class="reward-pill" id="stickyRewardPill">
+                <span class="promo-bar-text">Adicione itens para desbloquear recompensas</span>
+              </div>
+            </div>
             <div class="promo-bar-track">
               <div class="promo-bar-fill"><div class="promo-bar-energy"></div></div>
               <div class="promo-bar-markers">
-                <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
-                <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
-                <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
+                <div class="promo-marker" data-goal="30" style="left:60%"><span class="marker-icon">30</span></div>
+                <div class="promo-marker" data-goal="40" style="left:80%"><span class="marker-icon">40</span></div>
+                <div class="promo-marker" data-goal="50" style="left:100%"><span class="marker-icon">50</span></div>
               </div>
             </div>
-            <button class="btn-view-cart-white" onclick="window.toggleCartSidebar(true)">Ver carrinho</button>
+          </div>
+          <div class="btn-view-wrap">
+             <button class="btn-view-cart-white" onclick="window.toggleCartSidebar(true)">Ver carrinho</button>
           </div>
         </div>
       `;
