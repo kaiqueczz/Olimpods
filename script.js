@@ -817,7 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (list) list.innerHTML = '<div class="empty-cart-msg">Seu carrinho está vazio.</div>';
       if (totalEl) totalEl.textContent = 'R$ 0,00';
       allFills.forEach(f => f.style.width = '0%');
-      allMsgs.forEach(m => m.textContent = 'Adicione itens para desbloquear recompensas');
+      allMsgs.forEach(m => m.innerHTML = 'Adicione itens para desbloquear recompensas');
       if (window.currentSaleType === 'wholesale') {
         if (checkoutBtn) checkoutBtn.classList.add('disabled');
       }
@@ -887,19 +887,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (totalItems < 30) {
       stage = "1";
       nextGoal = 30;
-      rewardMsg = `Faltam ${30 - totalItems} unidades para ativar 5% OFF`;
+      rewardMsg = `Faltam ${30 - totalItems} unidades para <span class="highlight">ativar 5% OFF</span>`;
     } else if (totalItems >= 30 && totalItems < 40) {
       stage = "2";
       nextGoal = 40;
-      rewardMsg = (totalItems === 30) ? "5% OFF ativado! Continue adicionando" : `Faltam ${40 - totalItems} unidades para ganhar 1 Pod grátis`;
+      rewardMsg = (totalItems === 30) ? `<span class="highlight">5% OFF ativado!</span> Continue adicionando` : `Faltam ${40 - totalItems} unidades para <span class="highlight">ganhar 1 Pod grátis</span>`;
     } else if (totalItems >= 40 && totalItems < 50) {
       stage = "3";
       nextGoal = 50;
-      rewardMsg = `1 Pod grátis desbloqueado! Faltam ${50 - totalItems} para frete grátis`;
+      rewardMsg = `<span class="highlight">1 Pod grátis desbloqueado!</span> Faltam ${50 - totalItems} para <span class="highlight">frete grátis</span>`;
     } else {
       stage = "4";
       nextGoal = 50;
-      rewardMsg = "Frete grátis liberado + 1 Pod grátis";
+      rewardMsg = `<span class="highlight">Frete grátis + 1 Pod grátis</span> liberados`;
     }
 
     const totalSavingsValue = calculateTotalSavings(window.cart, totalItems);
@@ -931,10 +931,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     allMsgs.forEach(m => {
       const pill = m.closest('.reward-pill');
-      if (m.textContent !== rewardMsg) {
+      if (m.innerHTML !== rewardMsg) {
         if (pill) pill.classList.add('changing');
         setTimeout(() => {
-          m.textContent = rewardMsg;
+          m.innerHTML = rewardMsg;
           if (pill) {
             pill.classList.remove('changing');
             if (isConquestCrossing) {

@@ -4860,13 +4860,26 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 11px 30px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 12px 32px;
+    background: linear-gradient(135deg, rgba(255, 11, 85, 0.08), rgba(15, 15, 22, 0.95));
+    border: 1px solid rgba(255, 11, 85, 0.35);
     border-radius: 50px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 11, 85, 0.08);
     transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-    min-height: 42px;
+    min-height: 44px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle inner shimmer line */
+.reward-pill::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 11, 85, 0.3), transparent);
 }
 
 .reward-pill.changing {
@@ -4876,24 +4889,28 @@ body {
 
 .reward-pill.conquest {
     animation: conquest-flash 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-    border-color: rgba(255, 11, 85, 0.5);
-    box-shadow: 0 0 25px rgba(255, 11, 85, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 11, 85, 0.6);
+    box-shadow: 0 0 30px rgba(255, 11, 85, 0.2), 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes conquest-flash {
     0%, 100% { transform: scale(1); }
-    40% { transform: scale(1.04); }
+    40% { transform: scale(1.05); }
 }
 
 .promo-bar-text {
-    font-family: var(--font-body);
-    font-size: 0.88rem;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
     font-weight: 400;
-    color: #ffffff;
+    color: rgba(255, 255, 255, 0.85);
     white-space: nowrap;
-    letter-spacing: 0.2px;
-    line-height: 1.4;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    letter-spacing: 0.3px;
+    line-height: 1;
+}
+
+.promo-bar-text .highlight {
+    color: #fff;
+    font-weight: 600;
 }
 
 /* Redesigned Track */
