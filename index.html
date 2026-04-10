@@ -111,7 +111,6 @@
             <a href="#produtos" class="category-link" data-cat="elfbar">Elfbar</a>
             <a href="#produtos" class="category-link" data-cat="blacksheep">Black Sheep</a>
             <a href="#produtos" class="category-link" data-cat="ignite">Ignite</a>
-            <a href="#produtos" class="category-link" data-cat="lostmary">Lost Mary</a>
             <a href="#produtos" class="category-link" data-cat="all">Todos</a>
           </div>
         </div>
@@ -500,7 +499,31 @@
     <div class="container">
       <h2 class="gradual-spacing" data-text="Selecione seu pedido"></h2>
 
-
+      <!-- Main Page Rewards Section -->
+      <div class="main-page-rewards reveal" data-delay="1">
+        <div class="reward-intro-badge">
+          Desbloqueie recompensas exclusivas adicionando mais itens!
+        </div>
+        <div class="reward-pill-container">
+          <div class="reward-pill" id="mainRewardPill">
+            <span class="promo-bar-text" id="mainRewardText">Adicione itens e ganhe <b class="text-red">recompensas!</b></span>
+          </div>
+        </div>
+        
+        <!-- Main Page Progress Bar -->
+        <div class="promo-bar-wrapper main-page">
+          <div class="promo-bar-track">
+            <div class="promo-bar-fill" id="mainPageProgressFill">
+              <div class="promo-bar-energy"></div>
+            </div>
+            <div class="promo-bar-markers">
+              <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
+              <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
+              <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Sale Toggle -->
       <div class="sale-toggle-wrapper reveal" data-delay="1">
@@ -518,7 +541,6 @@
         <button class="tab-btn" data-category="ignite">Ignite</button>
         <button class="tab-btn" data-category="elfbar">Elfbar</a>
         <button class="tab-btn" data-category="blacksheep">Blacksheep</button>
-        <button class="tab-btn" data-category="lostmary">Lost Mary</button>
       </div>
 
       <!-- Products Grid -->
@@ -649,7 +671,6 @@
             <span class="promo-savings-label">Você já economizou:</span>
             <span class="promo-savings-value" id="savingsValue">R$ 0,00</span>
           </div>
-          <button class="btn-view-cart-white" onclick="window.toggleCartSidebar(true)">VER CARRINHO</button>
       </div>
     </div>
 

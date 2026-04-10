@@ -775,8 +775,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutBtn = document.getElementById('sidebarCheckoutBtn');
     
     // Standardized Selectors for Ideal Bar - Sidebar & Static versions
-    const allFills = document.querySelectorAll('.promo-bar-fill, #progressFill, #progressFillStatic, #progressFillCheckout');
-    const allMsgs = document.querySelectorAll('.promo-bar-text, #progressText, #progressTextStatic, #progressTextCheckout');
+    const allFills = document.querySelectorAll('.promo-bar-fill, #progressFill, #progressFillStatic, #progressFillCheckout, #mainPageProgressFill');
+    const allMsgs = document.querySelectorAll('.promo-bar-text, #progressText, #progressTextStatic, #progressTextCheckout, #mainRewardText');
     const allSavingsValues = document.querySelectorAll('.promo-savings-value, #savingsValue, #savingsValueStatic, #savingsValueCheckout');
     const allSavingsWrappers = document.querySelectorAll('.promo-savings, #savingsDisplay, #savingsDisplayStatic, #savingsDisplayCheckout');
     const progressBar = document.querySelector('.minimum-progress-container, .promo-bar-wrapper');
@@ -798,6 +798,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (checkoutBtn) checkoutBtn.classList.remove('disabled');
     } else {
       if (progressBar) progressBar.style.display = 'block';
+      // Wholesale MOQ: 10 units
+      if (totalItems >= 10) {
+        if (checkoutBtn) checkoutBtn.classList.remove('disabled');
+      } else {
+        if (checkoutBtn) checkoutBtn.classList.add('disabled');
+      }
     }
 
     // Guard: Only manipulate sidebar list if it exists on this page
@@ -811,6 +817,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (window.currentSaleType === 'wholesale') {
         if (checkoutBtn) checkoutBtn.classList.add('disabled');
       }
+      // Reset markers
+      document.querySelectorAll('.promo-marker').forEach(m => m.classList.remove('reached'));
+      // Hide savings
+      allSavingsWrappers.forEach(w => w.style.display = 'none');
       return;
     }
 
@@ -862,93 +872,98 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Wholesale specific progress bar updates
-    if (window.currentSaleType === 'wholesale') {
-      let fillPct = Math.min((totalItems / 50) * 100, 100);
-      let stage = "1";
-      let msg = '';
-      
-      if (totalItems < 30) {
-          stage = "1";
-          msg = `Faltam <b>${30 - totalItems}</b> unidades para ativar <b>5% OFF</b>`;
-      } else if (totalItems >= 30 && totalItems < 40) {
-          stage = "2";
-          msg = (totalItems === 30) ? `<b>5% OFF ativado!</b> Vale a partir da próxima unidade` : `<b>5% OFF ativo!</b> Faltam <b>${40 - totalItems}</b> para ganhar <b>1 POD GRÁTIS</b>`;
-      } else if (totalItems >= 40 && totalItems < 50) {
-          stage = "3";
-          msg = `🔥 <b>1 POD GRÁTIS</b> garantido! Faltam <b>${50 - totalItems}</b> para <b>FRETE GRÁTIS</b>`;
-      } else if (totalItems >= 50) {
-          stage = "4";
-          msg = `🚚 <b>FRETE GRÁTIS</b> liberado! (+ 1 POD GRÁTIS)`;
-      }
+    // =========================================
+    // IDEAL REWARD BAR CALCULATION
+    // =========================================
+    let stage = "1";
+    let rewardMsg = "";
+    let fillPct = Math.min((totalItems / 50) * 100, 100);
 
-      allFills.forEach(f => {
-          f.style.width = `${fillPct}%`;
-          f.setAttribute('data-stage', stage);
-      });
+    if (totalItems < 30) {
+      stage = "1";
+      rewardMsg = `Faltam <b class="text-red">${30 - totalItems}</b> unidades para <b class="text-red">5% OFF</b>`;
+    } else if (totalItems >= 30 && totalItems < 40) {
+      stage = "2";
+      rewardMsg = (totalItems === 30) ? "<b class=\"text-red\">5% OFF ATIVADO!</b>" : `Faltam <b class="text-red">${40 - totalItems}</b> para <b class="text-red">1 POD GRÁTIS</b>`;
+    } else if (totalItems >= 40 && totalItems < 50) {
+      stage = "3";
+      rewardMsg = `<b class="text-red">1 POD GRÁTIS!</b> Faltam <b class="text-red">${50 - totalItems}</b> para <b class="text-red">FRETE GRÁTIS</b>`;
+    } else {
+      stage = "4";
+      rewardMsg = "<b class=\"text-red\">FRETE GRÁTIS LIBERADO!</b> (+ 1 POD GRÁTIS)";
+    }
 
-      allMsgs.forEach(m => {
-          m.innerHTML = msg;
-          m.style.color = (totalItems >= 30) ? '#ff0b55' : '';
-      });
-      
-      const totalSv = calculateTotalSavings(window.cart, totalItems);
-      allSavingsValues.forEach(s => { s.textContent = `R$ ${totalSv.toFixed(2).replace('.', ',')}`; });
-      allSavingsWrappers.forEach(w => { w.style.display = (totalSv > 0) ? 'flex' : 'none'; });
+    const totalSavingsValue = calculateTotalSavings(window.cart, totalItems);
 
-      const updateMarkers = () => {
-          document.querySelectorAll('.promo-marker, .milestone-marker').forEach(m => {
-              const goal = parseInt(m.getAttribute('data-goal'));
-              if (totalItems >= goal) {
-                  if (!m.classList.contains('reached')) {
-                      m.classList.add('reached', 'pop-hit');
-                      setTimeout(() => m.classList.remove('pop-hit'), 400);
-                  }
-              } else { m.classList.remove('reached'); }
-          });
-      };
-      updateMarkers();
-
-      if (totalItems < 10) {
-        if (checkoutBtn) checkoutBtn.classList.add('disabled');
+    // Update all Ideal Bars (Sidebar, Product Page, Sticky)
+    allFills.forEach(f => {
+      f.style.width = `${fillPct}%`;
+      f.setAttribute('data-stage', stage);
+    });
+    
+    allMsgs.forEach(m => {
+      if (m.id === 'mainRewardText' && m.innerHTML !== rewardMsg) {
+        m.classList.add('changing');
+        setTimeout(() => {
+          m.innerHTML = rewardMsg;
+          m.classList.remove('changing');
+          // Add glow to pill if rewards are active
+          const pill = document.getElementById('mainRewardPill');
+          if (pill) {
+            pill.classList.toggle('active-glow', totalItems >= 30);
+          }
+        }, 300);
       } else {
-        if (checkoutBtn) checkoutBtn.classList.remove('disabled');
+        m.innerHTML = rewardMsg;
       }
+    });
 
-      // Re-inject Sticky Bar if missing
-      let stickyBar = document.getElementById('stickyUpsellBar');
-      if (!stickyBar && !document.querySelector('.promo-bar-wrapper-static')) {
-          stickyBar = document.createElement('div');
-          stickyBar.id = 'stickyUpsellBar';
-          stickyBar.className = 'sticky-upsell-bar';
-          stickyBar.innerHTML = `
-            <div class="promo-bar-wrapper">
-                <div class="promo-bar-main-row">
-                    <div class="promo-bar-track-group">
-                        <div class="promo-bar-text">Adicione itens e ganhe recompensas!</div>
-                        <div class="promo-bar-track">
-                            <div class="promo-bar-fill"><div class="promo-bar-energy"></div></div>
-                            <div class="promo-bar-markers">
-                                <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
-                                <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
-                                <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn-view-cart-white" onclick="window.toggleCartSidebar(true)">VER CARRINHO</button>
-                </div>
-                <div id="savingsDisplay" class="promo-savings" style="display:none;">
-                    <span class="promo-savings-label">Você já economizou:</span>
-                    <span class="promo-savings-value" id="savingsValue">R$ 0,00</span>
-                </div>
+    allSavingsValues.forEach(s => {
+      s.textContent = `R$ ${totalSavingsValue.toFixed(2).replace('.', ',')}`;
+    });
+
+    allSavingsWrappers.forEach(w => {
+      w.style.display = (totalSavingsValue > 0) ? 'flex' : 'none';
+    });
+
+    // Update Milestones (Markers)
+    document.querySelectorAll('.promo-marker').forEach(m => {
+      const goal = parseInt(m.getAttribute('data-goal'));
+      m.classList.toggle('reached', totalItems >= goal);
+    });
+
+    // Re-inject Sticky Bar (Ideal Promo Bar) if missing
+    let stickyBar = document.getElementById('stickyUpsellBar');
+    if (!stickyBar && !window.location.pathname.includes('checkout')) {
+      stickyBar = document.createElement('div');
+      stickyBar.id = 'stickyUpsellBar';
+      stickyBar.className = 'sticky-upsell-bar';
+      stickyBar.innerHTML = `
+        <div class="promo-bar-wrapper">
+          <p class="promo-bar-text">Adicione itens e ganhe <b class="text-red">recompensas!</b></p>
+          <div class="promo-bar-flex-row">
+            <div class="promo-bar-track">
+              <div class="promo-bar-fill"><div class="promo-bar-energy"></div></div>
+              <div class="promo-bar-markers">
+                <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
+                <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
+                <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
+              </div>
             </div>
-          `;
-          document.body.appendChild(stickyBar);
-      }
+            <button class="btn-view-cart-white" onclick="window.toggleCartSidebar(true)">Ver carrinho</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(stickyBar);
+      // Re-trigger calculation to update the newly created bar
+      renderSidebarCart();
+    }
 
-      if (stickyBar) {
-          if (totalItems > 0) stickyBar.classList.add('active');
-          else stickyBar.classList.remove('active');
+    if (stickyBar) {
+      if (totalItems > 0 && window.currentSaleType === 'wholesale') {
+        stickyBar.classList.add('active');
+      } else {
+        stickyBar.classList.remove('active');
       }
     }
   }
@@ -1285,7 +1300,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ],
         "price": "105.00",
         "retail_price": "160.00",
-        "image": "assets/img/blacksheep_30k.webp",
+        "image": "assets/img/blacksheep_40k.png",
         "retail_available": true
       },
       {
@@ -1314,7 +1329,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ],
         "price": "95.00",
         "retail_price": "145.00",
-        "image": "assets/img/blacksheep_30k.webp",
+        "image": "assets/img/blacksheep_30k.png",
         "retail_available": true
       },
       {
@@ -1334,35 +1349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ],
         "price": "90.00",
         "retail_price": "135.00",
-        "image": "assets/img/blacksheep_30k.webp",
-        "retail_available": true
-      },
-      {
-        "id": "lost-mary-20k",
-        "brand": "lostmary",
-        "name": "Lost Mary 20k",
-        "flavors": [
-          "Lime grapefruit",
-          "Icy mint"
-        ],
-        "price": "95.00",
-        "retail_price": "145.00",
-        "image": "assets/img/lostmary_20k.jpg",
-        "retail_available": true
-      },
-      {
-        "id": "lost-mary-35k",
-        "brand": "lostmary",
-        "name": "Lost Mary 35k Dura 🆕",
-        "flavors": [
-          "Grapefruit passion guava",
-          "Miami mint",
-          "Hawaiian juice",
-          "Hawaiian mint"
-        ],
-        "price": "105.00",
-        "retail_price": "160.00",
-        "image": "assets/img/Lostmary_35k.webp",
+        "image": "assets/img/blacksheep_25k.png",
         "retail_available": true
       }
     ];

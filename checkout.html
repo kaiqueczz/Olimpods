@@ -264,19 +264,22 @@
 
             <aside class="checkout-summary">
                 <div class="summary-card glow-card">
-                    <h3 class="summary-title" style="margin-bottom: 15px;">Resumo do Pedido</h3>
+                    <h3 class="summary-title" id="summaryTitle">Resumo do Pedido</h3>
                     
-                    <div class="promo-bar-wrapper checkout-promo" id="checkoutPromoBar" style="margin: -10px 0 20px 0;">
-                      <p class="promo-bar-text" id="checkoutStaticMsg">Adicione itens e ganhe <b class="text-red">recompensas!</b></p>
+                    <!-- REWARD COMPONENT (CHECKOUT - SIDEBAR) -->
+                    <div class="promo-bar-wrapper" id="checkoutPromoBar" style="margin-top: 10px; margin-bottom: 20px;">
+                      <p class="promo-bar-text" id="progressTextCheckout" style="position:relative; bottom: 0; margin-bottom: 8px;">Adicione itens e ganhe <b class="text-red">recompensas!</b></p>
                       <div class="promo-bar-track">
-                        <div class="promo-bar-fill" id="checkoutStaticProgress">
-                          <div class="promo-bar-energy"></div>
-                        </div>
+                        <div class="promo-bar-fill" id="progressFillCheckout"><div class="promo-bar-energy"></div></div>
                         <div class="promo-bar-markers">
                           <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
                           <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
                           <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
                         </div>
+                      </div>
+                      <div id="savingsDisplaySummary" class="promo-savings" style="display:none; margin-top: 10px;">
+                        <span class="promo-savings-label">Você já economizou:</span>
+                        <span class="promo-savings-value" id="savingsValueSummary">R$ 0,00</span>
                       </div>
                     </div>
 
@@ -317,7 +320,7 @@
             <div class="checkout-upsell-promo">
                 <h2 class="upsell-title">Desbloqueie <span>recompensas exclusivas</span> adicionando mais itens!</h2>
 
-                <div class="promo-bar-wrapper" id="promoBarWrapperCheckout" style="max-width: 600px; margin: 40px auto 20px;">
+                <div class="promo-bar-wrapper" id="promoBarWrapperCheckout">
                     <p class="promo-bar-text" id="progressTextCheckout">Adicione itens e ganhe <b class="text-red">recompensas!</b></p>
                     <div class="promo-bar-track">
                         <div class="promo-bar-fill" id="progressFillCheckout"><div class="promo-bar-energy"></div></div>
@@ -327,12 +330,9 @@
                             <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
                         </div>
                     </div>
-                    <div class="promo-bar-footer-row">
-                        <div id="savingsDisplayCheckout" class="promo-savings" style="display:none;">
-                            <span class="promo-savings-label">Você já economizou:</span>
-                            <span class="promo-savings-value" id="savingsValueCheckout">R$ 0,00</span>
-                        </div>
-                        <button class="btn-view-cart-white" onclick="window.toggleCartSidebar(true)">VER CARRINHO</button>
+                    <div id="savingsDisplayCheckout" class="promo-savings" style="display:none; margin-top: 10px;">
+                        <span class="promo-savings-label">Você já economizou:</span>
+                        <span class="promo-savings-value" id="savingsValueCheckout">R$ 0,00</span>
                     </div>
                 </div>
 

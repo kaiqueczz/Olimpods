@@ -536,14 +536,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 imgSrc = 'Images Pods/' + imgSrc;
             }
 
-            const unitPriceHtml = hasDiscount 
-                ? `<span style="text-decoration: line-through; color: #888; font-size: 0.75rem;">R$ ${price.toFixed(2).replace('.', ',')}</span> <span style="color: #ff0b55;">R$ ${(price * 0.95).toFixed(2).replace('.', ',')}</span>`
-                : `R$ ${price.toFixed(2).replace('.', ',')}`;
-
-            const totalItemPriceHtml = hasDiscount
-                ? `R$ ${(itemTotal * 0.95).toFixed(2).replace('.', ',')}`
-                : `R$ ${itemTotal.toFixed(2).replace('.', ',')}`;
-
             itemEl.innerHTML = `
                 <div class="item-img">
                     <img src="${imgSrc}" alt="${item.name}" onerror="this.src='assets/logo-ignite.png'">
@@ -552,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="item-name">${item.name}</span>
                     <span class="item-flavor">Sabor: ${item.flavor || 'N/A'}</span>
                     <div class="item-price-unit" style="font-size: 0.8rem; margin-top: 4px; color: #888;">
-                        ${unitPriceHtml}
+                        R$ ${price.toFixed(2).replace('.', ',')}
                     </div>
                     <div class="item-controls">
                         <div class="qty-stepper">
@@ -564,7 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
                 <div class="item-price" style="font-weight: 800; color: #fff; font-size: 1rem; text-align: right;">
-                    ${totalItemPriceHtml}
+                    R$ ${itemTotal.toFixed(2).replace('.', ',')}
                 </div>
             `;
 
@@ -605,11 +597,13 @@ document.addEventListener('DOMContentLoaded', () => {
             msg = (totalItems === 30) ? `<b>5% OFF ativado!</b> Vale a partir da próxima unidade` : `<b>5% OFF ativo!</b> Faltam <b>${40 - totalItems}</b> para ganhar <b>1 POD GRÁTIS</b>`;
         } else if (totalItems >= 40 && totalItems < 50) {
             stage = "3";
-            msg = `🔥 <b>1 POD GRÁTIS</b> garantido! Faltam <b>${50 - totalItems}</b> para <b>FRETE GRÁTIS</b>`;
+            msg = `<b>1 POD GRÁTIS</b> garantido! Faltam <b>${50 - totalItems}</b> para <b>FRETE GRÁTIS</b>`;
         } else if (totalItems >= 50) {
             stage = "4";
-            msg = `🚚 <b>FRETE GRÁTIS</b> liberado! (+ 1 POD GRÁTIS)`;
+            msg = `<b>FRETE GRÁTIS</b> liberado! (+ 1 POD GRÁTIS)`;
         }
+        
+        let fillPct = Math.min((totalItems / 50) * 100, 100);
         
         const calculateDisplaySavings = () => {
             if (totalItems <= 30) return 0;
@@ -627,20 +621,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const totalSavedVal = calculateDisplaySavings();
         
-        // Update all bars on checkout
-        const allFills = document.querySelectorAll('.promo-bar-fill, #progressFillCheckout, #progressFillStatic');
-        const allMsgs = document.querySelectorAll('.promo-bar-text, #progressTextCheckout, #progressTextStatic');
-        const allSavingsValues = document.querySelectorAll('.promo-savings-value, #savingsValueCheckout, #savingsValueStatic');
-        const allSavingsWrappers = document.querySelectorAll('.promo-savings, #savingsDisplayCheckout, #savingsDisplayStatic');
-        const allMarkers = document.querySelectorAll('.promo-marker, .milestone-marker');
+        // Update all Ideal Bars on checkout
+        const allFills = document.querySelectorAll('.promo-bar-fill, #progressFillCheckout');
+        const allMsgs = document.querySelectorAll('.promo-bar-text, #progressTextCheckout');
+        const allSavingsValues = document.querySelectorAll('.promo-savings-value, #savingsValueCheckout, #savingsValueSummary');
+        const allSavingsWrappers = document.querySelectorAll('.promo-savings, #savingsDisplayCheckout, #savingsDisplaySummary');
+        const allMarkers = document.querySelectorAll('.promo-marker');
 
         allFills.forEach(f => {
             f.style.width = `${fillPct}%`;
             f.setAttribute('data-stage', stage);
         });
+        
         allMsgs.forEach(m => { 
             m.innerHTML = msg; 
-            m.style.color = (totalItems >= 30) ? '#ff0b55' : '';
+            if (totalItems >= 30) m.classList.add('active');
+            else m.classList.remove('active');
         });
         
         allSavingsValues.forEach(s => { s.textContent = `R$ ${totalSavedVal.toFixed(2).replace('.', ',')}`; });
@@ -648,13 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         allMarkers.forEach(m => {
             const goal = parseInt(m.getAttribute('data-goal'));
-            if (totalItems >= goal) {
-                if (!m.classList.contains('reached')) {
-                    m.classList.add('reached');
-                }
-            } else {
-                m.classList.remove('reached');
-            }
+            m.classList.toggle('reached', totalItems >= goal);
         });
 
         // --- Recalculate Totals & Update UI ---
@@ -767,8 +757,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const totalItems = checkoutCart.reduce((sum, item) => sum + item.quantity, 0);
-            if (!window.selectedShippingMethod && totalItems < 50 && localStorage.getItem('ignite_sale_type') !== 'retail') {
+            const totalItemsCount = checkoutCart.reduce((sum, item) => sum + parseInt(item.quantity || 0), 0);
+            if (!window.selectedShippingMethod && totalItemsCount < 50 && localStorage.getItem('ignite_sale_type') !== 'retail') {
                 alert("Por favor, selecione uma opção de entrega antes de finalizar o pedido.");
                 return;
             }
@@ -794,11 +784,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Re-calcular total com base na nova lógica de escala exclusiva
             const baseSubtotal = items.reduce((sum, i) => sum + (parseFloat(i.price) * i.quantity), 0);
-            const totalItemsCount = items.reduce((sum, i) => sum + i.quantity, 0);
+            const totalItemsCountSubmit = items.reduce((sum, i) => sum + i.quantity, 0);
             let discount = 0;
             
             // 5% ONLY on units above 30 (max 10 units, i.e. 31-40)
-            if (totalItemsCount > 30) {
+            if (totalItemsCountSubmit > 30) {
                 const avgPrice = baseSubtotal / totalItemsCount;
                 const extraUnits = Math.min(totalItemsCount - 30, 10);
                 discount = extraUnits * avgPrice * 0.05;
@@ -919,7 +909,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         city: document.getElementById('city').value,
                         state: document.getElementById('state').value,
                         cost: shippingVal,
-                        method: shippingMethod
+                        method: shippingMethodLabel
                     },
                     items: items.map(i => ({
                         name: i.name,
@@ -986,7 +976,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Meta Pixel: Purchase
                 if (window.fbq) {
-                    const totalValue = parseFloat(document.getElementById('final-total')?.textContent.replace('R$ ', '').replace(',', '.')) || 0;
+                    const totalValueEl = document.getElementById('summary-total');
+                    const totalValue = totalValueEl ? parseFloat(totalValueEl.textContent.replace('R$ ', '').replace('.', '').replace(',', '.')) : 0;
                     fbq('track', 'Purchase', {
                         value: totalValue,
                         currency: 'BRL',
@@ -1001,7 +992,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
-            function startPixCountdown(orderObj, ordersList) {
+            function startPixCountdown(orderObj) {
                 const timerEl = document.getElementById('pix-countdown');
                 const statusTitle = document.getElementById('payment-status-title');
                 let timeLeft = 600; // 10 minutes
@@ -1053,7 +1044,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (paymentDetails) paymentDetails.classList.add('hidden');
 
                     orderObj.status = "Pago & Aprovado";
-                    localStorage.setItem('userOrders', JSON.stringify(ordersList));
+                    const currentOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+                    const orderIdx = currentOrders.findIndex(o => o.id === orderObj.id);
+                    if (orderIdx !== -1) {
+                        currentOrders[orderIdx].status = orderObj.status;
+                        localStorage.setItem('userOrders', JSON.stringify(currentOrders));
+                    }
                     
                     // Trigger PDF generation on server
                     const payUrl = `${API_BASE}/api/orders/${orderObj.id}/pay`;

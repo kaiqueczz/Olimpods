@@ -265,7 +265,7 @@ const PRODUCTS_DATA = [
     ],
     "price": "105.00",
     "retail_price": "160.00",
-    "image": "assets/img/blacksheep_30k.webp",
+    "image": "assets/img/blacksheep_40k.png",
     "retail_available": true
   },
   {
@@ -294,7 +294,7 @@ const PRODUCTS_DATA = [
     ],
     "price": "95.00",
     "retail_price": "145.00",
-    "image": "assets/img/blacksheep_30k.webp",
+    "image": "assets/img/blacksheep_30k.png",
     "retail_available": true
   },
   {
@@ -314,35 +314,7 @@ const PRODUCTS_DATA = [
     ],
     "price": "90.00",
     "retail_price": "135.00",
-    "image": "assets/img/blacksheep_30k.webp",
-    "retail_available": true
-  },
-  {
-    "id": "lost-mary-20k",
-    "brand": "lostmary",
-    "name": "Lost Mary 20k",
-    "flavors": [
-      "Lime grapefruit",
-      "Icy mint"
-    ],
-    "price": "95.00",
-    "retail_price": "145.00",
-    "image": "assets/img/lostmary_20k.jpg",
-    "retail_available": true
-  },
-  {
-    "id": "lost-mary-35k",
-    "brand": "lostmary",
-    "name": "Lost Mary 35k Dura 🆕",
-    "flavors": [
-      "Grapefruit passion guava",
-      "Miami mint",
-      "Hawaiian juice",
-      "Hawaiian mint"
-    ],
-    "price": "105.00",
-    "retail_price": "160.00",
-    "image": "assets/img/Lostmary_35k.webp",
+    "image": "assets/img/blacksheep_25k.png",
     "retail_available": true
   }
 ];
