@@ -1544,6 +1544,27 @@ body {
   z-index: 2;
 }
 
+.btn-view-cart-white {
+  background: #fff;
+  color: #050507;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 50px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.75rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+}
+
+.btn-view-cart-white:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
+  background: #f8f8f8;
+}
+
 .reward-pill-container {
   display: flex;
   justify-content: center;
@@ -2515,6 +2536,15 @@ body {
   grid-template-columns: repeat(4, 1fr);
   gap: 48px;
   margin-bottom: 40px;
+}
+
+.gradual-spacing {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 8vw, 3.5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.95;
+  margin-bottom: 24px;
 }
 
 .footer-col h4 {
