@@ -416,6 +416,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
         const isFreeShipping = (saleType === 'wholesale' && totalItems >= 50);
 
+        // Sort: Transportadoras first (Jadlog, Loggi), then Correios
+        const transportadoras = options.filter(o => o.carrier !== 'Correios').sort((a, b) => a.price - b.price);
+        const correios = options.filter(o => o.carrier === 'Correios').sort((a, b) => a.price - b.price);
+        const sorted = [...transportadoras, ...correios];
+
         let htmlContent = '';
         
         htmlContent += `<div style="margin-top: 20px; margin-bottom: 20px; font-weight: 700; color: #fff; font-size: 1.15rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
@@ -423,16 +428,20 @@ document.addEventListener('DOMContentLoaded', () => {
             <span style="font-weight: 400; font-size: 0.8rem; color: #888;">Simulado em tempo real</span>
         </div>`;
 
-        options.forEach(opt => {
+        sorted.forEach((opt, index) => {
             const currentPrice = isFreeShipping ? 0 : opt.price;
             const displayName = `${opt.carrier} - ${opt.type}`;
             const displayPrice = currentPrice === 0 ? 'GRÁTIS' : `R$ ${currentPrice.toFixed(2).replace('.', ',')}`;
             
             // Auto-select if it's the only one or if it was re-calculated
-            const isSelected = window.selectedShippingMethod === displayName || (options.length === 1);
+            const isSelected = window.selectedShippingMethod === displayName || (sorted.length === 1) || (index === 0 && !window.selectedShippingMethod);
+
+            // "Mais indicado" badge on the first transportadora
+            const isRecommended = (index === 0 && opt.carrier !== 'Correios');
 
             htmlContent += `
-                <label class="shipping-option ${currentPrice === 0 ? 'promo-option' : ''}" style="display:flex; justify-content:space-between; align-items:center; background:${currentPrice === 0 ? 'rgba(255,11,85,0.08)' : 'rgba(255,255,255,0.03)'}; padding:15px; border-radius:8px; cursor:pointer; border:1px solid ${currentPrice === 0 ? 'var(--accent-primary)' : 'rgba(255,255,255,0.1)'}; transition: all 0.3s ease; margin-bottom: 10px;">
+                <label class="shipping-option ${currentPrice === 0 ? 'promo-option' : ''}" style="display:flex; justify-content:space-between; align-items:center; background:${currentPrice === 0 ? 'rgba(255,11,85,0.08)' : 'rgba(255,255,255,0.03)'}; padding:15px; border-radius:8px; cursor:pointer; border:1px solid ${isRecommended ? 'rgba(255, 11, 85, 0.35)' : (currentPrice === 0 ? 'var(--accent-primary)' : 'rgba(255,255,255,0.1)')}; transition: all 0.3s ease; margin-bottom: 10px; position: relative;">
+                    ${isRecommended ? '<span style="position:absolute; top:-9px; right:15px; background:#ff0033; color:#fff; font-family:var(--font-display); font-size:0.6rem; font-weight:700; padding:3px 10px; border-radius:50px; letter-spacing:0.5px; text-transform:uppercase;">Mais indicado</span>' : ''}
                     <div style="display:flex; align-items:center; gap:15px;">
                         <input type="radio" name="shippingMethod" value="${currentPrice}" data-name="${displayName}" onchange="updateShippingSelection(this)" ${isSelected ? 'checked' : ''} style="accent-color: var(--accent-primary); width: 20px; height: 20px; cursor: pointer;">
                         <div class="shipping-info" style="display:flex; flex-direction:column;">
