@@ -400,6 +400,22 @@ body.checkout-page {
     text-align: left !important;
 }
 
+/* Summary promo bar — left-aligned grid */
+.summary-card .promo-bar-wrapper {
+    width: 100% !important;
+    margin: 10px 0 16px !important;
+    padding: 0 !important;
+}
+
+.summary-card .promo-summary-text {
+    text-align: left !important;
+    font-size: 0.85rem !important;
+}
+
+.summary-card .promo-bar-track {
+    margin-right: 14px;
+}
+
 
 .cart-items {
     display: flex;

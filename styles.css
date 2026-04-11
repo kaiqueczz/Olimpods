@@ -4765,11 +4765,11 @@ body {
 /* Summary-only text (sidebar cart, checkout order summary) */
 .promo-summary-text {
     font-family: var(--font-display);
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     font-weight: 500;
     font-style: normal;
     color: rgba(255, 255, 255, 0.6);
-    text-align: center;
+    text-align: left;
     margin: 0 0 12px;
     letter-spacing: 0.2px;
 }
@@ -4845,71 +4845,76 @@ body {
     font-weight: 600 !important;
 }
 
-/* Redesigned Track */
+/* ===== BARRINHA IDEAL — Design Original ===== */
 .promo-bar-track {
     position: relative;
-    height: 12px;
-    background: rgba(255, 255, 255, 0.05);
+    height: 10px;
+    background: rgba(255, 255, 255, 0.06);
     border-radius: 50px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    display: flex;
-    align-items: center;
     overflow: visible;
-    margin-bottom: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-right: 14px;
 }
 
-.promo-bar-track.intense-glow {
-    animation: intense-pulse 1.5s infinite alternate;
+/* Passing Glow */
+.promo-bar-energy {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+    animation: energy-ray 2s infinite linear;
+    border-radius: 50px;
 }
 
-@keyframes intense-pulse {
-    from { box-shadow: 0 0 5px rgba(255, 11, 85, 0.2); }
-    to { box-shadow: 0 0 20px rgba(255, 11, 85, 0.6); }
+@keyframes energy-ray {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 .promo-bar-fill {
     height: 100%;
     border-radius: 50px;
-    background: linear-gradient(90deg, #FF0B55 0%, #FF4D7F 100%);
     width: 0%;
+    background: #ff0033;
+    box-shadow: 0 0 6px rgba(255, 0, 51, 0.3);
     transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1);
     position: relative;
-    box-shadow: 0 0 15px rgba(255, 11, 85, 0.5);
     z-index: 2;
+    overflow: hidden;
 }
 
-.promo-bar-fill.pulse {
-    animation: bar-pulse 0.4s ease;
-}
+/* Stage intensities */
+.promo-bar-fill[data-stage="1"] { background: #ff0033; }
+.promo-bar-fill[data-stage="2"] { background: linear-gradient(90deg, #ff0033, #ff1a4d); }
+.promo-bar-fill[data-stage="3"] { background: linear-gradient(90deg, #ff0033, #ff4d8d, #ff0033); }
+.promo-bar-fill[data-stage="4"] { background: linear-gradient(90deg, #ff0033, #ff1a4d, #ff4d8d, #ff0033); }
 
-@keyframes bar-pulse {
-    0%, 100% { transform: scaleY(1); }
-    50% { transform: scaleY(1.2); }
-}
-
-/* Markers States */
+/* Markers (Milestones 30/40/50) */
 .promo-bar-markers {
     position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    transform: translateY(-50%);
-    z-index: 3;
+    top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none;
+    z-index: 3;
 }
 
 .promo-marker {
     position: absolute;
-    transform: translate(-50%, 0);
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
     background: #111;
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 5;
+}
+
+.promo-marker span,
+.promo-marker .marker-icon {
+    font-size: 9px;
     font-weight: 800;
     color: rgba(255, 255, 255, 0.3);
 }
@@ -4921,7 +4926,8 @@ body {
     transform: translate(-50%, -50%) scale(1.25);
 }
 
-.promo-marker.reached span {
+.promo-marker.reached span,
+.promo-marker.reached .marker-icon {
     color: #fff;
 }
 
@@ -4935,28 +4941,6 @@ body {
     40% { transform: translate(-50%, -50%) scale(1.8); box-shadow: 0 0 20px #ff0033; }
     70% { transform: translate(-50%, -50%) scale(1.1); }
     100% { transform: translate(-50%, -50%) scale(1.25); }
-}
-
-/* Labels below track */
-.promo-bar-labels {
-    position: relative;
-    height: 20px;
-    margin-top: 4px;
-}
-
-.promo-label {
-    position: absolute;
-    transform: translateX(-50%);
-    font-size: 8px;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.25);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    transition: color 0.3s;
-}
-
-.promo-label.active {
-    color: #ff0033;
 }
 
 /* Savings Display */
