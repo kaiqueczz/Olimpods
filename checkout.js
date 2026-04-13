@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 0. API Config
     // =========================================
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const isNodePort = window.location.port === '3000';
-    const API_BASE = (isLocalhost && !isNodePort) ? 'http://localhost:3000' : '';
+    const isNodePort = window.location.port === '3001';
+    const API_BASE = (isLocalhost && !isNodePort) ? 'http://localhost:3001' : '';
 
     // DOM Elements - Initialized early to avoid ReferenceErrors
     const summaryItems = document.getElementById('summary-items');
@@ -831,7 +831,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log(`🔄 PIX: Tentativa ${attempt}/${MAX_RETRIES}...`);
 
                 try {
-                    let apiUrl = `/api/pix`;
+                    let apiUrl = `${API_BASE}/api/pix`;
                     let fetchOptions = {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -943,7 +943,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Push to Backend
-                let apiUrl = `/api/orders/new`;
+                let apiUrl = `${API_BASE}/api/orders/new`;
                 let fetchOptions = {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

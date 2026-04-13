@@ -973,24 +973,18 @@ document.addEventListener('DOMContentLoaded', () => {
       stickyBar.id = 'stickyUpsellBar';
       stickyBar.className = 'sticky-upsell-bar';
       stickyBar.innerHTML = `
-        <div class="promo-bar-wrapper">
-          <div class="promo-bar-flex-row">
-            <div class="reward-pill-container">
-              <div class="reward-pill" id="stickyRewardPill">
-                <span class="promo-bar-text">Adicione itens para desbloquear recompensas</span>
-              </div>
-            </div>
+        <div class="sticky-bar-inner">
+          <span class="promo-bar-text" id="stickyPromoText">Adicione itens e ganhe <b class="text-red">recompensas!</b></span>
+          <div class="sticky-bar-row">
             <div class="promo-bar-track">
               <div class="promo-bar-fill"><div class="promo-bar-energy"></div></div>
               <div class="promo-bar-markers">
-                <div class="promo-marker" data-goal="30" style="left:60%"><span class="marker-icon">30</span></div>
-                <div class="promo-marker" data-goal="40" style="left:80%"><span class="marker-icon">40</span></div>
-                <div class="promo-marker" data-goal="50" style="left:100%"><span class="marker-icon">50</span></div>
+                <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
+                <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
+                <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
               </div>
             </div>
-          </div>
-          <div class="btn-view-wrap">
-             <button class="btn-view-cart-white" onclick="window.toggleCartSidebar(true)">Ver carrinho</button>
+            <button class="sticky-bar-btn" onclick="window.toggleCartSidebar(true)">VER CARRINHO</button>
           </div>
         </div>
       `;

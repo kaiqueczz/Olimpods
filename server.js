@@ -221,7 +221,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     // ── API Routes (Proxy) ──
-    if (req.method === 'POST' && pathname === '/api/pix/qrcode') {
+    if (req.method === 'POST' && (pathname === '/api/pix/qrcode' || pathname === '/api/pix')) {
         // Generate PIX QR Code
         const body = await readBody(req);
         console.log('🔄 PIX QRCode request...');

@@ -30,10 +30,10 @@ echo "✅ Node.js encontrado: $(node -v)"
 echo ""
 
 # Verificar se a porta já está em uso
-if lsof -i :3000 &> /dev/null; then
-    echo "⚠️  A porta 3000 já está em uso."
+if lsof -i :3001 &> /dev/null; then
+    echo "⚠️  A porta 3001 já está em uso."
     echo "   Encerrando processo anterior..."
-    lsof -ti :3000 | xargs kill -9 2>/dev/null
+    lsof -ti :3001 | xargs kill -9 2>/dev/null
     sleep 1
     echo "✅ Porta liberada!"
 fi

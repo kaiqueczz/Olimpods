@@ -5149,108 +5149,140 @@ body {
    UNIVERSAL ELITE STICKY BAR
    ============================================ */
 
+/* =============================================
+   STICKY BAR — ISOLATED DESIGN (Barrinha Ideal)
+   ============================================= */
 .sticky-upsell-bar {
     position: fixed;
-    bottom: -150px; /* Hidden by default */
+    bottom: -150px;
     left: 50%;
     transform: translateX(-50%);
-    width: 100%;
-    max-width: 760px; /* Aumentado em ~15% para visual alongado premium */
+    width: 80%; /* Longer again as requested */
+    max-width: 700px; /* Increased length */
     background: rgba(10, 10, 10, 0.96);
     backdrop-filter: blur(25px) saturate(220%);
     -webkit-backdrop-filter: blur(25px) saturate(220%);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-top: 1px solid rgba(255, 11, 85, 0.45);
-    border-radius: 100px; 
-    padding: 16px 26px; /* Reduzido em 20% (de 20px 32px para 16px 26px) */
+    border-radius: 100px; /* Pill shape */
+    padding: 8px 24px; /* Slimmer (fina) vertically */
     z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
     box-shadow: 0 -10px 40px rgba(0,0,0,0.5), 0 0 20px rgba(255,11,85,0.05);
     transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-}
-
-.sticky-upsell-bar .promo-bar-wrapper {
-    width: 100%;
-    margin: 0;
 }
 
 .sticky-upsell-bar.active {
     bottom: 25px;
 }
 
-/* Hide savings from sticky bar as per user request */
-.sticky-upsell-bar .promo-savings {
-    display: none !important;
-}
-
-/* New Flex Row for Bar + Button */
-.sticky-upsell-bar .promo-bar-flex-row {
-    display: flex;
-    align-items: center;
-    gap: 60px; /* Puxando o botão bem para a direita */
+/* Inner container */
+.sticky-bar-inner {
     width: 100%;
+    position: relative;
 }
 
-.sticky-upsell-bar .promo-bar-track {
-    flex: 1;
-    margin-right: 0; /* Removing right margin to center better with the button */
-}
-
-/* Positioning text exactly in the gap between the top border and the progress track */
+/* Promo text: flush-left, 4-5px above the track */
 .sticky-upsell-bar .promo-bar-text {
-    position: absolute !important;
-    top: -11px !important; /* Centro exato do espaço vazio superior (considerando padding 16px) */
-    bottom: auto !important;
-    left: 26px !important;
-    width: auto;
-    font-size: 0.65rem !important;
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #ff0b55;
     letter-spacing: 0.3px;
     text-align: left;
-    margin: 0 !important;
-    color: #ff0b55;
-    font-weight: 800;
-    z-index: 10;
+    margin: 0 0 -1px 0; /* Quase encostado na linha */
+    padding: 0;
+    position: static;
+    width: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Sticky Bar Layout Optimizations */
-.sticky-upsell-bar .promo-bar-wrapper {
-    width: 100%;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.sticky-upsell-bar .promo-bar-flex-row {
+/* Horizontal row: track + button side by side, centered */
+.sticky-bar-row {
     display: flex;
     align-items: center;
-    gap: 20px;
-    width: 100%;
-}
-
-.sticky-upsell-bar .btn-view-wrap {
-    width: 100%;
-    display: flex;
     justify-content: center;
+    gap: 16px;
+    width: 100%;
 }
 
-@media (max-width: 768px) {
-    .sticky-upsell-bar .promo-bar-flex-row {
-        flex-direction: column;
-        gap: 15px;
+/* Track fills the remaining space */
+.sticky-upsell-bar .promo-bar-track {
+    flex: 1;
+    position: relative;
+    height: 6px; /* Fina (slimmer track) */
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 50px;
+    overflow: visible;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-right: 12px; /* space for marker 50 at 100% */
+}
+
+/* Markers scoped to sticky */
+.sticky-upsell-bar .promo-marker {
+    width: 20px;
+    height: 20px;
+}
+
+.sticky-upsell-bar .promo-marker span {
+    font-size: 8px;
+}
+
+/* Ver Carrinho button */
+.sticky-bar-btn {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 100px;
+    padding: 6px 16px; /* Slimmer button to match */
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.sticky-bar-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Mobile overrides */
+@media (max-width: 600px) {
+    .sticky-upsell-bar {
+        width: 92%;
+        padding: 12px 18px;
+        border-radius: 20px; /* slightly less pill on mobile for space */
     }
-    .sticky-upsell-bar .upsell-message {
-        font-size: 0.65rem;
+
+    .sticky-bar-row {
+        gap: 10px;
     }
-    .sticky-upsell-bar .btn-view-cart {
-        padding: 5px 10px;
-        font-size: 0.6rem;
+
+    .sticky-upsell-bar .promo-bar-text {
+        font-size: 0.55rem;
+    }
+
+    .sticky-bar-btn {
+        padding: 6px 12px;
+        font-size: 0.55rem;
+    }
+
+    .sticky-upsell-bar .promo-marker {
+        width: 16px;
+        height: 16px;
+    }
+
+    .sticky-upsell-bar .promo-marker span {
+        font-size: 7px;
     }
 }
+
 
 /* ============================================
    MOBILE RESPONSIVE — PROMO BAR SYSTEM
@@ -5290,47 +5322,7 @@ body {
     }
 }
 
-/* Sticky bar promo bar — Mobile */
-@media (max-width: 600px) {
-    .sticky-upsell-bar .promo-bar-flex-row {
-        gap: 12px;
-    }
-
-    .sticky-upsell-bar .promo-bar-track {
-        margin-right: 0;
-    }
-
-    .sticky-upsell-bar .btn-view-cart-white {
-        padding: 6px 12px !important;
-        font-size: 0.6rem !important;
-    }
-
-    .sticky-upsell-bar .promo-marker {
-        width: 18px;
-        height: 18px;
-    }
-
-    .sticky-upsell-bar .promo-marker span {
-        font-size: 7px;
-    }
-
-    .sticky-upsell-bar .upsell-actions {
-        width: 100%;
-    }
-
-    .sticky-upsell-bar .btn-view-cart {
-        width: 100%;
-        text-align: center;
-        padding: 10px 16px;
-        font-size: 0.7rem;
-        border-radius: 8px;
-    }
-
-    .sticky-savings-summary {
-        font-size: 0.65rem;
-        text-align: center;
-    }
-}
+/* (Old sticky bar mobile overrides removed — now handled by new isolated rules above) */
 
 /* Very small screens */
 @media (max-width: 360px) {
