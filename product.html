@@ -40,27 +40,22 @@
         }
 
         .main-image-box {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border-subtle);
+            background: var(--bg-product); /* Match exactly the pod background color */
+            border: 1px solid rgba(255,255,255,0.05);
             border-radius: var(--radius-lg);
             padding: 40px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 500px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+            /* Remove glow/blur that exposes image edges */
+            box-shadow: 0 40px 80px rgba(0,0,0,0.5);
             position: relative;
             overflow: hidden;
         }
 
         .main-image-box::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at center, rgba(255, 11, 85, 0.1) 0%, transparent 70%);
-            pointer-events: none;
+            display: none; /* Removed radial glow to avoid matching issues */
         }
 
         .product-img-real {
@@ -526,7 +521,7 @@
 
         .catalog-title {
             font-family: var(--font-display);
-            font-size: 1.6rem;
+            font-size: 1.28rem;
             font-weight: 700;
             margin-bottom: 30px;
             letter-spacing: -0.5px;
@@ -568,24 +563,14 @@
 
         /* Mini Product Card */
         .p-card-mini {
-            background: rgba(13, 13, 18, 0.6);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            padding: 15px;
-            transition: all 0.4s var(--ease-smooth);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
             gap: 12px;
         }
 
         .p-card-mini:hover {
             transform: translateY(-5px);
             border-color: var(--accent-primary);
-            background: rgba(13, 13, 18, 0.8);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            background: var(--bg-product);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
         }
 
         .p-mini-img {
@@ -940,10 +925,6 @@
               <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
             </div>
           </div>
-          <div id="savingsDisplay" class="promo-savings" style="display:none;">
-            <span class="promo-savings-label">Você já economizou:</span>
-            <span class="promo-savings-value" id="savingsValue">R$ 0,00</span>
-          </div>
         </div>
 
         <div class="cart-items-list" id="sidebarCartItems">
@@ -980,6 +961,11 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/supabase-config.js?v=3.7"></script>
+    <script src="assets/products-data.js?v=5.0"></script>
+    <script src="assets/shipping-logic.js?v=3.7"></script>
 
     <script>
 
@@ -1263,8 +1249,14 @@
             const qty = parseInt(qtyInput.value) || 1;
             const flavorValue = document.getElementById('flavorValue');
             const flavor = flavorValue ? flavorValue.value : '';
+            const selector = document.getElementById('customFlavorSelect');
+            const addBtn = document.querySelector('.btn-add-cart');
 
             if (!flavor) {
+                if (selector) {
+                    selector.classList.add('shake');
+                    setTimeout(() => selector.classList.remove('shake'), 400);
+                }
                 alert('Por favor, selecione um sabor antes de adicionar ao carrinho.');
                 return false;
             }
@@ -1282,10 +1274,26 @@
                 window.cart.push({ id, name, price: finalPrice, image, quantity: qty, flavor: flavor });
             }
 
+            // Success feedback
+            if (addBtn) {
+                const originalText = addBtn.textContent;
+                addBtn.textContent = '✓ ADICIONADO';
+                addBtn.style.backgroundColor = '#00ff88';
+                setTimeout(() => {
+                    addBtn.textContent = originalText;
+                    addBtn.style.backgroundColor = '';
+                }, 2000);
+            }
+
             if (window.updateCartUI) {
                 window.updateCartUI();
                 window.toggleCartSidebar(true);
             } else {
+                if (window.catalogHeadline) {
+                    window.catalogHeadline.textContent = 'CONTINUE COMPRANDO';
+                    window.catalogHeadline.classList.add('gradual-spacing');
+                    window.catalogHeadline.dataset.gsInit = ''; // Allow re-init
+                }
                 localStorage.setItem('ignite_cart', JSON.stringify(window.cart));
                 window.location.href = 'checkout.html';
             }
@@ -1305,7 +1313,7 @@
         }
 
 
-        async function loadProduct() {
+        function loadProduct() {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
             if (!productId) {
@@ -1313,26 +1321,20 @@
                 return;
             }
 
-            try {
-                const response = await fetch('products.json?v=' + Date.now());
-                if (!response.ok) throw new Error("Falha ao carregar produtos");
-                const products = await response.json();
-                const product = products.find(p => p.id === productId);
+            // Use the global PRODUCTS_DATA from assets/products-data.js
+            // This avoids CORS issues when opening the file locally and improves reliability
+            const products = (typeof PRODUCTS_DATA !== 'undefined') ? PRODUCTS_DATA : [];
+            const product = products.find(p => p.id === productId);
 
-                if (product) {
-                    renderProduct(product);
-                    
-                    // Render new desktop/unified catalog sections
-                    renderFavoritesCarousel(products);
-                    renderFullCatalog(products);
-                } else {
-
-                    document.getElementById('productContent').innerHTML = '<p>Produto não encontrado.</p>';
-                }
-            } catch (error) {
-                console.error("Erro ao carregar produto:", error);
+            if (product) {
+                renderProduct(product);
+                
+                // Render recommendations and full catalog using the same data source
+                renderFavoritesCarousel(products);
+                renderFullCatalog(products);
+            } else {
                 const pc = document.getElementById('productContent');
-                if (pc) pc.innerHTML = '<p>Erro ao carregar produto.</p>';
+                if (pc) pc.innerHTML = '<div class="container"><p style="text-align:center; padding: 100px 0;">Produto não encontrado.</p></div>';
             }
         }
 
@@ -1346,30 +1348,32 @@
             const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
             
             container.innerHTML = `
-                <div class="promo-dual-grid" style="margin: 20px 0 35px;">
-                    <!-- Retângulo Maior: Linha de Progresso -->
-                    <div class="promo-box-main">
-                        <p class="promo-bar-text" style="margin-bottom: 12px; font-weight: 800; font-size: 0.75rem; color: #ff0b55; text-transform: uppercase;">Adicione itens e ganhe recompensas!</p>
-                        <div class="promo-bar-track">
-                            <div class="promo-bar-fill"><div class="promo-bar-energy"></div></div>
-                            <div class="promo-bar-markers">
-                                <div class="promo-marker" data-goal="30" style="left:60%"><span>30</span></div>
-                                <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
-                                <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
-                            </div>
+                <h2 class="gradual-spacing" data-text="Continue comprando" style="margin-bottom: 30px;"></h2>
+
+                <!-- Standardized Rewards Bar (Matches Index.html) -->
+                <div class="main-page-rewards reveal" data-delay="1" style="margin-bottom: 40px;">
+                    <div class="reward-pill-container">
+                        <div class="reward-pill">
+                            <span class="promo-bar-text">Adicione itens para desbloquear recompensas</span>
                         </div>
                     </div>
-
-                    <!-- Retângulo Menor: Valor Economizado -->
-                    <div class="promo-box-savings promo-savings" style="display: none;">
-                        <span class="promo-savings-label" style="display: block; font-size: 0.65rem; color: #888; margin-bottom: 4px; text-transform: uppercase; font-weight: 700;">Você já economizou:</span>
-                        <span class="promo-savings-value" style="font-size: 1.25rem; font-weight: 900; color: #ff0b55;">R$ 0,00</span>
+                    <p class="reward-copy">Desbloqueie recompensas adicionando mais itens</p>
+                    <div class="promo-bar-wrapper main-page">
+                        <div class="promo-bar-track">
+                            <div class="promo-bar-fill">
+                                <div class="promo-bar-energy"></div>
+                            </div>
+                            <div class="promo-bar-markers">
+                                <div class="promo-marker" data-goal="30" style="left:60%"><span class="marker-icon">30</span></div>
+                                <div class="promo-marker" data-goal="40" style="left:80%"><span class="marker-icon">40</span></div>
+                                <div class="promo-marker" data-goal="50" style="left:100%"><span class="marker-icon">50</span></div>
+                            </div>
+                        </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="section-header-pill" style="margin-bottom: 25px;">🔥 Recomendações Premium</div>
-
-                <h2 class="catalog-title">+ Escolhidos</h2>
 
                 <div class="p-grid-catalog">
                     ${favorites.map(p => {
@@ -1388,6 +1392,7 @@
                     }).join('')}
                 </div>
             `;
+            if (window.initGradualSpacing) window.initGradualSpacing();
         }
 
         function renderFullCatalog(allProducts) {
@@ -1406,15 +1411,15 @@
             
             let html = `
                 <div class="section-header-pill">🛍️ Explore tudo</div>
-                <h2 class="catalog-title">Confira outros produtos</h2>
             `;
 
             for (const brand in brands) {
                 const brandProducts = brands[brand];
                 html += `
                     <div class="brand-sub-divider">
-                        <h3>${brand}</h3>
+                        <h3>${brand.toUpperCase()}</h3>
                     </div>
+                    <h2 class="gradual-spacing catalog-title" data-text="Continue comprando"></h2>
 
                     <div class="p-grid-catalog">
                         ${brandProducts.map(p => {
@@ -1435,6 +1440,7 @@
                 `;
             }
             container.innerHTML = html;
+            if (window.initGradualSpacing) window.initGradualSpacing();
         }
 
         loadProduct();
@@ -1443,10 +1449,6 @@
 
 
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="assets/supabase-config.js?v=3.7"></script>
-    <script src="assets/products-data.js?v=5.0"></script>
-    <script src="assets/shipping-logic.js?v=3.7"></script>
     <script src="script.js?v=5.0"></script>
 
 </body>

@@ -64,5 +64,38 @@
         "total": 1110,
         "status": "Aguardando Pagamento",
         "agency": "Olimpo Pods - Centro"
+    },
+    {
+        "id": "ERR-14041000",
+        "date": "13/04/2026",
+        "customer": {
+            "name": "marcos augusto",
+            "email": "conceptsttw@gmail.com",
+            "phone": "(31) 77136-1239"
+        },
+        "shipping": {
+            "cep": "63500-005",
+            "address": "Rua Professor João Coelho",
+            "number": "55",
+            "complement": "",
+            "neighborhood": "Centro",
+            "city": "Iguatu",
+            "state": "CE",
+            "cost": 114.27,
+            "method": "Jadlog - E-commerce"
+        },
+        "items": [
+            {
+                "name": "Black Sheep 25k",
+                "qty": 10,
+                "price": 90,
+                "image": "assets/img/blacksheep_25k.png",
+                "flavor": "Mix Variado"
+            }
+        ],
+        "subtotal": 900,
+        "total": 1014.27,
+        "status": "Aguardando Pagamento",
+        "agency": "Olimpo Pods - Centro"
     }
 ]

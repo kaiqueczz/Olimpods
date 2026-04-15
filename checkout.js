@@ -8,9 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================
     // 0. API Config
     // =========================================
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const isNodePort = window.location.port === '3001';
-    const API_BASE = (isLocalhost && !isNodePort) ? 'http://localhost:3001' : '';
+    const isLocalHostIP = window.location.hostname === '127.0.0.1';
+    const isLocalHostName = window.location.hostname === 'localhost';
+    const isLocal = isLocalHostIP || isLocalHostName;
+    
+    // Always use the explicit port 3001 for API if we are anywhere on local,
+    // even if the frontend is on 3000, 3002, or file://
+    const API_BASE = isLocal ? `http://${window.location.hostname}:3001` : '';
 
     // DOM Elements - Initialized early to avoid ReferenceErrors
     const summaryItems = document.getElementById('summary-items');
@@ -104,16 +108,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadCheckoutUpsellProducts() {
         if (!checkoutUpsellGrid) return;
+        
+        // Prioritize local data to avoid CORS issues
+        let allProducts = (typeof PRODUCTS_DATA !== 'undefined') ? PRODUCTS_DATA : [];
+        
         try {
             const response = await fetch('products.json?v=' + Date.now());
-            if (!response.ok) throw new Error("Falha ao carregar products.json");
-            const allProducts = await response.json();
-            
-            updateCheckoutUpsell(allProducts || []);
+            if (response.ok) {
+                allProducts = await response.json();
+            }
         } catch (error) {
-            console.error("Erro ao carregar sugestões, usando fallback:", error);
-            updateCheckoutUpsell(window.PRODUCTS_DATA || []);
+            console.warn("Usando fallback PRODUCTS_DATA no Checkout.");
         }
+        
+        updateCheckoutUpsell(allProducts);
     }
 
     function updateCheckoutUpsell(allProducts) {
@@ -205,19 +213,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initial Catalog Load
     async function initCheckoutCatalogs() {
+        // Safe load using the global PRODUCTS_DATA constant
+        let allProducts = (typeof PRODUCTS_DATA !== 'undefined') ? PRODUCTS_DATA : [];
+
         try {
             const response = await fetch('products.json?v=' + Date.now());
-            if (!response.ok) throw new Error("Falha ao carregar produtos");
-            const allProducts = await response.json();
-            
-            // Single unified carousel with ALL products
-            updateCheckoutUpsell(allProducts);
-            
+            if (response.ok) {
+                allProducts = await response.json();
+            }
         } catch (error) {
-            console.error("Erro ao inicializar catálogos:", error);
-            // Fallback to local data
-            updateCheckoutUpsell(window.PRODUCTS_DATA || []);
+            console.warn("Inicializando checkout com PRODUCTS_DATA.");
         }
+        
+        updateCheckoutUpsell(allProducts);
     }
 
     initCheckoutCatalogs();
@@ -404,10 +412,10 @@ document.addEventListener('DOMContentLoaded', () => {
             list.innerHTML = '<p style="color: #ff0b55; padding: 20px; text-align:center;">Erro ao calcular frete. Verifique o CEP ou tente novamente.</p>';
         }
 
-        // Reset previous selection
-        window.selectedShippingCost = 0;
-        window.selectedShippingMethod = '';
-        if (typeof validateWholesale === 'function') validateWholesale();
+        // No longer resetting here to avoid breaking the 'Finalizar' validation
+        // window.selectedShippingCost = 0;
+        // window.selectedShippingMethod = '';
+        // if (typeof validateWholesale === 'function') validateWholesale();
     }
 
     function renderShippingList(options) {
@@ -695,8 +703,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (totalEl) totalEl.textContent = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
 
-        if (window.currentCepCalculated && !window.isCalculatingShipping) {
+        if (window.currentCepCalculated && !window.isCalculatingShipping && window.lastCalculatedItems !== totalItems) {
             window.isCalculatingShipping = true;
+            window.lastCalculatedItems = totalItems;
             fetchShippingOptions(window.currentCepCalculated).finally(() => {
                 window.isCalculatingShipping = false;
             });

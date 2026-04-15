@@ -4,7 +4,8 @@
    ============================================ */
 
 /* ---------- Google Fonts ---------- */
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+/* ---------- Google Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
 html, body {
   overflow-x: hidden;
@@ -19,44 +20,27 @@ html {
 
 :root {
   --banner-height: 44px;
-  /* Colors — Dark Tech Palette */
+  /* Colors — Dark Tech Palette (Reverted) */
   --bg-primary: #0a0a0f;
-  --bg-secondary: #111118;
-  --bg-card: rgba(255, 255, 255, 0.07);
-  --bg-glass: rgba(255, 255, 255, 0.05);
-  --bg-glass-hover: rgba(255, 255, 255, 0.08);
+  --bg-secondary: #0f0f14;
+  --bg-product: #0a0a0f;
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --bg-glass: rgba(13, 13, 18, 0.7);
+  --bg-glass-hover: rgba(255, 255, 255, 0.1);
 
   --accent-primary: #FF0B55;
   --accent-secondary: #FF4D7F;
-  --accent-glow: rgba(255, 11, 85, 0.5);
+  --accent-glow: rgba(255, 11, 85, 0.4);
   --accent-neon: #FF0B55;
-  --accent-neon-glow: rgba(255, 11, 85, 0.4);
-  --accent-warm: #ff6b6b;
-  --accent-gold: #ffd93d;
 
-  --text-primary: #f0f0f5;
-  --text-secondary: rgba(240, 240, 245, 0.65);
-  --text-muted: rgba(240, 240, 245, 0.4);
+  /* Typography — Geometric & Clean (Preserved) */
+  --font-display: 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
 
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-accent: rgba(255, 11, 85, 0.3);
-
-  /* Typography */
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-short: 'Space Grotesk', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-
-  /* Spacing */
-  --section-padding: 100px 0;
-  --container-max: 1280px;
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
-
-  /* Transitions */
-  --ease-smooth: cubic-bezier(.19,1,.22,1);
-  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Spacing Tokens (Reverted to standard) */
+  --p-padding: 30px;
+  --p-radius: 16px;
+  --section-margin: 100px;
 
   /* Glassmorphism */
   --glass-bg: rgba(13, 13, 18, 0.7);
@@ -106,6 +90,20 @@ body {
   --glow-color-2: #FF4D7F;
   --glow-color-3: #CC0944;
   --glow-color-4: #E80A4D;
+}
+
+/* Standardized Cards — checkout, summary, details */
+.checkout-card, .summary-card, .promo-bar-wrapper {
+  background: var(--bg-glass) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--p-radius) !important;
+  padding: 40px !important; /* Large padding for elegance */
+  box-shadow: none !important;
+  margin-bottom: 30px;
+}
+
+.checkout-card::before, .glow-card::before {
+    display: none !important; /* Remove glow effects */
 }
 
 .glow-card::before {
@@ -216,6 +214,18 @@ input {
 ::-webkit-scrollbar-thumb {
   background: var(--accent-primary);
   border-radius: 10px;
+}
+
+/* Premium Visual Integration: Clean Transparent PNGs */
+.p-img-container img, 
+.product-img-real,
+.p-mini-img,
+.main-image-box img {
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.2)); /* Added a very soft natural shadow instead of boxes */
 }
 
 /* ============================================
@@ -484,6 +494,22 @@ body {
 }
 
 .search-bar:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  background: var(--bg-glass-hover);
+  box-shadow: 0 0 0 4px rgba(255, 11, 85, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
   border-color: var(--accent-primary);
   background: var(--bg-glass-hover);
   box-shadow: 0 0 0 3px var(--accent-glow);
@@ -667,67 +693,86 @@ body {
   max-width: 900px;
 }
 
+/* Hero H1 - Aggressive and Minimal */
 .hero h1 {
   font-family: var(--font-display);
-  font-size: clamp(3rem, 8vw, 5.5rem);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  font-size: clamp(3rem, 10vw, 96px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -3.5px;
+  text-transform: none; /* More natural like reference */
   color: #fff;
-  margin-bottom: 16px;
-  animation: fadeInUp 0.8s 0.15s var(--ease-smooth) both;
+  margin-bottom: 24px;
 }
 
-.hero-subtitle {
-  font-family: var(--font-body);
-  font-size: clamp(1.1rem, 1.8vw, 1.25rem);
-  font-weight: 400;
-  color: #fff !important;
-  line-height: 1.4;
-  max-width: 800px;
-  margin: 0 auto 40px;
-  text-align: center;
-  opacity: 0;
-  animation: fadeInUp 0.8s 0.6s var(--ease-smooth) both;
+/* Section Labels — inspired by marcados.me */
+.section-label {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 12px;
 }
 
-@media (max-width: 768px) {
-  .hero-subtitle {
-    font-size: 10px !important; 
-    letter-spacing: -0.2px !important;
-    padding: 0 5px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 auto 25px !important;
-  }
-  .hero h1.gradual-spacing .gs-char {
-    font-size: clamp(2rem, 10vw, 3rem) !important;
-  }
+/* Redesign Headlines — No more glow, just clean bold type */
+.catalog-title.gradual-spacing, 
+.checkout-upsell-promo .gradual-spacing {
+  font-size: clamp(1.2rem, 4vw, 42px) !important;
+  font-weight: 900 !important;
+  letter-spacing: -1.2px !important;
+  white-space: nowrap !important;
+  display: flex !important;
+  justify-content: center !important;
+  margin-bottom: 40px !important;
+  line-height: 1 !important;
+}
+
+/* Adjust /LABEL pattern */
+.section-header-pill {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    color: var(--text-muted) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 16px !important;
+    display: block !important;
+}
+
+.section-header-pill::before {
+    content: "/";
+    color: var(--accent-primary);
+    margin-right: 2px;
+}
+
+/* ---------- Global Buttons Reset — Marcados.me ---------- */
+.btn-primary, .hero-cta, .btn-checkout, .toggle-btn.wholesale, .toggle-btn.retail {
+  border-radius: 100px !important;
+  padding: 18px 40px !important;
+  font-weight: 900 !important;
+  font-family: var(--font-display) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1) !important;
+  background: #fff !important;
+  color: #000 !important;
+  border: none !important;
+  font-size: 14px !important;
+}
+
+.btn-primary:hover, .hero-cta:hover, .btn-checkout:hover {
+  transform: translateY(-4px) scale(1.02);
+  background: var(--accent-primary) !important;
 }
 
 .hero-cta {
-  display: inline-block;
-  padding: 20px 48px;
-  background: var(--accent-primary);
-  color: #fff;
-  text-decoration: none;
-  border-radius: 50px;
-  font-weight: 900;
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-  box-shadow: 0 10px 40px rgba(255, 11, 85, 0.4);
-  will-change: transform, box-shadow;
-}
-
-.hero-cta:hover {
-  transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 20px 60px rgba(255, 11, 85, 0.6);
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: 0 15px 35px rgba(255, 11, 85, 0.2) !important;
 }
 
 /* Gradual Spacing */
@@ -750,7 +795,7 @@ body {
 .gradual-spacing .gs-char {
   display: inline-block;
   font-family: var(--font-display);
-  font-size: var(--gs-size, clamp(3rem, 8vw, 5.5rem));
+  font-size: var(--gs-size, clamp(2.4rem, 6.4vw, 4.4rem));
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -876,6 +921,20 @@ body {
     text-shadow: none;
     clip-path: inset(0);
   }
+}
+
+/* Shake Animation */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  50% { transform: translateX(8px); }
+  75% { transform: translateX(-4px); }
+}
+
+.shake {
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 15px rgba(255, 11, 85, 0.3) !important;
 }
 
 /* Brand Boxes */
@@ -1405,43 +1464,61 @@ body {
   font-weight: 500;
 }
 
-/* ============================================
-   SECTION 3 — PRODUCTS
-   ============================================ */
-.products-section {
-  padding: var(--section-padding);
-  background: var(--bg-secondary);
-  position: relative;
-}
-
-.products-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
-}
-
-/* Sale Toggle */
-.sale-toggle-wrapper {
+/* ---------- Product Cards Overhaul — Marcados.me Style ---------- */
+.p-card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--p-radius) !important;
+  padding: var(--p-padding) !important;
+  transition: transform 0.4s var(--ease-smooth);
+  overflow: hidden;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin: 30px 0 40px;
-  gap: 12px;
+  backdrop-filter: blur(10px);
 }
 
-.sale-toggle {
-  position: relative;
+.p-card:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  transform: translateY(-8px);
+}
+
+.p-card .product-name {
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    margin-bottom: 12px !important;
+    text-transform: none !important;
+}
+
+.p-img-container {
+  border-radius: 20px !important;
+  background: transparent !important;
+  margin-bottom: 30px;
   display: flex;
-  background: var(--bg-glass);
-  border: 1px solid var(--border-subtle);
-  border-radius: 50px;
-  padding: 4px;
-  width: 280px;
-  z-index: 2;
+  align-items: center;
+  justify-content: center;
+  height: 280px;
+}
+
+.btn-buy {
+  width: 100%;
+  border-radius: 12px !important;
+  height: 50px;
+  font-weight: 700;
+  font-family: var(--font-display) !important;
+  font-size: 14px !important;
+  background: var(--accent-primary) !important;
+  color: #fff !important;
+  margin-top: auto;
+  border: none !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+.btn-buy:hover {
+  background: var(--accent-primary) !important;
+  transform: translateY(-4px);
 }
 
 .toggle-btn {
@@ -1530,10 +1607,116 @@ body {
   width: 100%;
 }
 
+.reward-copy {
+  color: var(--accent-primary) !important;
+  font-family: var(--font-display) !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1.5px !important;
+  margin-bottom: 5px !important;
+  text-align: center !important;
+  opacity: 1 !important;
+  display: block;
+}
+
 .promo-bar-wrapper.main-page {
   width: 100%;
   max-width: 600px;
   margin-top: 10px;
+}
+
+/* ============================================
+   SMART NOTIFICATION SYSTEM
+   ============================================ */
+body .smart-notification {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-radius: 100px;
+  padding: 16px 28px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  transform: translateX(-150%);
+  transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+  min-width: 320px;
+  pointer-events: auto;
+  border: none !important;
+}
+
+.smart-notification.active {
+  transform: translateX(0);
+}
+
+.smart-notification::before {
+  display: none; /* Removed the side bar for cleaner look */
+}
+
+.sn-header {
+  display: none; /* Simplified to just content line */
+}
+
+.sn-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.sn-savings {
+  font-size: 14px;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.sn-savings span {
+  color: var(--accent-primary);
+}
+
+.sn-tip {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(0,0,0,0.1);
+}
+
+.sn-icon {
+  font-size: 1.1rem;
+}
+
+@keyframes pulse-dot {
+  0% { opacity: 0.5; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0.5; transform: scale(0.8); }
+}
+
+@media (max-width: 600px) {
+  .smart-notification {
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+    min-width: auto;
+    padding: 15px;
+    transform: translateY(150%);
+  }
+  .smart-notification.active {
+    transform: translateY(0);
+  }
 }
 
 /* ============================================
@@ -2089,7 +2272,7 @@ body {
 
 .product-card {
   position: relative;
-  background: var(--bg-card);
+  background: var(--bg-product); /* Use standardized product background */
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -2129,7 +2312,7 @@ body {
 .product-image {
   position: relative;
   height: 260px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  background: var(--bg-product); /* Unified solid background */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4774,10 +4957,38 @@ body {
     letter-spacing: 0.2px;
 }
 
+/* Mini Savings Pill (Checkout Only) */
+.mini-savings-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: #fff;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.mini-savings-label {
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 800;
+    color: #666;
+    letter-spacing: 0.5px;
+}
+
+.mini-savings-val {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--accent-primary);
+}
+
 .reward-pill-container {
     display: flex;
+    align-items: center;
     justify-content: center;
-    margin-bottom: 8px;
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
 .reward-pill {

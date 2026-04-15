@@ -243,6 +243,7 @@ const PRODUCTS_DATA = [
     "image": "assets/img/Ignite_v80-removebg-preview.png",
     "retail_available": true
   },
+  /* 
   {
     "id": "black-sheep-40k",
     "brand": "blacksheep",
@@ -297,6 +298,7 @@ const PRODUCTS_DATA = [
     "image": "assets/img/blacksheep_30k.png",
     "retail_available": true
   },
+  */
   {
     "id": "black-sheep-25k",
     "brand": "blacksheep",

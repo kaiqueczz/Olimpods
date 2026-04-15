@@ -50,14 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Vortex Config ---
-    const PARTICLE_COUNT = 180; // Optimized from 350
+    const PARTICLE_COUNT = 100; // Optimized from 180 for maximum smoothness
     const PROP_COUNT = 9;   // x, y, vx, vy, life, ttl, speed, radius, hue
     const PROPS_LEN = PARTICLE_COUNT * PROP_COUNT;
     const RANGE_Y = 100;
     const BASE_TTL = 50;
     const RANGE_TTL = 150;
     const BASE_SPEED = 0.0;
-    const RANGE_SPEED = 0.3; // Slightly slower for smoother feel
+    const RANGE_SPEED = 0.2; // Slightly slower for smoother feel
     const BASE_RADIUS = 1;
     const RANGE_RADIUS = 2;
     const BASE_HUE = 0;     // pure red
@@ -403,46 +403,42 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================
   // 0.6 Gradual Spacing Animation
   // =========================================
-  (function initGradualSpacing() {
+  window.initGradualSpacing = function() {
     document.querySelectorAll('.gradual-spacing').forEach(el => {
-      const text = el.getAttribute('data-text') || '';
+      if (el.dataset.gsInit === 'true') return;
+      
+      const text = el.getAttribute('data-text') || el.textContent || '';
       el.innerHTML = '';
 
       const accentWord = 'Olimpo!';
       const accentStart = text.indexOf(accentWord);
       const accentEnd = accentStart + accentWord.length;
 
-      const words = text.split(' ');
       let charIndex = 0;
-
-      words.forEach((word, wordIdx) => {
-        const wordSpan = document.createElement('span');
-        wordSpan.className = 'gs-word';
-        wordSpan.style.display = 'inline-flex';
-
-        word.split('').forEach((char) => {
-          const span = document.createElement('span');
-          span.className = 'gs-char';
+      text.split('').forEach((char) => {
+        const span = document.createElement('span');
+        span.className = 'gs-char';
+        
+        if (char === ' ') {
+          span.className = 'gs-char gs-space';
+          span.innerHTML = '&nbsp;';
+          span.style.width = '0.35em';
+          span.style.display = 'inline-block';
+        } else {
+          span.textContent = char;
+          span.style.display = 'inline-block';
           if (accentStart !== -1 && charIndex >= accentStart && charIndex < accentEnd) {
             span.classList.add('gs-accent');
           }
-          span.textContent = char;
-          // span.style.setProperty('--char-delay', `${charIndex * 0.04}s`); // Delay removed
-          wordSpan.appendChild(span);
-          charIndex++;
-        });
-
-        el.appendChild(wordSpan);
-        charIndex++; // for the space
-
-        if (wordIdx < words.length - 1) {
-          const space = document.createElement('span');
-          space.className = 'gs-space';
-          el.appendChild(space);
         }
+        
+        el.appendChild(span);
+        charIndex++;
       });
+      el.dataset.gsInit = 'true';
     });
-  })();
+  };
+  window.initGradualSpacing();
 
   // =========================================
   // 0.7 Brand Boxes Swoosh Delay
@@ -769,9 +765,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // State trackers for persuasive rewards animations
-  window.lastTotalItems = 0;
-  window.lastStage = "1";
+  // =========================================
+  // Smart Notification Injection
+  // =========================================
+  const isCheckout = window.location.pathname.includes('checkout.html');
+  
+  if (!document.getElementById('smartNotification') && isCheckout) {
+    const sn = document.createElement('div');
+    sn.id = 'smartNotification';
+    sn.className = 'smart-notification';
+    sn.innerHTML = `
+      <div class="sn-header">
+        <span class="sn-label">Progresso do Pedido</span>
+        <div class="sn-status-dot"></div>
+      </div>
+      <div class="sn-content">
+        <div class="sn-savings">Economia: <span id="smartSavingsValue">R$ 0,00</span></div>
+        <div class="sn-tip"><span class="sn-icon">🚀</span> <span id="smartProgressTip">Adicione itens para economizar</span></div>
+      </div>
+    `;
+    document.body.appendChild(sn);
+  }
+  
+  const smartNotif = document.getElementById('smartNotification');
+  const smartSavings = document.getElementById('smartSavingsValue');
+  const smartTip = document.getElementById('smartProgressTip');
 
   function renderSidebarCart() {
     const list = document.getElementById('sidebarCartItems');
@@ -781,8 +799,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Standardized Selectors for Ideal Bar - Sidebar & Static versions
     const allFills = document.querySelectorAll('.promo-bar-fill, #progressFill, #progressFillStatic, #progressFillCheckout, #progressFillCheckout2, #mainPageProgressFill');
     const allMsgs = document.querySelectorAll('.reward-pill .promo-bar-text, .promo-summary-text, #progressText, #progressTextStatic, #progressTextCheckout, #progressTextCheckout2, #mainRewardText');
-    const allSavingsValues = document.querySelectorAll('.promo-savings-value, #savingsValue, #savingsValueStatic, #savingsValueCheckout');
-    const allSavingsWrappers = document.querySelectorAll('.promo-savings, #savingsDisplay, #savingsDisplayStatic, #savingsDisplayCheckout');
+    const allSavingsValues = document.querySelectorAll('.promo-savings-value, #savingsValue, #savingsValueStatic, #savingsValueCheckout, .mini-savings-val');
+    const allSavingsWrappers = document.querySelectorAll('.promo-savings, #savingsDisplay, #savingsDisplayStatic, #savingsDisplayCheckout, .mini-savings-pill');
     const progressBar = document.querySelector('.minimum-progress-container, .promo-bar-wrapper');
 
     // Universal Update for all Progress Bars (Must run even if sidebar list is missing)
@@ -946,13 +964,27 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    allSavingsValues.forEach(s => {
-      s.textContent = `R$ ${totalSavingsValue.toFixed(2).replace('.', ',')}`;
-    });
+    // Update Smart Notification
+    if (smartNotif) {
+      if (totalItems > 0 && window.currentSaleType === 'wholesale') {
+        smartNotif.classList.add('active');
+        if (smartSavings) smartSavings.textContent = `R$ ${totalSavingsValue.toFixed(2).replace('.', ',')}`;
+        
+        if (smartTip) {
+          let tipText = "";
+          if (totalItems < 30) tipText = `Faltam ${30 - totalItems} para 5% OFF`;
+          else if (totalItems < 40) tipText = `Faltam ${40 - totalItems} para 1 Pod Grátis`;
+          else if (totalItems < 50) tipText = `Faltam ${50 - totalItems} para Frete Grátis`;
+          else tipText = "Todas as recompensas liberadas!";
+          smartTip.textContent = tipText;
+        }
+      } else {
+        smartNotif.classList.remove('active');
+      }
+    }
 
-    allSavingsWrappers.forEach(w => {
-      w.style.display = (totalSavingsValue > 0) ? 'flex' : 'none';
-    });
+    // Hide legacy savings
+    allSavingsWrappers.forEach(w => w.style.display = 'none');
 
     // Update Milestones (Markers)
     document.querySelectorAll('.promo-marker').forEach(m => {
@@ -1388,16 +1420,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     ];
 
+    // Use PRODUCTS_DATA from assets/products-data.js as primary source to avoid CORS
+    // while still keeping fetch as a second-layer check for updates.
+    allProducts = (typeof PRODUCTS_DATA !== 'undefined') ? PRODUCTS_DATA : [];
+
     try {
       const response = await fetch('products.json?v=' + new Date().getTime());
-      if (!response.ok) throw new Error();
-      allProducts = await response.json();
-      renderProducts('all');
+      if (response.ok) {
+        allProducts = await response.json();
+      }
     } catch (err) {
-      console.warn('Usando dados de fallback (local test ou erro CORS).');
-      allProducts = window.PRODUCTS_DATA || [];
-      renderProducts('all');
+      console.warn('Usando dados de PRODUCTS_DATA (local test ou erro CORS).');
     }
+    
+    renderProducts('all');
   }
 
   // =========================================
