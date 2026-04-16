@@ -268,7 +268,13 @@
                     
                     <!-- REWARD COMPONENT (CHECKOUT - SIDEBAR) -->
                     <div class="promo-bar-wrapper" id="checkoutPromoBar" style="margin-top: 10px; margin-bottom: 20px;">
-                      <p class="promo-summary-text" id="progressTextCheckout">Adicione itens para desbloquear recompensas</p>
+                      <div class="summary-reward-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 10px;">
+                        <p class="promo-summary-text" id="progressTextCheckout" style="margin-bottom: 0;">Adicione itens para desbloquear recompensas</p>
+                        <div class="mini-savings-pill" id="savingsDisplaySidebar" style="display: none;">
+                          <span class="mini-savings-label">SUA ECONOMIA:</span>
+                          <span class="mini-savings-val" id="savingsValueSidebar">R$ 0,00</span>
+                        </div>
+                      </div>
                       <div class="promo-bar-track">
                         <div class="promo-bar-fill" id="progressFillCheckout"><div class="promo-bar-energy"></div></div>
                         <div class="promo-bar-markers">

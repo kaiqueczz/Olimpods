@@ -268,13 +268,13 @@ document.addEventListener('DOMContentLoaded', () => {
         slide.classList.toggle('active', index === currentIndex);
         slide.style.zIndex = 10 - distance;
 
-        // Dynamic opacity and scale based on distance
+        // Maintained brightness, only dynamic scale for focal depth
         if (index !== currentIndex) {
-          slide.style.opacity = Math.max(0.3, 0.7 - (distance * 0.2));
-          slide.style.transform = `scale(${Math.max(0.7, 0.9 - (distance * 0.05))})`;
+          slide.style.opacity = '0.9'; /* Keep high visibility */
+          slide.style.transform = `scale(${Math.max(0.85, 0.95 - (distance * 0.05))})`;
         } else {
           slide.style.opacity = '1';
-          slide.style.transform = 'scale(1) translateY(-15px)';
+          slide.style.transform = 'scale(1.05)';
         }
       });
 
@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const setPositionByIndex = () => {
       const isMobile = window.innerWidth <= 768;
       const containerWidth = container.clientWidth;
-      const slideWidth = slides[0].offsetWidth;
+      const slideWidth = 380; // Match new aesthetic width
       const gap = isMobile ? 24 : 40;
 
       const offsetToCenter = (containerWidth / 2) - (slideWidth / 2);
@@ -765,29 +765,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // =========================================
-  // Smart Notification Injection
-  // =========================================
-  const isCheckout = window.location.pathname.includes('checkout.html');
-  
-  if (!document.getElementById('smartNotification') && isCheckout) {
-    const sn = document.createElement('div');
-    sn.id = 'smartNotification';
-    sn.className = 'smart-notification';
-    sn.innerHTML = `
-      <div class="sn-header">
-        <span class="sn-label">Progresso do Pedido</span>
-        <div class="sn-status-dot"></div>
-      </div>
-      <div class="sn-content">
-        <div class="sn-savings">Economia: <span id="smartSavingsValue">R$ 0,00</span></div>
-        <div class="sn-tip"><span class="sn-icon">🚀</span> <span id="smartProgressTip">Adicione itens para economizar</span></div>
-      </div>
-    `;
-    document.body.appendChild(sn);
-  }
-  
-  const smartNotif = document.getElementById('smartNotification');
+  // (Smart Notification Injection Removed - Integrated into Checkout Summary)
   const smartSavings = document.getElementById('smartSavingsValue');
   const smartTip = document.getElementById('smartProgressTip');
 
@@ -964,24 +942,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Update Smart Notification
-    if (smartNotif) {
-      if (totalItems > 0 && window.currentSaleType === 'wholesale') {
-        smartNotif.classList.add('active');
-        if (smartSavings) smartSavings.textContent = `R$ ${totalSavingsValue.toFixed(2).replace('.', ',')}`;
-        
-        if (smartTip) {
-          let tipText = "";
-          if (totalItems < 30) tipText = `Faltam ${30 - totalItems} para 5% OFF`;
-          else if (totalItems < 40) tipText = `Faltam ${40 - totalItems} para 1 Pod Grátis`;
-          else if (totalItems < 50) tipText = `Faltam ${50 - totalItems} para Frete Grátis`;
-          else tipText = "Todas as recompensas liberadas!";
-          smartTip.textContent = tipText;
-        }
-      } else {
-        smartNotif.classList.remove('active');
-      }
-    }
+    // Smart Notification logic removed to prevent UI clutter on landing page.
 
     // Hide legacy savings
     allSavingsWrappers.forEach(w => w.style.display = 'none');

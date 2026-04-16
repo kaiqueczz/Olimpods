@@ -32,9 +32,29 @@ html {
   --accent-secondary: #FF4D7F;
   --accent-glow: rgba(255, 11, 85, 0.4);
   --accent-neon: #FF0B55;
+  --accent-neon-glow: rgba(255, 11, 85, 0.5);
+  --accent-gradient: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  --border-accent: rgba(255, 11, 85, 0.3);
+
+  /* Text Colors */
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0A0B0;
+  --text-muted: #666677;
+
+  /* Borders & Radii */
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+
+  /* Layout */
+  --container-max: 1280px;
+  --section-padding: 100px 0;
 
   /* Typography — Geometric & Clean (Preserved) */
   --font-display: 'Inter', sans-serif;
+  --font-short: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
 
   /* Spacing Tokens (Reverted to standard) */
@@ -45,6 +65,10 @@ html {
   /* Glassmorphism */
   --glass-bg: rgba(13, 13, 18, 0.7);
   --glass-border: rgba(255, 255, 255, 0.1);
+
+  /* Animations */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 * {
@@ -93,13 +117,20 @@ body {
 }
 
 /* Standardized Cards — checkout, summary, details */
-.checkout-card, .summary-card, .promo-bar-wrapper {
+.checkout-card, .summary-card {
   background: var(--bg-glass) !important;
   border: 1px solid var(--border-subtle) !important;
   border-radius: var(--p-radius) !important;
   padding: 40px !important; /* Large padding for elegance */
   box-shadow: none !important;
   margin-bottom: 30px;
+}
+
+.promo-bar-wrapper {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-bottom: 20px;
 }
 
 .checkout-card::before, .glow-card::before {
@@ -245,6 +276,11 @@ input {
   z-index: 1100;
   display: flex;
   align-items: center;
+}
+
+/* Removed redundant mini-savings-pill to clean up UI as requested */
+.mini-savings-pill {
+  display: none !important;
 }
 
 @keyframes bannerGradient {
@@ -493,23 +529,8 @@ body {
   color: var(--text-muted);
 }
 
-.search-bar:focus {
+.search-wrapper:focus-within .search-bar {
   outline: none;
-  border-color: var(--accent-primary);
-  background: var(--bg-glass-hover);
-  box-shadow: 0 0 0 4px rgba(255, 11, 85, 0.1);
-}
-
-.search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
-  width: 18px;
-  height: 18px;
-  pointer-events: none;
-}
   border-color: var(--accent-primary);
   background: var(--bg-glass-hover);
   box-shadow: 0 0 0 3px var(--accent-glow);
@@ -707,13 +728,16 @@ body {
 
 /* Section Labels — inspired by marcados.me */
 .section-label {
-  font-size: 14px;
-  font-weight: 800;
-  color: #fff;
-  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-short);
+  font-size: 0.85rem;
+  font-weight: 700;
   letter-spacing: 1px;
-  display: block;
-  margin-bottom: 12px;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  margin-bottom: 16px;
 }
 
 /* Redesign Headlines — No more glow, just clean bold type */
@@ -1085,8 +1109,10 @@ body {
    SECTION 2 — SOCIAL PROOF / TESTIMONIALS
    ============================================ */
 .social-proof {
-  padding: var(--section-padding);
+  padding: 120px 0;
+  background: radial-gradient(circle at center, #161622 0%, var(--bg-primary) 70%);
   position: relative;
+  overflow: hidden;
 }
 
 .section-header {
@@ -1094,13 +1120,14 @@ body {
   margin-bottom: 32px;
 }
 
+/* Section Label Consolidated */
 .section-label {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   font-family: var(--font-short);
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.85rem;
+  font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--accent-primary);
@@ -1211,19 +1238,29 @@ body {
 }
 
 .testimonial-card {
-  flex: 0 0 420px;
+  flex: 0 0 380px;
+  aspect-ratio: 1 / 1.1;
   position: relative;
   padding: 40px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
-  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  opacity: 0.5;
-  transform: scale(0.9);
+  background: #FFFFFF;
+  border: 1px solid #EEEEEE;
+  border-radius: 24px;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  opacity: 1;
+  transform: scale(0.92);
   user-select: none;
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.testimonial-card.active {
+    opacity: 1;
+    transform: scale(1.05);
+    background: #FFFFFF;
+    border-color: var(--accent-primary);
+    box-shadow: 0 15px 50px rgba(255, 11, 85, 0.2);
 }
 
 /* Carousel Navigation Controls */
@@ -1243,8 +1280,7 @@ body {
   z-index: 20;
   transition: all 0.4s var(--ease-smooth);
   cursor: pointer;
-  backdrop-filter: blur(6px); /* Reduced from 10px */
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 .carousel-nav-btn:hover {
@@ -1268,29 +1304,60 @@ body {
   right: -28px;
 }
 
+/* Testimonial Sub-elements Consolidated */
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.author-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-neon));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.testimonial-text {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: #1a1a1f;
+  font-style: italic;
+  margin-bottom: 35px;
+  font-weight: 500;
+  text-shadow: none;
+}
+
+/* CAROUSEL DOTS - REFINED */
 .carousel-dots {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 40px;
+  margin-top: 50px;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--bg-glass);
-  border: 1px solid var(--border-subtle);
+  width: 14px;
+  height: 5px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
   cursor: pointer;
-  transition: all 0.3s var(--ease-smooth);
+  transition: all 0.4s var(--ease-smooth);
 }
 
 .dot.active {
+  width: 38px;
   background: var(--accent-primary);
-  border-color: transparent;
-  width: 28px;
-  border-radius: 10px;
-  box-shadow: 0 0 15px var(--accent-glow);
+  box-shadow: 0 0 20px var(--accent-glow);
 }
 
 @media (max-width: 1024px) {
@@ -1334,49 +1401,31 @@ body {
 .testimonial-stars svg {
   width: 18px;
   height: 18px;
-  color: var(--accent-gold);
+  color: var(--accent-primary);
 }
 
 .testimonial-text {
   font-family: var(--font-body);
   font-size: 0.95rem;
-  color: var(--text-secondary);
+  color: #333333;
   line-height: 1.7;
   margin-bottom: 24px;
   font-style: italic;
   flex-grow: 1;
-  /* Faz o texto ocupar o espaço disponível para alinhar o autor no rodapé */
 }
 
-.testimonial-author {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.author-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-neon));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1rem;
-  color: #fff;
-}
+/* Author Info Consolidated */
 
 .author-info h4 {
   font-family: var(--font-short);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: #111111;
 }
 
 .author-info span {
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: #666666;
 }
 
 /* Our Story */
@@ -1414,17 +1463,22 @@ body {
 .story-content p {
   font-family: var(--font-body);
   font-size: 1rem;
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  opacity: 0.85;
   line-height: 1.8;
   margin-bottom: 16px;
 }
 
+/* Scroll Reveal Animation System */
 .reveal {
-  opacity: 1;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s var(--ease-smooth), transform 0.6s var(--ease-smooth);
 }
 
 .reveal.animate-in {
   opacity: 1;
+  transform: translateY(0);
 }
 
 .story-visual {
@@ -1464,33 +1518,86 @@ body {
   font-weight: 500;
 }
 
-/* ---------- Product Cards Overhaul — Marcados.me Style ---------- */
-.p-card {
-  background: var(--bg-card) !important;
-  border: 1px solid var(--glass-border) !important;
-  border-radius: var(--p-radius) !important;
-  padding: var(--p-padding) !important;
-  transition: transform 0.4s var(--ease-smooth);
+/* ---------- Product Cards — Original Neon Style ---------- */
+.product-card {
+  position: relative;
+  background: var(--bg-product);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  height: 100%;
+  transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+  opacity: 0;
+  transform: translateY(30px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(10px);
+  will-change: transform, opacity;
 }
 
-.p-card:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-  transform: translateY(-8px);
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0; 
+  left: -100%;
+  width: 50%; 
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  transition: 0.5s;
+  pointer-events: none;
 }
 
-.p-card .product-name {
-    font-size: 22px !important;
-    font-weight: 800 !important;
-    margin-bottom: 12px !important;
-    text-transform: none !important;
+.product-card.animate-in {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.p-img-container {
+.product-card:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 20px 60px rgba(255, 11, 85, 0.2), 0 0 20px rgba(255, 11, 85, 0.1);
+}
+
+.product-card:hover::before {
+  left: 200%;
+  transition: 1.2s var(--ease-smooth);
+}
+
+.product-image {
+  position: relative;
+  height: 260px;
+  background: var(--bg-product);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.product-info {
+  padding: 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.product-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1.3;
+  color: #fff;
+}
+
+.product-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.4s ease;
+}
   border-radius: 20px !important;
   background: transparent !important;
   margin-bottom: 30px;
@@ -1521,16 +1628,41 @@ body {
   transform: translateY(-4px);
 }
 
+.sale-toggle-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+.sale-toggle {
+  display: flex;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-subtle);
+  border-radius: 50px;
+  width: 250px; /* Decreased width */
+  position: relative;
+  padding: 4px;
+  gap: 8px; /* Added gap between buttons */
+}
+
 .toggle-btn {
   position: relative;
   flex: 1;
-  padding: 12px 0;
+  padding: 10px 0;
   font-family: var(--font-short);
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.85rem; /* Sized for new width */
+  font-weight: 700;
   color: var(--text-secondary);
   z-index: 3;
   transition: color 0.3s var(--ease-smooth);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .toggle-btn.active {
@@ -1541,22 +1673,24 @@ body {
   position: absolute;
   top: 4px;
   left: 4px;
-  width: calc(50% - 4px);
+  width: calc(50% - 8px); /* Account for gap */
   height: calc(100% - 8px);
   background: var(--accent-primary);
   border-radius: 50px;
-  transition: transform 0.4s var(--ease-bounce);
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   z-index: 1;
+  box-shadow: 0 0 15px var(--accent-glow);
 }
 
 .sale-toggle[data-active="retail"] .toggle-slider {
-  transform: translateX(100%);
+  transform: translateX(calc(100% + 8px)); /* Translate across gap */
 }
 
 .sale-info-text {
   font-size: 0.8rem;
-  color: var(--text-muted);
-  font-style: italic;
+  color: var(--accent-primary);
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 
@@ -1571,24 +1705,28 @@ body {
 }
 
 .tab-btn {
-  padding: 10px 24px;
-  font-size: 0.88rem;
-  font-weight: 600;
+  padding: 12px 28px;
+  font-size: 0.9rem;
+  font-weight: 700;
   color: var(--text-secondary);
-  background: var(--bg-glass);
-  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.05); /* Added slight background */
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50px;
-  transition: all 0.3s var(--ease-smooth);
+  transition: all 0.4s var(--ease-smooth);
+  cursor: pointer;
+  text-transform: uppercase;
 }
 
 .tab-btn:hover {
-  color: var(--text-primary);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
   border-color: var(--accent-primary);
+  transform: translateY(-2px);
 }
 
 .tab-btn.active {
   color: #fff;
-  background: linear-gradient(135deg, var(--accent-primary), #FF0B55);
+  background: var(--accent-primary);
   border-color: transparent;
   box-shadow: 0 4px 20px var(--accent-glow);
 }
@@ -1608,16 +1746,15 @@ body {
 }
 
 .reward-copy {
-  color: var(--accent-primary) !important;
-  font-family: var(--font-display) !important;
-  font-size: 0.9rem !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 1.5px !important;
-  margin-bottom: 5px !important;
-  text-align: center !important;
-  opacity: 1 !important;
   display: block;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
 }
 
 .promo-bar-wrapper.main-page {
@@ -2270,44 +2407,7 @@ body .smart-notification {
   gap: 24px;
 }
 
-.product-card {
-  position: relative;
-  background: var(--bg-product); /* Use standardized product background */
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-  opacity: 0;
-  transform: translateY(30px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  will-change: transform, opacity;
-}
-
-.product-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 50%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-  transition: 0.5s;
-  pointer-events: none;
-}
-
-.product-card.animate-in {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.product-card:hover {
-  border-color: var(--accent-primary);
-  transform: translateY(-12px) scale(1.02);
-  box-shadow: 0 20px 60px rgba(255, 11, 85, 0.2), 0 0 20px rgba(255, 11, 85, 0.1);
-}
-
-.product-card:hover::before {
-  left: 200%;
-  transition: 1.2s var(--ease-smooth);
-}
+/* Product Card Specific Elements */
 
 .product-image {
   position: relative;
@@ -2406,7 +2506,7 @@ body .smart-notification {
   margin-bottom: 12px !important;
 }
 
-.product-name {
+.product-name, .testimonial-author {
   font-family: var(--font-display);
   font-size: 1.1rem;
   font-weight: 700;
@@ -2505,8 +2605,12 @@ body .smart-notification {
 /* ============================================
    SECTION 4 — FOOTER / MISSION
    ============================================ */
+/* Professional Multi-Column Footer */
 .footer-section {
-  padding: 70px 0;
+  background: #08080c;
+  padding: 70px 0 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
   position: relative;
 }
 
@@ -2582,13 +2686,7 @@ body .smart-notification {
 }
 
 /* Professional Multi-Column Footer */
-.footer-section {
-  background: #08080c;
-  padding: 40px 0 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
-  overflow: hidden;
-  position: relative;
-}
+/* Footer Section Consolidated */
 
 .footer-grid {
   display: grid;
@@ -2629,9 +2727,7 @@ body .smart-notification {
   border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.footer-section {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
+/* Footer Grid Overrides */
 
 .footer-col:hover {
   background: rgba(255, 255, 255, 0.02);
@@ -3293,6 +3389,7 @@ body .smart-notification {
 /* ============================================
    SCROLL ANIMATION BASE
    ============================================ */
+/* Reveal Base Consolidated */
 .reveal {
   opacity: 0;
   transform: translateY(30px);
@@ -4927,22 +5024,17 @@ body .smart-notification {
     PERSUASIVE REWARDS DESIGN — BARRINHA IDEAL
     ============================================ */
 
-.promo-bar-wrapper {
-    width: 90%;
-    margin: 20px auto;
-    position: relative;
-    z-index: 10;
-}
-
+/* Promo Bar Wrapper Re-defined for Barrinha Ideal */
 .reward-copy {
-    font-family: var(--font-display);
-    font-size: 0.75rem;
-    font-weight: 600;
-    font-style: normal;
-    color: rgba(255, 255, 255, 0.5);
+    display: block;
     text-align: center;
-    letter-spacing: 0.3px;
-    margin: 0 0 14px;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
 }
 
 /* Summary-only text (sidebar cart, checkout order summary) */
@@ -4957,20 +5049,22 @@ body .smart-notification {
     letter-spacing: 0.2px;
 }
 
-/* Mini Savings Pill (Checkout Only) */
+/* Mini Savings Pill (Integrated) */
 .mini-savings-pill {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
+    gap: 6px;
+    padding: 4px 10px;
     background: #fff;
     border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    white-space: nowrap;
+    height: 24px;
 }
 
 .mini-savings-label {
     font-family: var(--font-display);
-    font-size: 10px;
+    font-size: 8px;
     font-weight: 800;
     color: #666;
     letter-spacing: 0.5px;
@@ -4978,9 +5072,13 @@ body .smart-notification {
 
 .mini-savings-val {
     font-family: var(--font-display);
-    font-size: 11px;
+    font-size: 9px;
     font-weight: 900;
     color: var(--accent-primary);
+}
+
+.summary-reward-header {
+    width: 100%;
 }
 
 .reward-pill-container {
