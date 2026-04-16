@@ -1373,68 +1373,83 @@
 
             `;
             if (window.initGradualSpacing) window.initGradualSpacing();
-            if (typeof updateRewardsUI === 'function') updateRewardsUI();
-        }
-
-        function renderFullCatalog(allProducts) {
+              function renderFullCatalog(allProducts) {
             const container = document.getElementById('fullCatalogContent');
             if (!container) return;
-
             const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
             
-            container.innerHTML = `
-                <div class="upsell-products-wrapper" style="position: relative; margin-top: 20px;">
-                    <button class="carousel-nav-btn prev" id="prevBtnProduct" aria-label="Anterior" style="position: absolute; left: -50px; top: 50%; transform: translateY(-50%); z-index: 10;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                    </button>
-                    <div class="upsell-carousel" id="product-upsell-carousel" style="display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 20px; padding: 20px 0; scroll-snap-type: x mandatory; -ms-overflow-style: none; scrollbar-width: none;">
-                        ${allProducts.map(p => {
-                            const price = parseFloat(p.price);
-                            const isRetail = saleType === 'retail';
-                            const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : price;
-                            return `
-                                <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'" style="flex: 0 0 calc(33.333% - 14px); min-width: 250px; scroll-snap-align: center;">
-                                    <div class="product-image" style="height: 200px;">
-                                        <img src="${p.image || 'assets/logo-ignite.png'}" alt="${p.name}" class="product-img-real" style="padding: 10px;">
-                                    </div>
-                                    <div class="product-info" style="padding: 15px;">
-                                        <div class="product-brand" style="font-size: 0.65rem;">${p.brand || 'Olimpo'}</div>
-                                        <div class="product-name" style="font-size: 0.9rem;">${p.name}</div>
-                                        <div class="product-price-row">
-                                            <span class="current" style="font-size: 1.1rem; color: var(--accent-primary); font-weight: 800;">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+            // Clear but preserve space for segments
+            container.innerHTML = '';
+            
+            const brands = ["ignite", "elfbar", "blacksheep"];
+            brands.forEach(brand => {
+                const brandProducts = allProducts.filter(p => (p.brand || '').toLowerCase() === brand);
+                if (brandProducts.length === 0) return;
+
+                const segment = document.createElement('div');
+                segment.className = 'brand-segment-section';
+                
+                const cId = `product-carousel-${brand}`;
+                const nId = `next-p-${brand}`;
+                const pId = `prev-p-${brand}`;
+
+                segment.innerHTML = `
+                    <div class="brand-header-pill" style="margin-top: 40px;">
+                        <h3>${brand.toUpperCase()}</h3>
+                    </div>
+                    <div class="upsell-products-wrapper" style="position: relative;">
+                        <button class="carousel-nav-btn prev" id="${pId}" aria-label="Anterior" style="position: absolute; left: -50px; top: 50%; transform: translateY(-50%); z-index: 10;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </button>
+                        <div class="upsell-carousel" id="${cId}" style="display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 20px; padding: 20px 0; scroll-snap-type: x mandatory; -ms-overflow-style: none; scrollbar-width: none;">
+                            ${brandProducts.map(p => {
+                                const price = parseFloat(p.price);
+                                const isRetail = saleType === 'retail';
+                                const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : price;
+                                return `
+                                    <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'" style="flex: 0 0 calc(33.333% - 14px); min-width: 250px; scroll-snap-align: center;">
+                                        <div class="product-image" style="height: 200px;">
+                                            <img src="${p.image || 'assets/logo-ignite.png'}" alt="${p.name}" class="product-img-real" style="padding: 10px;">
+                                        </div>
+                                        <div class="product-info" style="padding: 15px;">
+                                            <div class="product-brand" style="font-size: 0.65rem;">${p.brand || brand}</div>
+                                            <div class="product-name" style="font-size: 0.9rem;">${p.name}</div>
+                                            <div class="product-price-row">
+                                                <span class="current" style="font-size: 1.1rem; color: var(--accent-primary); font-weight: 800;">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            `;
-                        }).join('')}
+                                `;
+                            }).join('')}
+                        </div>
+                        <button class="carousel-nav-btn next" id="${nId}" aria-label="Próximo" style="position: absolute; right: -50px; top: 50%; transform: translateY(-50%); z-index: 10;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
                     </div>
-                    <button class="carousel-nav-btn next" id="nextBtnProduct" aria-label="Próximo" style="position: absolute; right: -50px; top: 50%; transform: translateY(-50%); z-index: 10;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                    </button>
-                </div>
-            `;
+                `;
+                container.appendChild(segment);
 
-            // Logic for Product Carousel Navigation
-            const track = document.getElementById('product-upsell-carousel');
-            const btnPrev = document.getElementById('prevBtnProduct');
-            const btnNext = document.getElementById('nextBtnProduct');
-
-            if (track && btnPrev && btnNext) {
-                const updateArrows = () => {
-                    const scrollLeft = track.scrollLeft;
-                    const maxScroll = track.scrollWidth - track.clientWidth;
-                    btnPrev.style.opacity = scrollLeft <= 5 ? '0' : '1';
-                    btnPrev.style.pointerEvents = scrollLeft <= 5 ? 'none' : 'all';
-                    btnNext.style.opacity = scrollLeft >= maxScroll - 5 ? '0' : '1';
-                    btnNext.style.pointerEvents = scrollLeft >= maxScroll - 5 ? 'none' : 'all';
-                };
-
-                btnPrev.onclick = () => { track.scrollBy({ left: -300, behavior: 'smooth' }); setTimeout(updateArrows, 400); };
-                btnNext.onclick = () => { track.scrollBy({ left: 300, behavior: 'smooth' }); setTimeout(updateArrows, 400); };
-                track.onscroll = updateArrows;
-                setTimeout(updateArrows, 500);
-            }
+                // Individual Nav for this Brand Carousel
+                const trk = document.getElementById(cId);
+                const bP = document.getElementById(pId);
+                const bN = document.getElementById(nId);
+                if (trk && bP && bN) {
+                    const upd = () => {
+                        const sL = trk.scrollLeft;
+                        const mS = trk.scrollWidth - trk.clientWidth;
+                        bP.style.opacity = sL <= 5 ? '0' : '1';
+                        bP.style.pointerEvents = sL <= 5 ? 'none' : 'all';
+                        bN.style.opacity = sL >= mS - 5 ? '0' : '1';
+                        bN.style.pointerEvents = sL >= mS - 5 ? 'none' : 'all';
+                    };
+                    bP.onclick = () => { trk.scrollBy({ left: -300, behavior: 'smooth' }); setTimeout(upd, 400); };
+                    bN.onclick = () => { trk.scrollBy({ left: 300, behavior: 'smooth' }); setTimeout(upd, 400); };
+                    trk.onscroll = upd;
+                    setTimeout(upd, 600);
+                }
+            });
         }
+
 
         loadProduct();
     </script>
@@ -1442,7 +1457,9 @@
 
 
 
+    <script src="assets/products-data.js?v=2.1"></script>
     <script src="script.js?v=5.0"></script>
+
 
 </body>
 </html>

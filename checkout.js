@@ -137,91 +137,106 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCheckoutUpsellProducts(sorted);
     }
 
-    function renderCheckoutUpsellProducts(products) {
+    function renderCheckoutUpsellProducts(allProducts) {
         if (!checkoutUpsellGrid) return;
-        checkoutUpsellGrid.innerHTML = '';
-        const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
+        const container = checkoutUpsellGrid.parentElement.parentElement; // carouselSection
+        const initialGrid = document.getElementById('checkout-upsell-products');
         
-        products.forEach((p, idx) => {
-            const card = document.createElement('div');
-            card.className = 'product-card animate-in';
-            card.style.animationDelay = `${idx * 0.05}s`;
+        // Clear the entire section to reconstruct with segments
+        const carouselSection = document.getElementById('carouselSection');
+        if (!carouselSection) return;
+        
+        // Clear content but preserve the rewards grid stack
+        const gridStack = carouselSection.querySelector('.olimpo-grid-stack');
+        carouselSection.innerHTML = '';
+        if (gridStack) carouselSection.appendChild(gridStack);
+
+        const brands = ["ignite", "elfbar", "blacksheep"];
+        const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
+
+        brands.forEach(brand => {
+            const brandProducts = allProducts.filter(p => (p.brand || '').toLowerCase() === brand);
+            if (brandProducts.length === 0) return;
+
+            const segment = document.createElement('div');
+            segment.className = 'brand-segment-section animate-in';
             
-            let imgSrc = p.image || 'assets/logo-ignite.png';
-            if (imgSrc && !imgSrc.includes('/') && !imgSrc.startsWith('http')) {
-                imgSrc = 'Images Pods/' + imgSrc;
-            }
+            const carouselId = `upsell-carousel-${brand}`;
+            const nextId = `next-${brand}`;
+            const prevId = `prev-${brand}`;
 
-            const price = parseFloat(p.price);
-            const isRetail = saleType === 'retail';
-            const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : price;
-            const cardId = `upsell-card-${p.id || idx}`;
-
-            card.innerHTML = `
-                <div class="product-image">
-                    <img src="${imgSrc}" alt="${p.name}" class="product-img-real" onerror="this.src='assets/logo-ignite.png'">
+            segment.innerHTML = `
+                <div class="brand-header-pill">
+                    <h3>${brand.toUpperCase()}</h3>
                 </div>
-                <div class="product-info">
-                    <div class="product-brand">${p.brand || 'Olimpo'}</div>
-                    <div class="product-name">${p.name}</div>
-                    <div class="product-price-row">
-                        <span class="current">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+                <div class="upsell-products-wrapper" style="position: relative;">
+                    <button class="carousel-nav-btn prev" id="${prevId}" style="position: absolute; left: -50px; top: 50%; transform: translateY(-50%); z-index: 10;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <div class="upsell-carousel" id="${carouselId}">
+                        ${brandProducts.map((p, idx) => {
+                            const price = parseFloat(p.price);
+                            const isRetail = saleType === 'retail';
+                            const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : price;
+                            const cardId = `upsell-card-${brand}-${p.id || idx}`;
+                            let imgSrc = p.image || 'assets/logo-ignite.png';
+                            if (imgSrc && !imgSrc.includes('/') && !imgSrc.startsWith('http')) {
+                                imgSrc = 'Images Pods/' + imgSrc;
+                            }
+                            return `
+                                <div class="product-card">
+                                    <div class="product-image">
+                                        <img src="${imgSrc}" alt="${p.name}" class="product-img-real" onerror="this.src='assets/logo-ignite.png'">
+                                    </div>
+                                    <div class="product-info">
+                                        <div class="product-brand">${p.brand || brand}</div>
+                                        <div class="product-name">${p.name}</div>
+                                        <div class="product-price-row">
+                                            <span class="current">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+                                        </div>
+                                        <div class="product-add-controls">
+                                            <div class="upsell-qty-stepper">
+                                                <button type="button" class="upsell-qty-btn" onclick="adjustUpsellQty('${cardId}', -1)">−</button>
+                                                <input type="number" class="upsell-qty-val" id="${cardId}-qty" value="10" min="1">
+                                                <button type="button" class="upsell-qty-btn" onclick="adjustUpsellQty('${cardId}', 1)">+</button>
+                                            </div>
+                                            <button type="button" class="upsell-add-btn" onclick="addToCartFromCheckout('${p.id}', '${p.name}', ${finalPrice}, '${p.image || ''}', '${cardId}-qty')">
+                                                Adicionar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
-                    <div class="product-add-controls">
-                        <div class="upsell-qty-stepper">
-                            <button type="button" class="upsell-qty-btn" onclick="adjustUpsellQty('${cardId}', -1)">−</button>
-                            <input type="number" class="upsell-qty-val" id="${cardId}-qty" value="10" min="1">
-                            <button type="button" class="upsell-qty-btn" onclick="adjustUpsellQty('${cardId}', 1)">+</button>
-                        </div>
-                        <button type="button" class="upsell-add-btn" onclick="addToCartFromCheckout('${p.id}', '${p.name}', ${finalPrice}, '${p.image || ''}', '${cardId}-qty')">
-                            Adicionar
-                        </button>
-                    </div>
+                    <button class="carousel-nav-btn next" id="${nextId}" style="position: absolute; right: -50px; top: 50%; transform: translateY(-50%); z-index: 10;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
                 </div>
             `;
-            checkoutUpsellGrid.appendChild(card);
+            carouselSection.appendChild(segment);
+
+            // Initialize Nav for this specific carousel
+            const track = document.getElementById(carouselId);
+            const bPrev = document.getElementById(prevId);
+            const bNext = document.getElementById(nextId);
+            if (track && bPrev && bNext) {
+                const updateSegArrows = () => {
+                    const sLeft = track.scrollLeft;
+                    const mScroll = track.scrollWidth - track.clientWidth;
+                    bPrev.style.opacity = sLeft <= 5 ? '0' : '1';
+                    bPrev.style.pointerEvents = sLeft <= 5 ? 'none' : 'all';
+                    bNext.style.opacity = sLeft >= mScroll - 5 ? '0' : '1';
+                    bNext.style.pointerEvents = sLeft >= mScroll - 5 ? 'none' : 'all';
+                };
+                bPrev.onclick = () => { track.scrollBy({ left: -305, behavior: 'smooth' }); setTimeout(updateSegArrows, 400); };
+                bNext.onclick = () => { track.scrollBy({ left: 305, behavior: 'smooth' }); setTimeout(updateSegArrows, 400); };
+                track.addEventListener('scroll', updateSegArrows);
+                setTimeout(updateSegArrows, 600);
+            }
         });
-        
-        // Remove old direct styles and rely on CSS classes
-        checkoutUpsellGrid.style.display = '';
-        checkoutUpsellGrid.style.justifyContent = '';
-        checkoutUpsellGrid.style.gap = '';
-        checkoutUpsellGrid.style.flexWrap = '';
-        
-        updateArrows();
     }
 
-    const updateArrows = () => {
-        if (!checkoutUpsellGrid) return;
-        const scrollLeft = checkoutUpsellGrid.scrollLeft;
-        const maxScroll = checkoutUpsellGrid.scrollWidth - checkoutUpsellGrid.clientWidth;
-
-        if (prevBtn) {
-            prevBtn.style.opacity = scrollLeft <= 5 ? '0' : '1';
-            prevBtn.style.pointerEvents = scrollLeft <= 5 ? 'none' : 'all';
-        }
-        if (nextBtn) {
-            nextBtn.style.opacity = scrollLeft >= maxScroll - 5 ? '0' : '1';
-            nextBtn.style.pointerEvents = scrollLeft >= maxScroll - 5 ? 'none' : 'all';
-        }
-    };
-
-    if (prevBtn) {
-        prevBtn.onclick = () => {
-            checkoutUpsellGrid.scrollBy({ left: -305, behavior: 'smooth' });
-            setTimeout(updateArrows, 400);
-        };
-    }
-    if (nextBtn) {
-        nextBtn.onclick = () => {
-            checkoutUpsellGrid.scrollBy({ left: 305, behavior: 'smooth' });
-            setTimeout(updateArrows, 400);
-        };
-    }
-
-    checkoutUpsellGrid.addEventListener('scroll', () => {
-      requestAnimationFrame(updateArrows);
-    });
     
     // Initial Catalog Load
     async function initCheckoutCatalogs() {
