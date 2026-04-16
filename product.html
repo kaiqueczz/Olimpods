@@ -1337,9 +1337,11 @@
             
             // Render the main title and the new Dual-Pill rewards system
             container.innerHTML = `
-                <div class="promo-rewards-stack">
+                <div class="olimpo-grid-stack">
+                    <!-- Nível 1: Título -->
                     <h2 class="gradual-spacing" data-text="CONTINUE COMPRANDO">CONTINUE COMPRANDO</h2>
                     
+                    <!-- Nível 2: Pílulas Dual (Esquerda Maior / Direita Menor) -->
                     <div class="reward-pill-container" id="rewardPillContainerSummary">
                         <div class="reward-pill">
                             <span class="reward-pill-msg" id="rewardMsgSummary">Carregando recompensas...</span>
@@ -1350,6 +1352,7 @@
                         </div>
                     </div>
 
+                    <!-- Nível 3: Barra de Progresso Ultra-Fina -->
                     <div class="main-page-rewards reveal" data-delay="1" style="width: 100%; display: block !important; opacity: 1; visibility: visible;">
                         <div class="promo-bar-wrapper main-page" style="margin: 0 auto; width: 100%; max-width: 650px;">
                             <div class="promo-bar-track">
@@ -1365,6 +1368,7 @@
                         </div>
                     </div>
                 </div>
+
 
             `;
             if (window.initGradualSpacing) window.initGradualSpacing();

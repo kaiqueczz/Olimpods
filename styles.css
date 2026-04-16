@@ -755,7 +755,7 @@ body {
   flex-wrap: nowrap !important;
   justify-content: center !important;
   align-items: center !important;
-  font-size: 1.85rem !important; /* Exactly 15% reduction requested */
+  font-size: 2rem !important; /* Prominent size as requested in audio */
   font-weight: 900 !important;
   white-space: nowrap !important;
   margin-bottom: 25px !important;
@@ -771,6 +771,7 @@ body {
   flex-wrap: nowrap !important;
   white-space: nowrap !important;
 }
+
 
 
 
@@ -2308,11 +2309,11 @@ body .smart-notification {
 /* Duplicate block removed to resolve conflicts */
 
 
-.promo-rewards-stack {
+.olimpo-grid-stack {
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
-  gap: 20px !important;
+  gap: 24px !important;
   width: 100% !important;
   max-width: 800px !important;
   margin: 0 auto 40px !important;
@@ -2322,33 +2323,34 @@ body .smart-notification {
   display: flex !important;
   flex-direction: row !important;
   justify-content: center !important;
-  align-items: stretch !important;
+  align-items: center !important;
   gap: 15px !important;
   width: 100% !important;
-  max-width: 650px !important;
+  max-width: 700px !important;
 }
 
 .reward-pill {
   flex: 1.8 !important; /* Larger Pill (Left) */
-  min-height: 50px !important;
+  min-height: 52px !important;
 }
 
 .reward-pill-economy {
-  flex: 1.2 !important; /* Smaller Pill (Right) */
-  min-height: 50px !important;
+  flex: 1 !important; /* Smaller Pill (Right) */
+  min-height: 52px !important;
 }
 
 .reward-pill, .reward-pill-economy {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 24px;
-  background: rgba(15, 15, 22, 0.9);
-  border: 1px solid rgba(255, 11, 85, 0.4);
-  border-radius: 50px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 11, 85, 0.2);
+  padding: 14px 28px;
+  background: rgba(15, 15, 22, 0.95);
+  border: 1px solid rgba(255, 11, 85, 0.45);
+  border-radius: 60px; /* Perfect pill shape */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 11, 85, 0.25);
   transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
+
 
 
 .reward-pill-economy {
