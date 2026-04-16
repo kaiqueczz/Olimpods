@@ -748,27 +748,30 @@ body {
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
-  gap: 24px !important;
+  gap: 32px !important; /* Increased gap to push elements down */
   width: 100% !important;
   max-width: 1000px !important;
-  margin: 0 auto 40px !important;
+  margin: 40px auto 60px !important; /* Added top margin to move everything down */
 }
+
 
 .gradual-spacing {
   display: flex !important;
   flex-wrap: nowrap !important;
   justify-content: center !important;
   align-items: center !important;
-  font-size: 6rem !important; /* Monumental 3x Scaling as requested */
+  font-size: 4.8rem !important; /* Re-scaled to fit 650px width */
   font-weight: 900 !important;
   white-space: nowrap !important;
-  margin-bottom: 40px !important;
+  margin-bottom: 50px !important; /* Pushing pills down */
   line-height: 1.0 !important;
-  letter-spacing: -3px !important;
+  letter-spacing: 2px !important; /* Stretching to match exact bar width */
   text-align: center !important;
-  width: 100% !important;
+  width: 650px !important; /* EXACT match to progress bar width */
+  max-width: 100% !important;
   text-transform: uppercase !important;
 }
+
 
 .gradual-spacing .gs-word,
 .gradual-spacing .gs-char,
