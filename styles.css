@@ -760,17 +760,18 @@ body {
   flex-wrap: nowrap !important;
   justify-content: center !important;
   align-items: center !important;
-  font-size: 4.8rem !important; /* Re-scaled to fit 650px width */
+  font-size: 3.8rem !important; /* Reduced 20% for perfect balance */
   font-weight: 900 !important;
   white-space: nowrap !important;
-  margin-bottom: 50px !important; /* Pushing pills down */
+  margin-bottom: 40px !important;
   line-height: 1.0 !important;
-  letter-spacing: 2px !important; /* Stretching to match exact bar width */
+  letter-spacing: 1px !important; /* Adjusted to fill 520px */
   text-align: center !important;
-  width: 650px !important; /* EXACT match to progress bar width */
-  max-width: 100% !important;
+  width: 520px !important; /* Reduced 20% (from 650px) */
+  max-width: 95vw !important;
   text-transform: uppercase !important;
 }
+
 
 
 .gradual-spacing .gs-word,
@@ -1739,8 +1740,10 @@ body {
     (Pill styles in PERSUASIVE REWARDS section below)
     ============================================ */
 .main-page-rewards {
-  display: none !important;
+  display: block !important; /* Restored for layout flow */
+  margin-bottom: 20px;
 }
+
 
 .reward-copy {
   display: none !important;
@@ -2298,12 +2301,16 @@ body .smart-notification {
   }
 
   .upsell-products-wrapper .upsell-carousel {
+    display: flex !important;
     padding: 10px 5px;
     gap: 12px;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 }
+
 
 /* Global Styles (Out of Media Queries) */
 .upsell-products-wrapper .carousel-nav-btn {
