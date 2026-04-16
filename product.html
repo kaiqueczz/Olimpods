@@ -1337,9 +1337,9 @@
             
             // Render the main title and the new Dual-Pill rewards system
             container.innerHTML = `
-                <h2 class="gradual-spacing" data-text="CONTINUE COMPRANDO">CONTINUE COMPRANDO</h2>
-                
-                <div class="main-page-rewards reveal" data-delay="1" style="margin-bottom: 50px; display: block !important; opacity: 1; visibility: visible;">
+                <div class="promo-rewards-stack">
+                    <h2 class="gradual-spacing" data-text="CONTINUE COMPRANDO">CONTINUE COMPRANDO</h2>
+                    
                     <div class="reward-pill-container" id="rewardPillContainerSummary">
                         <div class="reward-pill">
                             <span class="reward-pill-msg" id="rewardMsgSummary">Carregando recompensas...</span>
@@ -1350,20 +1350,22 @@
                         </div>
                     </div>
 
-                    
-                    <div class="promo-bar-wrapper main-page" style="margin: 0 auto; max-width: 650px;">
-                        <div class="promo-bar-track">
-                            <div class="promo-bar-fill" id="mainProgressFill">
-                                <div class="promo-bar-energy"></div>
-                            </div>
-                            <div class="promo-bar-markers">
-                                <div class="promo-marker" data-goal="30" style="left:60%"><span class="marker-icon">30</span></div>
-                                <div class="promo-marker" data-goal="40" style="left:80%"><span class="marker-icon">40</span></div>
-                                <div class="promo-marker" data-goal="50" style="left:100%"><span class="marker-icon">50</span></div>
+                    <div class="main-page-rewards reveal" data-delay="1" style="width: 100%; display: block !important; opacity: 1; visibility: visible;">
+                        <div class="promo-bar-wrapper main-page" style="margin: 0 auto; width: 100%; max-width: 650px;">
+                            <div class="promo-bar-track">
+                                <div class="promo-bar-fill" id="mainProgressFill">
+                                    <div class="promo-bar-energy"></div>
+                                </div>
+                                <div class="promo-bar-markers">
+                                    <div class="promo-marker" data-goal="30" style="left:60%"><span class="marker-icon">30</span></div>
+                                    <div class="promo-marker" data-goal="40" style="left:80%"><span class="marker-icon">40</span></div>
+                                    <div class="promo-marker" data-goal="50" style="left:100%"><span class="marker-icon">50</span></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
             `;
             if (window.initGradualSpacing) window.initGradualSpacing();
             if (typeof updateRewardsUI === 'function') updateRewardsUI();

@@ -2308,28 +2308,48 @@ body .smart-notification {
 /* Duplicate block removed to resolve conflicts */
 
 
-.reward-pill-container {
+.promo-rewards-stack {
   display: flex !important;
-  flex-direction: row !important; /* Side by side globally */
-  justify-content: center !important;
+  flex-direction: column !important;
   align-items: center !important;
-  gap: 15px !important;
-  margin-bottom: 25px !important;
-  flex-wrap: nowrap !important;
+  gap: 20px !important;
+  width: 100% !important;
+  max-width: 800px !important;
+  margin: 0 auto 40px !important;
 }
 
+.reward-pill-container {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  gap: 15px !important;
+  width: 100% !important;
+  max-width: 650px !important;
+}
+
+.reward-pill {
+  flex: 1.8 !important; /* Larger Pill (Left) */
+  min-height: 50px !important;
+}
+
+.reward-pill-economy {
+  flex: 1.2 !important; /* Smaller Pill (Right) */
+  min-height: 50px !important;
+}
 
 .reward-pill, .reward-pill-economy {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 22px;
+  padding: 12px 24px;
   background: rgba(15, 15, 22, 0.9);
   border: 1px solid rgba(255, 11, 85, 0.4);
   border-radius: 50px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 11, 85, 0.2);
   transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
+
 
 .reward-pill-economy {
   padding: 10px 18px;
@@ -5216,13 +5236,14 @@ body .smart-notification {
 /* ===== BARRINHA IDEAL — Design Original ===== */
 .promo-bar-track {
     position: relative;
-    height: 10px;
+    height: 8px !important; /* Ultra-thin bar as requested */
     background: rgba(255, 255, 255, 0.06);
     border-radius: 50px;
     overflow: visible;
     border: 1px solid rgba(255, 255, 255, 0.05);
     margin-right: 14px;
 }
+
 
 /* Passing Glow */
 .promo-bar-energy {
