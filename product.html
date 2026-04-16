@@ -1337,17 +1337,19 @@
             
             // Render the main title and the new Dual-Pill rewards system
             container.innerHTML = `
-                <h2 class="gradual-spacing" data-text="Continue comprando" style="margin-bottom: 30px; font-size: 2.2rem !important; white-space: nowrap !important;"></h2>
+                <h2 class="gradual-spacing" data-text="CONTINUE COMPRANDO">CONTINUE COMPRANDO</h2>
                 
                 <div class="main-page-rewards reveal" data-delay="1" style="margin-bottom: 50px; display: block !important; opacity: 1; visibility: visible;">
-                    <div class="reward-pill-container">
-                        <div class="reward-pill" id="mainRewardPill">
-                            <span class="promo-bar-text">Adicione itens para desbloquear recompensas</span>
+                    <div class="reward-pill-container" id="rewardPillContainerSummary">
+                        <div class="reward-pill">
+                            <span class="reward-pill-msg" id="rewardMsgSummary">Carregando recompensas...</span>
                         </div>
                         <div class="reward-pill-economy" id="economyPillSummary" style="display: none;">
-                            <span class="economy-text">Sua economia:<span class="economy-val" id="savingsValueSummary">R$ 0,00</span></span>
+                            <span class="economy-text">Sua economia:</span>
+                            <span class="economy-val" id="savingsValueSummary">R$ 0,00</span>
                         </div>
                     </div>
+
                     
                     <div class="promo-bar-wrapper main-page" style="margin: 0 auto; max-width: 650px;">
                         <div class="promo-bar-track">

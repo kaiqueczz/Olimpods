@@ -14,12 +14,6 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;900&display=swap"
         rel="stylesheet">
     <style>
-        .gradual-spacing {
-            white-space: nowrap !important;
-            display: block !important;
-            width: 100% !important;
-            text-align: center !important;
-        }
         
         .reward-pill-container {
     display: flex !important;
@@ -374,18 +368,21 @@
     <section class="checkout-extra-products" id="carouselSection">
         <div class="container">
             <div class="checkout-upsell-promo">
-                <h2 class="gradual-spacing" data-text="CONTINUE COMPRANDO" style="margin-bottom: 30px;"></h2>
+                <h2 class="gradual-spacing" data-text="CONTINUE COMPRANDO">CONTINUE COMPRANDO</h2>
+                
+                <div class="reward-pill-container" id="rewardPillContainerSummary">
+                    <div class="reward-pill">
+                        <span class="reward-pill-msg" id="rewardMsgSummary">Carregando recompensas...</span>
+                    </div>
+                    <div class="reward-pill-economy" id="economyPillSummary" style="display: none;">
+                        <span class="economy-text">Sua economia:</span>
+                        <span class="economy-val" id="savingsValueSummary">R$ 0,00</span>
+                    </div>
+                </div>
+
 
                 <!-- Standardized Rewards Bar (Matches Index.html) -->
                 <div class="main-page-rewards reveal" data-delay="1" style="margin-bottom: 40px; display: block !important;">
-                    <div class="reward-pill-container">
-                        <div class="reward-pill" id="checkoutUpsellPill">
-                            <span class="promo-bar-text" id="progressTextCheckout2">Adicione itens para desbloquear recompensas</span>
-                        </div>
-                        <div class="reward-pill-economy" id="economyPillCheckout" style="display: none;">
-                            <span class="economy-text">Sua economia:<span class="economy-val" id="savingsValueCheckout">R$ 0,00</span></span>
-                        </div>
-                    </div>
                     <div class="promo-bar-wrapper main-page" style="margin: 0 auto; max-width: 650px;">
                         <div class="promo-bar-track">
                             <div class="promo-bar-fill" id="progressFillCheckout2">

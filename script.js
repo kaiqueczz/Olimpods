@@ -781,7 +781,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Standardized Selectors for Ideal Bar - Sidebar & Static versions
     const allFills = document.querySelectorAll('.promo-bar-fill, #progressFill, #progressFillStatic, #progressFillCheckout, #progressFillCheckout2, #mainPageProgressFill, #mainProgressFill');
-    const allMsgs = document.querySelectorAll('.reward-pill .promo-bar-text, .promo-summary-text, #progressText, #progressTextStatic, #progressTextCheckout, #progressTextCheckout2, #mainRewardText, #mainRewardPill .promo-bar-text');
+    const allMsgs = document.querySelectorAll('.reward-pill .promo-bar-text, .promo-summary-text, #progressText, #progressTextStatic, #progressTextCheckout, #progressTextCheckout2, #mainRewardText, #mainRewardPill .promo-bar-text, #rewardMsgSummary, .reward-pill-msg');
+
     const allSavingsValues = document.querySelectorAll('.promo-savings-value, #savingsValue, #savingsValueStatic, #savingsValueCheckout, .mini-savings-val, .savings-value, #savingsValueSummary, .economy-val');
     const allSavingsWrappers = document.querySelectorAll('.promo-savings, #savingsDisplay, #savingsDisplayStatic, #savingsDisplayCheckout, .mini-savings-pill, .reward-pill-economy, .reward-pill-savings, #economyPillCheckout, #economyPillSummary, #savingsDisplaySummary');
     const progressBar = document.querySelector('.minimum-progress-container, .promo-bar-wrapper');

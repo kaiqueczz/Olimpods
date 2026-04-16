@@ -749,18 +749,30 @@ body {
   margin-bottom: 16px;
 }
 
-/* Redesign Headlines — No more glow, just clean bold type */
-.catalog-title.gradual-spacing, 
-.checkout-upsell-promo .gradual-spacing {
-  font-size: clamp(1.2rem, 4vw, 42px) !important;
-  font-weight: 900 !important;
-  letter-spacing: -1.2px !important;
-  white-space: nowrap !important;
+/* Redesign Headlines — Unified & Clean */
+.gradual-spacing {
   display: flex !important;
+  flex-wrap: nowrap !important;
   justify-content: center !important;
-  margin-bottom: 40px !important;
-  line-height: 1 !important;
+  align-items: center !important;
+  font-size: 1.85rem !important; /* Exactly 15% reduction requested */
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+  margin-bottom: 25px !important;
+  line-height: 1.2 !important;
+  letter-spacing: -1px !important;
+  text-align: center !important;
+  width: 100% !important;
 }
+
+.gradual-spacing .gs-word,
+.gradual-spacing .gs-char {
+  display: inline-flex !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+}
+
+
 
 /* Adjust /LABEL pattern */
 .section-header-pill {
@@ -808,46 +820,21 @@ body {
     box-shadow: 0 15px 35px rgba(255, 11, 85, 0.2) !important;
 }
 
-/* Gradual Spacing */
-.gradual-spacing {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0;
-}
-
-.gradual-spacing .gs-word {
-  display: inline-flex;
-  white-space: normal;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-
-
+/* Gradual Spacing — Inner Styling */
 .gradual-spacing .gs-char {
-  display: inline-block;
   font-family: var(--font-display);
-  font-size: var(--gs-size, clamp(2.4rem, 6.4vw, 4.4rem));
-  font-weight: 700;
-  line-height: 1.3; /* Added to protect accents */
-  letter-spacing: 0.5px;
+  font-size: inherit; /* Use parent 1.8rem */
+  font-weight: 900;
   text-transform: uppercase;
   color: var(--accent-primary);
   opacity: 0;
   animation: gsGlitch 0.8s steps(1) forwards;
-  /* animation-delay removed */
-}
-
-.gradual-spacing .gs-char.gs-accent {
-  color: var(--accent-primary);
 }
 
 .gradual-spacing .gs-space {
-  width: 0.4em;
+  width: 0.35em;
 }
 
-/* Glitch Entrance — aggressive */
 @keyframes gsGlitch {
   0% {
     opacity: 0;
@@ -2318,23 +2305,19 @@ body .smart-notification {
   padding: 15px;
 }
 
-.gradual-spacing {
-  font-size: 1.8rem !important;
-  white-space: nowrap !important;
-  display: block !important;
-  width: 100% !important;
-  text-align: center !important;
-  letter-spacing: -0.5px !important;
-}
+/* Duplicate block removed to resolve conflicts */
+
 
 .reward-pill-container {
   display: flex !important;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 25px;
-  flex-wrap: nowrap;
+  flex-direction: row !important; /* Side by side globally */
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 15px !important;
+  margin-bottom: 25px !important;
+  flex-wrap: nowrap !important;
 }
+
 
 .reward-pill, .reward-pill-economy {
   display: inline-flex;
@@ -3090,11 +3073,11 @@ body .smart-notification {
     overflow-x: hidden;
   }
 
-  .products-section .gradual-spacing,
   .products-section .sale-toggle-wrapper,
   .products-section .category-tabs {
     padding: 0 20px;
   }
+
 
   .products-carousel-viewport {
     width: 100%;
@@ -3273,13 +3256,8 @@ body .smart-notification {
     text-overflow: ellipsis;
   }
 
-  .products-section .gradual-spacing {
-    --gs-size: 1.2rem !important;
-    white-space: nowrap !important;
-    justify-content: center;
-    width: 100%;
-    margin-bottom: 20px;
-  }
+
+
 
   .gs-char {
     --gs-size: 1.2rem;
@@ -4408,9 +4386,8 @@ body .smart-notification {
   }
 }
 
-.institutional-header h1.gradual-spacing {
-  justify-content: center;
-}
+
+
 
 .institutional-header p {
   color: var(--text-secondary);
