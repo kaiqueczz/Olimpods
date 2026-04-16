@@ -741,6 +741,8 @@ body {
   align-items: center;
   gap: 8px;
   font-family: var(--font-short);
+}
+
 /* OLIMPO DESIGN SYSTEM v12 — AUTHORITATIVE GRID */
 .olimpo-grid-stack {
   display: flex !important;
