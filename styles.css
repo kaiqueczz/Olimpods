@@ -1587,14 +1587,8 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   transition: all 0.4s ease;
 }
-  border-radius: 20px !important;
-  background: transparent !important;
-  margin-bottom: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 280px;
-}
+
+
 
 .btn-buy {
   width: 100%;
@@ -2330,26 +2324,27 @@ body .smart-notification {
 }
 
 .reward-pill {
-  flex: 1.8 !important; /* Larger Pill (Left) */
+  flex: 1.8 !important; /* Proporção Larga (Progresso) */
   min-height: 52px !important;
 }
 
 .reward-pill-economy {
-  flex: 1 !important; /* Smaller Pill (Right) */
+  flex: 1 !important; /* Proporção Menor (Economia) */
   min-height: 52px !important;
 }
 
 .reward-pill, .reward-pill-economy {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 14px 28px;
-  background: rgba(15, 15, 22, 0.95);
-  border: 1px solid rgba(255, 11, 85, 0.45);
-  border-radius: 60px; /* Perfect pill shape */
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 11, 85, 0.25);
-  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 14px 28px !important;
+  background: rgba(15, 15, 22, 0.95) !important;
+  border: 1px solid rgba(255, 11, 85, 0.45) !important;
+  border-radius: 60px !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 11, 85, 0.25) !important;
+  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1) !important;
 }
+
 
 
 
