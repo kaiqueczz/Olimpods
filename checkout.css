@@ -1305,3 +1305,9 @@ body.checkout-page {
     font-family: var(--font-display);
     letter-spacing: 1px;
 }
+
+/* Global Styles for Carousel Navigation */
+.upsell-products-wrapper .carousel-nav-btn {
+    z-index: 100 !important;
+    cursor: pointer !important;
+}
