@@ -763,14 +763,15 @@ body {
   font-size: 3.8rem !important;
   font-weight: 900 !important;
   white-space: nowrap !important;
-  margin-bottom: 40px !important;
-  line-height: 1.0 !important;
+  margin-bottom: 15px !important; /* Brought closer to subtitle as requested */
+  line-height: 1.2 !important; /* Increased to ensure tilde (~) visibility */
   letter-spacing: 1px !important;
   text-align: center !important;
-  width: auto !important; /* Reverted to auto for global centering */
+  width: 100% !important; /* Forced 100% for absolute centering */
   max-width: 95vw !important;
   text-transform: uppercase !important;
 }
+
 
 /* Specific alignment for the Olimpo Rewards Grid items only */
 .olimpo-grid-stack .gradual-spacing {
