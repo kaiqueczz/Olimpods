@@ -755,7 +755,8 @@ body {
   flex-wrap: nowrap !important;
   justify-content: center !important;
   align-items: center !important;
-  font-size: 2rem !important; /* Prominent size as requested in audio */
+  font-size: 5.5rem !important; /* 3x bigger (was ~1.85-2rem) */
+
   font-weight: 900 !important;
   white-space: nowrap !important;
   margin-bottom: 25px !important;
@@ -2325,19 +2326,22 @@ body .smart-notification {
 
 .reward-pill {
   flex: 1.8 !important; /* Proporção Larga (Progresso) */
-  min-height: 52px !important;
+  min-height: 42px !important; /* Reduced 20% from 52px */
 }
+
 
 .reward-pill-economy {
   flex: 1 !important; /* Proporção Menor (Economia) */
-  min-height: 52px !important;
+  min-height: 42px !important; /* Reduced 20% from 52px */
+
 }
 
 .reward-pill, .reward-pill-economy {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 14px 28px !important;
+  padding: 11px 22px !important; /* Reduced 20% from 14px/28px */
+
   background: rgba(15, 15, 22, 0.95) !important;
   border: 1px solid rgba(255, 11, 85, 0.45) !important;
   border-radius: 60px !important;
@@ -2355,7 +2359,8 @@ body .smart-notification {
 
 .reward-pill-economy .economy-text {
   font-family: var(--font-display);
-  font-size: 0.8rem;
+  font-size: 0.65rem !important; /* Reduced 20% from 0.8rem */
+
   font-weight: 400;
   color: rgba(255, 255, 255, 0.85);
 }
