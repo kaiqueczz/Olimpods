@@ -723,8 +723,17 @@ document.addEventListener('DOMContentLoaded', () => {
               </svg>
             </button>
           </div>
-          <div class="promo-bar-wrapper" id="promoBarWrapper">
-            <p class="promo-bar-text" id="promoBarText">Adicione itens e ganhe <b class="text-red">recompensas!</b></p>
+          <div class="promo-bar-wrapper" id="promoBarWrapper" style="padding-top: 10px;">
+            <div class="reward-pill-container" style="display: flex !important; justify-content: flex-start; align-items: center; gap: 8px; margin-bottom: 15px; flex-wrap: nowrap;">
+                <div class="reward-pill" id="sidebarRewardPill" style="padding: 6px 14px; min-height: 32px;">
+                    <span class="promo-bar-text" id="promoBarText" style="font-size: 0.75rem !important;">Adicione itens e ganhe recompensas!</span>
+                </div>
+                <div class="reward-pill-savings" id="sidebarSavingsPill" style="display: none; padding: 6px 12px; min-height: 32px; background: #fff;">
+                    <span class="savings-label" style="font-size: 7px;">ECONOMIA:</span>
+                    <span class="savings-value" id="savingsValue" style="font-size: 0.75rem;">R$ 0,00</span>
+                </div>
+            </div>
+            
             <div class="promo-bar-track">
               <div class="promo-bar-fill" id="promoBarFill">
                 <div class="promo-bar-energy"></div>
@@ -734,10 +743,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="promo-marker" data-goal="40" style="left:80%"><span>40</span></div>
                 <div class="promo-marker" data-goal="50" style="left:100%"><span>50</span></div>
               </div>
-            </div>
-            <div id="savingsDisplay" class="promo-savings" style="display:none;">
-              <span class="promo-savings-label">Você já economizou:</span>
-              <span class="promo-savings-value" id="savingsValue">R$ 0,00</span>
             </div>
           </div>
           <div class="cart-items-list" id="sidebarCartItems">
@@ -775,10 +780,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutBtn = document.getElementById('sidebarCheckoutBtn');
     
     // Standardized Selectors for Ideal Bar - Sidebar & Static versions
-    const allFills = document.querySelectorAll('.promo-bar-fill, #progressFill, #progressFillStatic, #progressFillCheckout, #progressFillCheckout2, #mainPageProgressFill');
-    const allMsgs = document.querySelectorAll('.reward-pill .promo-bar-text, .promo-summary-text, #progressText, #progressTextStatic, #progressTextCheckout, #progressTextCheckout2, #mainRewardText');
-    const allSavingsValues = document.querySelectorAll('.promo-savings-value, #savingsValue, #savingsValueStatic, #savingsValueCheckout, .mini-savings-val');
-    const allSavingsWrappers = document.querySelectorAll('.promo-savings, #savingsDisplay, #savingsDisplayStatic, #savingsDisplayCheckout, .mini-savings-pill');
+    const allFills = document.querySelectorAll('.promo-bar-fill, #progressFill, #progressFillStatic, #progressFillCheckout, #progressFillCheckout2, #mainPageProgressFill, #mainProgressFill');
+    const allMsgs = document.querySelectorAll('.reward-pill .promo-bar-text, .promo-summary-text, #progressText, #progressTextStatic, #progressTextCheckout, #progressTextCheckout2, #mainRewardText, #mainRewardPill .promo-bar-text');
+    const allSavingsValues = document.querySelectorAll('.promo-savings-value, #savingsValue, #savingsValueStatic, #savingsValueCheckout, .mini-savings-val, .savings-value, #savingsValueSummary, .economy-val');
+    const allSavingsWrappers = document.querySelectorAll('.promo-savings, #savingsDisplay, #savingsDisplayStatic, #savingsDisplayCheckout, .mini-savings-pill, .reward-pill-economy, .reward-pill-savings, #economyPillCheckout, #economyPillSummary, #savingsDisplaySummary');
     const progressBar = document.querySelector('.minimum-progress-container, .promo-bar-wrapper');
 
     // Universal Update for all Progress Bars (Must run even if sidebar list is missing)
@@ -944,8 +949,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Smart Notification logic removed to prevent UI clutter on landing page.
 
-    // Hide legacy savings
-    allSavingsWrappers.forEach(w => w.style.display = 'none');
+    // Update Savings Pill visibility
+    allSavingsWrappers.forEach(w => {
+      w.style.display = (totalSavingsValue > 0) ? 'inline-flex' : 'none';
+    });
 
     // Update Milestones (Markers)
     document.querySelectorAll('.promo-marker').forEach(m => {

@@ -717,13 +717,22 @@ body {
 /* Hero H1 - Aggressive and Minimal */
 .hero h1 {
   font-family: var(--font-display);
-  font-size: clamp(3rem, 10vw, 96px);
+  font-size: clamp(3.5rem, 10vw, 96px);
   font-weight: 900;
-  line-height: 0.95;
+  line-height: 1.25; /* Increased to prevent cutting accents */
   letter-spacing: -3.5px;
-  text-transform: none; /* More natural like reference */
+  text-transform: none;
   color: #fff;
   margin-bottom: 24px;
+}
+
+.hero-subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: var(--text-secondary);
+  max-width: 700px;
+  margin: 0 auto 48px; /* Added spacing to button */
+  line-height: 1.6;
 }
 
 /* Section Labels — inspired by marcados.me */
@@ -774,7 +783,7 @@ body {
 }
 
 /* ---------- Global Buttons Reset — Marcados.me ---------- */
-.btn-primary, .hero-cta, .btn-checkout, .toggle-btn.wholesale, .toggle-btn.retail {
+.btn-primary, .hero-cta, .btn-checkout {
   border-radius: 100px !important;
   padding: 18px 40px !important;
   font-weight: 900 !important;
@@ -821,6 +830,7 @@ body {
   font-family: var(--font-display);
   font-size: var(--gs-size, clamp(2.4rem, 6.4vw, 4.4rem));
   font-weight: 700;
+  line-height: 1.3; /* Added to protect accents */
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: var(--accent-primary);
@@ -1239,9 +1249,9 @@ body {
 
 .testimonial-card {
   flex: 0 0 380px;
-  aspect-ratio: 1 / 1.1;
+  min-height: 250px;
   position: relative;
-  padding: 40px;
+  padding: 32px;
   background: #FFFFFF;
   border: 1px solid #EEEEEE;
   border-radius: 24px;
@@ -1326,16 +1336,7 @@ body {
   color: #fff;
 }
 
-.testimonial-text {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  line-height: 1.7;
-  color: #1a1a1f;
-  font-style: italic;
-  margin-bottom: 35px;
-  font-weight: 500;
-  text-shadow: none;
-}
+/* Content follows consolidated logic below */
 
 /* CAROUSEL DOTS - REFINED */
 .carousel-dots {
@@ -1409,7 +1410,7 @@ body {
   font-size: 0.95rem;
   color: #333333;
   line-height: 1.7;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   font-style: italic;
   flex-grow: 1;
 }
@@ -1666,7 +1667,7 @@ body {
 }
 
 .toggle-btn.active {
-  color: #fff;
+  color: #fff !important;
 }
 
 .toggle-slider {
@@ -1688,9 +1689,10 @@ body {
 
 .sale-info-text {
   font-size: 0.8rem;
-  color: var(--accent-primary);
-  font-weight: 600;
+  color: var(--text-muted);
+  font-weight: 500;
   letter-spacing: 0.5px;
+  text-align: center;
 }
 
 
@@ -1736,25 +1738,11 @@ body {
     (Pill styles in PERSUASIVE REWARDS section below)
     ============================================ */
 .main-page-rewards {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 30px auto;
-  max-width: var(--container-max);
-  gap: 8px;
-  width: 100%;
+  display: none !important;
 }
 
 .reward-copy {
-  display: block;
-  text-align: center;
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--accent-primary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
+  display: none !important;
 }
 
 .promo-bar-wrapper.main-page {
@@ -2315,12 +2303,60 @@ body .smart-notification {
     -webkit-overflow-scrolling: touch;
   }
 
-  .upsell-products-wrapper .upsell-carousel .product-card {
-    width: 75vw;
-    min-width: 240px;
-    max-width: 300px;
-    scroll-snap-align: center;
-  }
+  .upsell-carousel .product-card {
+  flex: 0 0 calc(33.333% - 15px);
+  min-width: 250px;
+  background: rgba(20, 20, 25, 0.4);
+  border-radius: 20px;
+  padding: 15px;
+}
+
+.gradual-spacing {
+  font-size: 1.8rem !important; /* 15% reduction */
+  white-space: nowrap !important;
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.reward-pill-container {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    flex-wrap: nowrap;
+}
+
+.reward-pill, .reward-pill-economy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 22px;
+    background: rgba(15, 15, 22, 0.9);
+    border: 1px solid rgba(255, 11, 85, 0.4);
+    border-radius: 50px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 11, 85, 0.2);
+    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.reward-pill-economy {
+    padding: 10px 18px;
+    border-color: rgba(255, 11, 85, 0.6);
+}
+
+.reward-pill-economy .economy-text {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.reward-pill-economy .economy-val {
+    color: #fff;
+    font-weight: 700;
+    margin-left: 4px;
+}
 
   .checkout-extra-products {
     padding: 40px 0;
@@ -3861,8 +3897,19 @@ body .smart-notification {
 
 /* Promo bar inside cart sidebar */
 .cart-sidebar .promo-bar-wrapper {
-  padding: 14px 30px 4px;
+  padding: 14px 45px 4px; /* Increased lateral padding to balance width */
   width: 100%;
+}
+
+.cart-sidebar .promo-bar-text {
+  text-align: left !important;
+  margin-bottom: 12px !important;
+  font-size: 0.8rem;
+}
+
+.cart-sidebar .promo-bar-track {
+  margin-left: 0;
+  margin-right: 14px; /* Compensation for the 50 milestone marker */
 }
 
 /* Cart Items List */
@@ -5077,16 +5124,43 @@ body .smart-notification {
     color: var(--accent-primary);
 }
 
-.summary-reward-header {
-    width: 100%;
+.reward-pill-container {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
 }
 
-.reward-pill-container {
-    display: flex;
+/* Designing the smaller Savings Pill */
+.reward-pill-savings {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 15px;
-    margin-bottom: 20px;
+    padding: 8px 18px;
+    background: #ffffff;
+    border: 1px solid #ffffff;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.reward-pill-savings .savings-label {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 6px;
+}
+
+.reward-pill-savings .savings-value {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: var(--accent-primary);
 }
 
 .reward-pill {
@@ -5600,7 +5674,12 @@ body .smart-notification {
 /* Cart sidebar promo bar — Mobile */
 @media (max-width: 480px) {
     .cart-sidebar .promo-bar-wrapper {
-        padding: 12px 20px 4px;
+        padding: 12px 30px 4px; /* Balanced mobile padding */
+    }
+
+    .cart-sidebar .promo-bar-text {
+        text-align: left !important;
+        margin-bottom: 10px !important;
     }
 
     .promo-bar-text {
@@ -5636,7 +5715,7 @@ body .smart-notification {
 /* Very small screens */
 @media (max-width: 360px) {
     .cart-sidebar .promo-bar-wrapper {
-        padding: 10px 16px 4px;
+        padding: 10px 24px 4px; /* Balanced very small screens */
     }
 
     .promo-bar-text {

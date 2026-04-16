@@ -13,6 +13,59 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;900&display=swap"
         rel="stylesheet">
+    <style>
+        .gradual-spacing {
+            white-space: nowrap !important;
+            display: block !important;
+            width: 100% !important;
+            text-align: center !important;
+        }
+        
+        .reward-pill-container {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.reward-pill-savings {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 18px;
+    background: #ffffff;
+    border: 1px solid #ffffff;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.reward-pill-savings .savings-label {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 6px;
+}
+
+.reward-pill-savings .savings-value {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: var(--accent-primary);
+}
+        
+        @media (max-width: 768px) {
+            .gradual-spacing {
+                font-size: 1.8rem !important;
+                white-space: normal !important;
+            }
+        }
+    </style>
   <!-- Meta Pixel Code -->
   <script>
   !function(f,b,e,v,n,t,s)
@@ -324,18 +377,16 @@
                 <h2 class="gradual-spacing" data-text="CONTINUE COMPRANDO" style="margin-bottom: 30px;"></h2>
 
                 <!-- Standardized Rewards Bar (Matches Index.html) -->
-                <div class="main-page-rewards reveal" data-delay="1" style="margin-bottom: 40px;">
+                <div class="main-page-rewards reveal" data-delay="1" style="margin-bottom: 40px; display: block !important;">
                     <div class="reward-pill-container">
                         <div class="reward-pill" id="checkoutUpsellPill">
                             <span class="promo-bar-text" id="progressTextCheckout2">Adicione itens para desbloquear recompensas</span>
                         </div>
-                        <div class="mini-savings-pill" id="savingsDisplayCheckout" style="display: none;">
-                            <span class="mini-savings-label">SUA ECONOMIA:</span>
-                            <span class="mini-savings-val" id="savingsValueCheckout">R$ 0,00</span>
+                        <div class="reward-pill-economy" id="economyPillCheckout" style="display: none;">
+                            <span class="economy-text">Sua economia:<span class="economy-val" id="savingsValueCheckout">R$ 0,00</span></span>
                         </div>
                     </div>
-                    <p class="reward-copy">Desbloqueie recompensas adicionando mais itens</p>
-                    <div class="promo-bar-wrapper main-page">
+                    <div class="promo-bar-wrapper main-page" style="margin: 0 auto; max-width: 650px;">
                         <div class="promo-bar-track">
                             <div class="promo-bar-fill" id="progressFillCheckout2">
                                 <div class="promo-bar-energy"></div>
@@ -346,20 +397,19 @@
                                 <div class="promo-marker" data-goal="50" style="left:100%"><span class="marker-icon">50</span></div>
                             </div>
                         </div>
-                        </div>
                     </div>
                 </div>
 
             </div>
-            <div class="upsell-products-wrapper">
-                <button class="carousel-nav-btn prev" id="prevBtnCheckout" aria-label="Anterior">
+            <div class="upsell-products-wrapper" style="position: relative;">
+                <button class="carousel-nav-btn prev" id="prevBtnCheckout" aria-label="Anterior" style="position: absolute; left: -50px; top: 50%; transform: translateY(-50%);">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
                 <div class="upsell-carousel" id="checkout-upsell-products">
                     <!-- Data populated by checkout.js -->
-                    <div style="text-align: center; color: #888; width: 100%;">Carregando o catálogo completo...</div>
+                    <div style="text-align: center; color: #888; width: 100%;">Carregando produtos...</div>
                 </div>
-                <button class="carousel-nav-btn next" id="nextBtnCheckout" aria-label="Próximo">
+                <button class="carousel-nav-btn next" id="nextBtnCheckout" aria-label="Próximo" style="position: absolute; right: -50px; top: 50%; transform: translateY(-50%);">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </button>
             </div>

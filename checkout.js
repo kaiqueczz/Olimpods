@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!checkoutUpsellGrid) return;
         checkoutUpsellGrid.innerHTML = '';
         const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
-
+        
         products.forEach((p, idx) => {
             const card = document.createElement('div');
             card.className = 'product-card animate-in';
@@ -181,35 +181,47 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             checkoutUpsellGrid.appendChild(card);
         });
+        
+        // Remove old direct styles and rely on CSS classes
+        checkoutUpsellGrid.style.display = '';
+        checkoutUpsellGrid.style.justifyContent = '';
+        checkoutUpsellGrid.style.gap = '';
+        checkoutUpsellGrid.style.flexWrap = '';
+        
         updateArrows();
     }
 
     const updateArrows = () => {
+        if (!checkoutUpsellGrid) return;
+        const scrollLeft = checkoutUpsellGrid.scrollLeft;
+        const maxScroll = checkoutUpsellGrid.scrollWidth - checkoutUpsellGrid.clientWidth;
+
         if (prevBtn) {
-            if (checkoutUpsellGrid.scrollLeft <= 5) prevBtn.classList.add('hidden');
-            else prevBtn.classList.remove('hidden');
+            prevBtn.style.opacity = scrollLeft <= 5 ? '0' : '1';
+            prevBtn.style.pointerEvents = scrollLeft <= 5 ? 'none' : 'all';
         }
         if (nextBtn) {
-            if (checkoutUpsellGrid.scrollLeft + checkoutUpsellGrid.clientWidth >= checkoutUpsellGrid.scrollWidth - 5) nextBtn.classList.add('hidden');
-            else nextBtn.classList.remove('hidden');
+            nextBtn.style.opacity = scrollLeft >= maxScroll - 5 ? '0' : '1';
+            nextBtn.style.pointerEvents = scrollLeft >= maxScroll - 5 ? 'none' : 'all';
         }
     };
 
-    if (nextBtn) {
-        nextBtn.onclick = () => {
-            checkoutUpsellGrid.scrollBy({ left: 305, behavior: 'smooth' });
-            setTimeout(updateArrows, 400);
-        };
-    }
     if (prevBtn) {
         prevBtn.onclick = () => {
             checkoutUpsellGrid.scrollBy({ left: -305, behavior: 'smooth' });
             setTimeout(updateArrows, 400);
         };
     }
+    if (nextBtn) {
+        nextBtn.onclick = () => {
+            checkoutUpsellGrid.scrollBy({ left: 305, behavior: 'smooth' });
+            setTimeout(updateArrows, 400);
+        };
+    }
 
-
-    checkoutUpsellGrid.addEventListener('scroll', updateArrows);
+    checkoutUpsellGrid.addEventListener('scroll', () => {
+      requestAnimationFrame(updateArrows);
+    });
     
     // Initial Catalog Load
     async function initCheckoutCatalogs() {
@@ -641,8 +653,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update all Ideal Bars on checkout
         const allFills = document.querySelectorAll('.promo-bar-fill, #progressFillCheckout');
         const allMsgs = document.querySelectorAll('.promo-bar-text, #progressTextCheckout');
-        const allSavingsValues = document.querySelectorAll('.promo-savings-value, #savingsValueCheckout, #savingsValueSummary');
-        const allSavingsWrappers = document.querySelectorAll('.promo-savings, #savingsDisplayCheckout, #savingsDisplaySummary');
+        const allSavingsValues = document.querySelectorAll('.savings-value, #savingsValueCheckout, .economy-val, #savingsValueSummary');
+        const allSavingsWrappers = document.querySelectorAll('.reward-pill-economy, .reward-pill-savings, #savingsDisplayCheckout, #economyPillCheckout, #savingsDisplaySummary');
         const allMarkers = document.querySelectorAll('.promo-marker');
 
         allFills.forEach(f => {
