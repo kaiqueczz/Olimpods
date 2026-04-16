@@ -741,60 +741,73 @@ body {
   align-items: center;
   gap: 8px;
   font-family: var(--font-short);
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--accent-primary);
-  margin-bottom: 16px;
+/* OLIMPO DESIGN SYSTEM v12 — AUTHORITATIVE GRID */
+.olimpo-grid-stack {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 24px !important;
+  width: 100% !important;
+  max-width: 1000px !important;
+  margin: 0 auto 40px !important;
 }
 
-/* Redesign Headlines — Unified & Clean */
 .gradual-spacing {
   display: flex !important;
   flex-wrap: nowrap !important;
   justify-content: center !important;
   align-items: center !important;
-  font-size: 5.5rem !important; /* 3x bigger (was ~1.85-2rem) */
-
+  font-size: 6rem !important; /* Monumental 3x Scaling as requested */
   font-weight: 900 !important;
   white-space: nowrap !important;
-  margin-bottom: 25px !important;
-  line-height: 1.2 !important;
-  letter-spacing: -1px !important;
+  margin-bottom: 40px !important;
+  line-height: 1.0 !important;
+  letter-spacing: -3px !important;
   text-align: center !important;
   width: 100% !important;
+  text-transform: uppercase !important;
 }
 
 .gradual-spacing .gs-word,
-.gradual-spacing .gs-char {
+.gradual-spacing .gs-char,
+.gradual-spacing .gs-space {
   display: inline-flex !important;
-  flex-wrap: nowrap !important;
   white-space: nowrap !important;
 }
 
-
-
-
-/* Adjust /LABEL pattern */
-.section-header-pill {
-    background: none !important;
-    border: none !important;
-    padding: 0 !important;
-    font-size: 14px !important;
-    font-weight: 800 !important;
-    color: var(--text-muted) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 2px !important;
-    margin-bottom: 16px !important;
-    display: block !important;
+.reward-pill-container {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 15px !important;
+  width: 100% !important;
+  max-width: 800px !important;
 }
 
-.section-header-pill::before {
-    content: "/";
-    color: var(--accent-primary);
-    margin-right: 2px;
+.reward-pill, .reward-pill-economy {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 32px !important; /* Ultra-compact slim design (-20%+) */
+  padding: 6px 18px !important;
+  background: rgba(15, 15, 22, 0.98) !important;
+  border: 1px solid rgba(255, 11, 85, 0.5) !important;
+  border-radius: 50px !important;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 11, 85, 0.3) !important;
+  transition: all 0.4s ease !important;
 }
+
+.reward-pill { flex: 2 !important; }
+.reward-pill-economy { flex: 1 !important; }
+
+.reward-pill-msg, .economy-text, .economy-val {
+  font-size: 0.7rem !important; /* Text also reduced */
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+}
+
+.promo-bar-track { height: 8px !important; }
 
 /* ---------- Global Buttons Reset — Marcados.me ---------- */
 .btn-primary, .hero-cta, .btn-checkout {
@@ -2301,89 +2314,9 @@ body .smart-notification {
   padding: 15px;
 }
 
-/* Duplicate block removed to resolve conflicts */
-
-
-.olimpo-grid-stack {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  gap: 24px !important;
-  width: 100% !important;
-  max-width: 800px !important;
-  margin: 0 auto 40px !important;
-}
-
-.reward-pill-container {
-  display: flex !important;
-  flex-direction: row !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 15px !important;
-  width: 100% !important;
-  max-width: 700px !important;
-}
-
-.reward-pill {
-  flex: 1.8 !important; /* Proporção Larga (Progresso) */
-  min-height: 42px !important; /* Reduced 20% from 52px */
-}
-
-
-.reward-pill-economy {
-  flex: 1 !important; /* Proporção Menor (Economia) */
-  min-height: 42px !important; /* Reduced 20% from 52px */
-
-}
-
-.reward-pill, .reward-pill-economy {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 11px 22px !important; /* Reduced 20% from 14px/28px */
-
-  background: rgba(15, 15, 22, 0.95) !important;
-  border: 1px solid rgba(255, 11, 85, 0.45) !important;
-  border-radius: 60px !important;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 11, 85, 0.25) !important;
-  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1) !important;
-}
-
-
-
-
-.reward-pill-economy {
-  padding: 10px 18px;
-  border-color: rgba(255, 11, 85, 0.6);
-}
-
-.reward-pill-economy .economy-text {
-  font-family: var(--font-display);
-  font-size: 0.65rem !important; /* Reduced 20% from 0.8rem */
-
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.reward-pill-economy .economy-val {
-  color: #fff;
-  font-weight: 700;
-  margin-left: 4px;
-}
-
 .checkout-extra-products {
   padding: 60px 0 100px;
 }
-
-.checkout-upsell-promo {
-  padding: 0 24px;
-}
-
-.checkout-upsell-promo p {
-  font-size: 1.1rem;
-}
-
-
 
 .checkout-extra-products .products-grid {
   display: flex;
@@ -5074,7 +5007,7 @@ body .smart-notification {
     color: #ff0033 !important;
 }
 
-/* =====================/* ========================/* ========================/* =======================/* ============================================
+/* ============================================
     PERSUASIVE REWARDS DESIGN — BARRINHA IDEAL
     ============================================ */
 
@@ -5129,15 +5062,6 @@ body .smart-notification {
     font-size: 9px;
     font-weight: 900;
     color: var(--accent-primary);
-}
-
-.reward-pill-container {
-    display: flex !important;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 25px;
-    flex-wrap: wrap;
 }
 
 /* Designing the smaller Savings Pill */
