@@ -101,13 +101,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Meta Pixel: InitiateCheckout (on land)
     if (window.fbq) fbq('track', 'InitiateCheckout');
 
-    const checkoutUpsellGrid = document.getElementById('checkout-upsell-products');
+    const checkoutUpsellGrid = document.getElementById('segmented-products-area');
     const nextBtn = document.getElementById('nextBtnCheckout');
 
     const prevBtn = document.getElementById('prevBtnCheckout');
 
     async function loadCheckoutUpsellProducts() {
         if (!checkoutUpsellGrid) return;
+
         
         // Prioritize local data to avoid CORS issues
         let allProducts = (typeof PRODUCTS_DATA !== 'undefined') ? PRODUCTS_DATA : [];
