@@ -138,18 +138,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderCheckoutUpsellProducts(allProducts) {
-        if (!checkoutUpsellGrid) return;
-        const container = checkoutUpsellGrid.parentElement.parentElement; // carouselSection
-        const initialGrid = document.getElementById('checkout-upsell-products');
+        const productArea = document.getElementById('segmented-products-area');
+        if (!productArea) return;
         
-        // Clear the entire section to reconstruct with segments
-        const carouselSection = document.getElementById('carouselSection');
-        if (!carouselSection) return;
-        
-        // Clear content but preserve the rewards grid stack
-        const gridStack = carouselSection.querySelector('.olimpo-grid-stack');
-        carouselSection.innerHTML = '';
-        if (gridStack) carouselSection.appendChild(gridStack);
+        // Clear only the product area
+        productArea.innerHTML = '';
 
         const brands = ["ignite", "elfbar", "blacksheep"];
         const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
@@ -214,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>
                 </div>
             `;
-            carouselSection.appendChild(segment);
+            productArea.appendChild(segment);
 
             // Initialize Nav for this specific carousel
             const track = document.getElementById(carouselId);
@@ -236,6 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
 
     
     // Initial Catalog Load

@@ -821,7 +821,7 @@
     </section>
 
     <section class="p-catalog-section" id="catalogOthers">
-        <div class="container" id="fullCatalogContent">
+        <div class="container" id="segmented-products-area">
             <!-- Injected by renderFullCatalog -->
         </div>
     </section>
@@ -1374,7 +1374,7 @@
             `;
             if (window.initGradualSpacing) window.initGradualSpacing();
               function renderFullCatalog(allProducts) {
-            const container = document.getElementById('fullCatalogContent');
+            const container = document.getElementById('segmented-products-area');
             if (!container) return;
             const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
             
