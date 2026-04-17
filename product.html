@@ -1204,33 +1204,20 @@
     <script src="script.js?v=5.0"></script>
 
     <script>
-        // Inline logic executes after data is available
+        // Premium Product Engine (v24)
         async function loadProduct() {
-
             const params = new URLSearchParams(window.location.search);
             const productId = params.get('id');
-
-            // Handle Buy Now logic
-            window.handleBuyNow = function(id, name, price, image) {
-                addToCart(id, name, price, image, false);
-                window.location.href = 'checkout.html';
-            };
 
             let allProducts = (typeof PRODUCTS_DATA !== 'undefined') ? PRODUCTS_DATA : [];
             try {
                 const response = await fetch('products.json?v=' + Date.now());
-                if (response.ok) {
-                    allProducts = await response.json();
-                }
-            } catch (err) {
-                console.warn("Fallback to PRODUCTS_DATA active.");
-            }
-
-            renderFullCatalog(allProducts);
+                if (response.ok) allProducts = await response.json();
+            } catch (err) { console.warn("Fallback active."); }
 
             const product = allProducts.find(p => p.id === productId);
             if (!product) {
-                document.getElementById('segmented-products-area').innerHTML = '<div style="padding: 100px; text-align:center;"><h2>Produto não encontrado</h2><a href="index.html" class="btn-primary">Voltar para Home</a></div>';
+                document.getElementById('productContent').innerHTML = '<div style="padding: 100px; text-align:center;"><h2>Produto não encontrado</h2><a href="index.html" class="btn-primary">Voltar para Home</a></div>';
                 return;
             }
 
@@ -1241,103 +1228,108 @@
 
             const content = `
                 <div class="product-grid-layout">
-                  <div class="product-visuals">
-                    <div class="main-image-box">
-                      <img src="${product.image || 'assets/logo-ignite.png'}" alt="${product.name}" class="product-img-real">
-                    </div>
-                  </div>
-
-                  <div class="product-info-column">
-                    <div class="product-header">
-                      <div class="p-brand">${product.brand || 'Ignite'}</div>
-                      <h1 class="p-title">${product.name}</h1>
-                      <div class="p-price-row">
-                        <span class="p-current">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
-                        ${isRetail ? '' : '<span class="p-wholesale-tag">Preço de Atacado</span>'}
-                      </div>
-                    </div>
-
-                    <div class="p-options">
-                      ${product.flavors && product.flavors.length > 0 ? `
-                        <div class="p-option-item">
-                          <label class="p-option-label">Escolha o Sabor</label>
-                          <div class="custom-select" id="customFlavorSelect">
-                            <div class="select-trigger" id="selectTrigger">
-                              <span id="selectedValue">Selecione um sabor</span>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                            </div>
-                            <div class="select-options" id="selectOptions">
-                              ${product.flavors.map(f => `<div class="select-option" data-value="${f}">${f}</div>`).join('')}
-                            </div>
-                          </div>
-                          <input type="hidden" id="flavorValue" value="">
+                    <!-- Left Column: Visuals -->
+                    <div class="product-column-left">
+                        <div class="main-image-box">
+                            <img src="${product.image || 'assets/logo-ignite.png'}" alt="${product.name}">
                         </div>
-                      ` : ''}
+                    </div>
 
-                      <div class="p-action-group">
-                        <button class="btn-buy-now" onclick="handleBuyNow('${product.id}', '${product.name}', '${finalPrice}', '${product.image || ''}')">Comprar Agora</button>
-                        <button class="btn-add-cart" onclick="addToCart('${product.id}', '${product.name}', '${finalPrice}', '${product.image || ''}', false)">Adicionar ao Carrinho</button>
-                      </div>
-
-                      <div class="quantity-control-wrapper">
-                        <div class="quantity-control">
-                          <button class="q-btn" onclick="updateQty(-1)">-</button>
-                          <input type="number" class="q-val" id="qtyVal" value="1" min="1" step="1" oninput="validateQty(this)">
-                          <button class="q-btn" onclick="updateQty(1)">+</button>
+                    <!-- Right Column: Info & Actions -->
+                    <div class="product-column-right">
+                        <div class="p-header">
+                            <div class="p-brand">${product.brand || 'Olimpo'}</div>
+                            <h1 class="p-name">${product.name}</h1>
+                            <div class="p-price-row">
+                                <span class="p-current">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+                                ${!isRetail ? '<span class="p-wholesale-tag">Atacado</span>' : ''}
+                            </div>
                         </div>
-                      </div>
-                    </div>
 
-                    <div class="shipping-box">
-                      <label class="p-option-label">Simular Frete</label>
-                      <div class="shipping-input-group">
-                        <input type="text" class="shipping-input" id="shippingInput" placeholder="Ex.: 00000-000" maxlength="9">
-                        <button class="btn-shipping" onclick="simulateShipping()">OK</button>
-                      </div>
-                      <div id="shipping-results" class="shipping-results">
-                         <!-- Results injected here -->
-                      </div>
+                        <div class="p-options-area">
+                            ${product.flavors && product.flavors.length > 0 ? `
+                                <div class="custom-select-wrapper" id="flavorSelectWrapper">
+                                    <label class="p-option-label">Escolha o Sabor</label>
+                                    <div class="custom-select-trigger" id="flavorTrigger">
+                                        <span id="flavorDisplay">Selecione um sabor</span>
+                                        <div class="arrow"></div>
+                                    </div>
+                                    <div class="custom-options" id="flavorOptions">
+                                        ${product.flavors.map(f => {
+                                            const parts = f.split(' – ');
+                                            const name = parts[0];
+                                            const desc = parts[1] ? ` – ${parts[1]}` : '';
+                                            return `
+                                                <div class="custom-option" data-value="${f}">
+                                                    <span class="flavor-name">${name}</span>
+                                                    ${desc ? `<span class="flavor-desc">${desc}</span>` : ''}
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                    <input type="hidden" id="selectedFlavor" value="">
+                                </div>
+                            ` : ''}
+
+                            <div class="p-actions-stack">
+                                <button class="btn-buy-now" onclick="handlePremiumBuyNow('${product.id}', '${product.name}', ${finalPrice}, '${product.image || ''}')">
+                                    Comprar Agora
+                                </button>
+                                <button class="btn-add-cart" onclick="addToCartPremium('${product.id}', '${product.name}', ${finalPrice}, '${product.image || ''}')">
+                                    Adicionar ao Carrinho
+                                </button>
+                                
+                                <div class="q-wrapper-premium">
+                                    <span class="q-label">Quantidade:</span>
+                                    <div class="q-stepper-premium">
+                                        <button type="button" class="q-btn-p" onclick="adjQty(-1)">−</button>
+                                        <input type="number" class="q-val-p" id="qtyPremium" value="1" min="1" readonly>
+                                        <button type="button" class="q-btn-p" onclick="adjQty(1)">+</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="shipping-box" style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05);">
+                                <label class="p-option-label">Simular Frete</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" id="cepp" placeholder="00000-000" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 10px; flex: 1;">
+                                    <button onclick="simShip()" style="background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 700;">OK</button>
+                                </div>
+                                <div id="shipRes" style="margin-top: 15px;"></div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
             `;
             document.getElementById('productContent').innerHTML = content;
 
-            // Meta Pixel: ViewContent
-            if (window.fbq) {
-                fbq('track', 'ViewContent', {
-                    content_name: product.name,
-                    content_category: product.brand,
-                    content_ids: [product.id],
-                    content_type: 'product',
-                    value: parseFloat(finalPrice),
-                    currency: 'BRL'
-                });
-            }
+            // Interactive Logic
+            const wrap = document.getElementById('flavorSelectWrapper');
+            const trig = document.getElementById('flavorTrigger');
+            const opts = document.getElementById('flavorOptions');
+            const hidden = document.getElementById('selectedFlavor');
+            const disp = document.getElementById('flavorDisplay');
 
-            // Flavor Select Interactions
-            const trigger = document.getElementById('selectTrigger');
-            const options = document.getElementById('selectOptions');
-            const hiddenInput = document.getElementById('flavorValue');
-            const displayValue = document.getElementById('selectedValue');
-
-            if (trigger && options) {
-                trigger.onclick = (e) => {
+            if (trig && wrap) {
+                trig.onclick = (e) => {
                     e.stopPropagation();
-                    options.classList.toggle('active');
+                    wrap.classList.toggle('active');
                 };
-                options.querySelectorAll('.select-option').forEach(opt => {
+                opts.querySelectorAll('.custom-option').forEach(opt => {
                     opt.onclick = () => {
                         const val = opt.getAttribute('data-value');
-                        displayValue.textContent = val;
-                        hiddenInput.value = val;
-                        options.classList.remove('active');
+                        disp.textContent = val.split(' – ')[0];
+                        hidden.value = val;
+                        wrap.classList.remove('active');
                     };
                 });
-                document.addEventListener('click', () => options.classList.remove('active'));
+                document.onclick = () => wrap.classList.remove('active');
             }
 
-            // Rewards Integration
+            // External catalog bits
+            renderFullCatalog(allProducts);
+            
+            // Re-render rewards container for sticky behavior
             const rewardsHtml = `
                 <div class="olimpo-grid-stack">
                     <h2 class="gradual-spacing" data-text="CONTINUE COMPRANDO">CONTINUE COMPRANDO</h2>
@@ -1350,35 +1342,70 @@
                             <span class="economy-val" id="savingsValueSummary">R$ 0,00</span>
                         </div>
                     </div>
-                    <div class="main-page-rewards reveal" style="width: 100%; display: block !important;">
-                        <div class="promo-bar-wrapper main-page" style="margin: 0 auto; width: 100%; max-width: 520px;">
-                            <div class="promo-bar-track">
-                                <div class="promo-bar-fill" id="mainProgressFill">
-                                    <div class="promo-bar-energy"></div>
-                                </div>
-                                <div class="promo-bar-markers">
-                                    <div class="promo-marker" data-goal="30" style="left:60%"><span class="marker-icon">30</span></div>
-                                    <div class="promo-marker" data-goal="40" style="left:80%"><span class="marker-icon">40</span></div>
-                                    <div class="promo-marker" data-goal="50" style="left:100%"><span class="marker-icon">50</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             `;
             const rContainer = document.getElementById('favoritesContent');
             if (rContainer) rContainer.innerHTML = rewardsHtml;
 
-            if (window.initGradualSpacing) window.initGradualSpacing();
             if (typeof updateRewardsUI === 'function') updateRewardsUI();
+            if (window.initGradualSpacing) window.initGradualSpacing();
         }
+
+        // Global Helpers (v24)
+        window.adjQty = (d) => {
+            const i = document.getElementById('qtyPremium');
+            if (i) i.value = Math.max(1, parseInt(i.value) + d);
+        };
+
+        window.addToCartPremium = (id, name, price, img) => {
+            const flav = document.getElementById('selectedFlavor')?.value;
+            if (!flav) {
+                const w = document.getElementById('flavorSelectWrapper');
+                w?.classList.add('shake');
+                setTimeout(() => w?.classList.remove('shake'), 400);
+                alert("Por favor, escolha um sabor!");
+                return;
+            }
+            const qty = parseInt(document.getElementById('qtyPremium').value);
+            if (!window.cart) window.cart = JSON.parse(localStorage.getItem('ignite_cart')) || [];
+            
+            const existing = window.cart.find(it => it.id === id && it.flavor === flav);
+            if (existing) existing.quantity += qty;
+            else window.cart.push({ id, name, price, image: img, quantity: qty, flavor: flav, brand: 'Olimpo' });
+
+            localStorage.setItem('ignite_cart', JSON.stringify(window.cart));
+            if (window.updateCartUI) window.updateCartUI();
+            if (window.toggleCartSidebar) window.toggleCartSidebar(true);
+        };
+
+        window.handlePremiumBuyNow = (id, name, price, img) => {
+            const flav = document.getElementById('selectedFlavor')?.value;
+            if (!flav) {
+                alert("Escolha um sabor primeiro!");
+                return;
+            }
+            const qty = parseInt(document.getElementById('qtyPremium').value);
+            if (!window.cart) window.cart = JSON.parse(localStorage.getItem('ignite_cart')) || [];
+            window.cart.push({ id, name, price, image: img, quantity: qty, flavor: flav, brand: 'Olimpo' });
+            localStorage.setItem('ignite_cart', JSON.stringify(window.cart));
+            window.location.href = 'checkout.html';
+        };
+
+        window.simShip = () => {
+            const res = document.getElementById('shipRes');
+            res.innerHTML = '<span style="color: var(--accent-primary)">Calculando...</span>';
+            setTimeout(() => {
+                res.innerHTML = `<div style="padding: 10px; border-left: 2px solid var(--accent-primary); background: rgba(255,255,255,0.02);">
+                    <p style="font-size: 0.8rem; margin: 0;">📦 <b>SEDEX:</b> R$ 22,90 (2-4 dias)</p>
+                    <p style="font-size: 0.8rem; margin: 5px 0 0;">🚚 <b>PAC:</b> R$ 14,50 (5-8 dias)</p>
+                </div>`;
+            }, 800);
+        };
 
         function renderFullCatalog(allProducts) {
             const container = document.getElementById('segmented-products-area');
             if (!container) return;
-            const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
             container.innerHTML = '';
-            
             const brands = ["ignite", "elfbar", "blacksheep"];
             brands.forEach(brand => {
                 const brandProducts = allProducts.filter(p => (p.brand || '').toLowerCase() === brand);
@@ -1397,23 +1424,20 @@
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
                         </button>
                         <div class="upsell-carousel" id="${cId}" style="display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 20px; padding: 20px 0; scroll-snap-type: x mandatory; -ms-overflow-style: none; scrollbar-width: none;">
-                            ${brandProducts.map(p => {
-                                const finalP = (saleType === 'retail') ? (p.retail_price || p.price * 1.4) : p.price;
-                                return `
-                                    <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'" style="flex: 0 0 calc(33.333% - 14px); min-width: 250px; scroll-snap-align: center;">
-                                        <div class="product-image" style="height: 200px;">
-                                            <img src="${p.image || 'assets/logo-ignite.png'}" alt="${p.name}" class="product-img-real" style="padding: 10px;">
-                                        </div>
-                                        <div class="product-info" style="padding: 15px;">
-                                            <div class="product-brand" style="font-size: 0.65rem;">${p.brand || brand}</div>
-                                            <div class="product-name" style="font-size: 0.9rem;">${p.name}</div>
-                                            <div class="product-price-row">
-                                                <span class="current" style="font-size: 1.1rem; color: var(--accent-primary); font-weight: 800;">R$ ${parseFloat(finalP).toFixed(2).replace('.', ',')}</span>
-                                            </div>
+                            ${brandProducts.map(p => `
+                                <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'" style="flex: 0 0 calc(33.333% - 14px); min-width: 250px; scroll-snap-align: center;">
+                                    <div class="product-image" style="height: 200px;">
+                                        <img src="${p.image || 'assets/logo-ignite.png'}" alt="${p.name}" class="product-img-real" style="padding: 10px;">
+                                    </div>
+                                    <div class="product-info" style="padding: 15px;">
+                                        <div class="product-brand" style="font-size: 0.65rem;">${p.brand || brand}</div>
+                                        <div class="product-name" style="font-size: 0.9rem;">${p.name}</div>
+                                        <div class="product-price-row">
+                                            <span class="current" style="font-size: 1.1rem; color: var(--accent-primary); font-weight: 800;">R$ ${parseFloat(p.price).toFixed(2).replace('.', ',')}</span>
                                         </div>
                                     </div>
-                                `;
-                            }).join('')}
+                                </div>
+                            `).join('')}
                         </div>
                         <button class="carousel-nav-btn next" id="${nId}" aria-label="Próximo" style="position: absolute; right: -50px; top: 50%; transform: translateY(-50%); z-index: 10;">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -1421,29 +1445,12 @@
                     </div>
                 `;
                 container.appendChild(segment);
-                const trk = document.getElementById(cId);
-                const bP = document.getElementById(pId);
-                const bN = document.getElementById(nId);
-                if (trk && bP && bN) {
-                    const upd = () => {
-                        const sL = trk.scrollLeft;
-                        const mS = trk.scrollWidth - trk.clientWidth;
-                        bP.style.opacity = sL <= 5 ? '0' : '1';
-                        bP.style.pointerEvents = sL <= 5 ? 'none' : 'all';
-                        bN.style.opacity = sL >= mS - 5 ? '0' : '1';
-                        bN.style.pointerEvents = sL >= mS - 5 ? 'none' : 'all';
-                    };
-                    bP.onclick = () => { trk.scrollBy({ left: -300, behavior: 'smooth' }); setTimeout(upd, 400); };
-                    bN.onclick = () => { trk.scrollBy({ left: 300, behavior: 'smooth' }); setTimeout(upd, 400); };
-                    trk.onscroll = upd;
-                    setTimeout(upd, 600);
-                }
             });
         }
 
-        // Initialize
         loadProduct();
     </script>
+
 
 
 
