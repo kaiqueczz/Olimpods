@@ -1003,113 +1003,6 @@
 
                   <!-- Info -->
                   <div class="product-info-column">
-                    <div class="p-brand" id="prodBrand">${product.brand}</div>
-                    <h1 class="p-name" id="prodName">${product.name}</h1>
-                    <div class="div-promo-label" style="display: ${hasBulkDiscount ? 'inline-block' : 'none'}; background: rgba(255, 11, 85, 0.15); color: #ff0b55; padding: 4px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; border: 1px solid rgba(255, 11, 85, 0.3); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">DESCONTO EXTRA ATIVADO — Você está economizando!</div>
-                    <div class="p-price" id="prodPrice">${priceDisplayHtml}</div>
-
-                    <div class="p-options">
-                      <div class="p-options-header">
-                        <label class="p-option-label">Sabores</label>
-                      </div>
-                      
-                      <div class="p-selector-wrapper glow-card" id="customFlavorSelect">
-                        <div class="custom-select-trigger" id="selectTrigger">
-                            <span id="selectedValue">Selecionar...</span>
-                        </div>
-                        <div class="custom-options" id="selectOptions">
-                           ${(product.flavors || []).map(f => {
-                const parts = f.split(' – ');
-                const name = parts[0];
-                const desc = parts[1] ? ` – ${parts[1]}` : '';
-                return `
-                                 <div class="custom-option" data-value="${f}">
-                                   <span class="flavor-name">${name}</span>
-                                   ${desc ? `<span class="flavor-desc">${desc}</span>` : ''}
-                                 </div>
-                               `;
-            }).join('')}
-                        </div>
-                        <input type="hidden" id="flavorValue" value="">
-                      </div>
-                      ${saleType === 'retail' ? '<p style="font-size: 0.8rem; font-weight: 300; font-style: italic; color: #888; margin-top: 8px;">Varejo — Compre a partir de 2 peças</p>' : ''}
-                    </div>
-
-                    <div class="p-actions">
-                      <div class="action-buttons-group">
-                        <button class="btn-buy-now" onclick="handleBuyNow('${product.id}', '${product.name}', '${finalPrice}', '${product.image || ''}')">Comprar Agora</button>
-                        <button class="btn-add-cart" onclick="addToCart('${product.id}', '${product.name}', '${finalPrice}', '${product.image || ''}', false)">Adicionar ao Carrinho</button>
-                      </div>
-
-                      <div class="quantity-control-wrapper">
-                        <div class="quantity-control">
-                          <button class="q-btn" onclick="updateQty(-1)">-</button>
-                          <input type="number" class="q-val" id="qtyVal" value="1" min="1" step="1" oninput="validateQty(this)">
-                          <button class="q-btn" onclick="updateQty(1)">+</button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="shipping-box">
-                      <label class="p-option-label">Simular Frete</label>
-                      <div class="shipping-input-group">
-                        <input type="text" class="shipping-input" id="shippingInput" placeholder="Ex.: 00000-000" maxlength="9">
-                        <button class="btn-shipping" onclick="simulateShipping()">OK</button>
-                      </div>
-                      <div id="shipping-results" class="shipping-results">
-                         <!-- Results injected here -->
-                      </div>
-                    </div>
-
-                    <!-- Mobile Brand Carousels -->
-                    <div id="mobile-brand-carousels" class="mobile-brand-carousels mobile-only" style="margin-top: 40px;">
-                        <!-- Injected by loadProduct -->
-                    </div>
-                  </div>
-                </div>
-            `;
-            document.getElementById('productContent').innerHTML = content;
-
-            // Meta Pixel: ViewContent
-            if (window.fbq) {
-                fbq('track', 'ViewContent', {
-                    content_name: product.name,
-                    content_category: product.brand,
-                    content_ids: [product.id],
-                    content_type: 'product',
-                    value: parseFloat(finalPrice),
-                    currency: 'BRL'
-                });
-            }
-
-            // Script para o seletor customizado
-            const trigger = document.getElementById('selectTrigger');
-            const options = document.getElementById('selectOptions');
-            const hiddenInput = document.getElementById('flavorValue');
-            const displayValue = document.getElementById('selectedValue');
-
-            trigger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                options.classList.toggle('show');
-            });
-
-
-            document.querySelectorAll('.custom-option').forEach(opt => {
-                opt.addEventListener('click', () => {
-                    const val = opt.getAttribute('data-value');
-                    const name = opt.querySelector('.flavor-name').textContent;
-                    displayValue.textContent = name;
-                    hiddenInput.value = val;
-                    options.classList.remove('show');
-                });
-            });
-
-            document.addEventListener('click', () => {
-                options.classList.remove('show');
-            });
-
-            // Re-apply mask to shipping input
-            const sInput = document.getElementById('shippingInput');
             if (sInput) {
                 sInput.addEventListener('input', (e) => {
                     let val = e.target.value.replace(/\D/g, "");
@@ -1304,32 +1197,8 @@
 
             return true;
         }
+    </script>
 
-
-        function loadProduct() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
-            if (!productId) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            // Use the global PRODUCTS_DATA from assets/products-data.js
-            // This avoids CORS issues when opening the file locally and improves reliability
-            const products = (typeof PRODUCTS_DATA !== 'undefined') ? PRODUCTS_DATA : [];
-            const product = products.find(p => p.id === productId);
-
-            if (product) {
-                renderProduct(product);
-                
-                // Render recommendations and full catalog using the same data source
-                renderFavoritesCarousel(products);
-                renderFullCatalog(products);
-            } else {
-                const pc = document.getElementById('productContent');
-                if (pc) pc.innerHTML = '<div class="container"><p style="text-align:center; padding: 100px 0;">Produto não encontrado.</p></div>';
-            }
-        }
     <!-- Core Scripts Loader (v21) -->
     <script src="assets/products-data.js?v=2.1"></script>
     <script src="script.js?v=5.0"></script>
@@ -1337,6 +1206,7 @@
     <script>
         // Inline logic executes after data is available
         async function loadProduct() {
+
             const params = new URLSearchParams(window.location.search);
             const productId = params.get('id');
 
