@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 imgSrc = 'Images Pods/' + imgSrc;
                             }
                             return `
-                                <div class="product-card">
+                                <div class="product-card animate-in">
                                     <div class="product-image">
                                         <img src="${imgSrc}" alt="${p.name}" class="product-img-real" onerror="this.src='assets/logo-ignite.png'">
                                     </div>

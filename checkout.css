@@ -1095,8 +1095,6 @@ body.checkout-page {
 }
 
 .gradual-spacing {
-    font-size: 1.8rem !important; /* 15% reduction for better fit */
-    white-space: nowrap !important;
     display: block !important;
     width: 100% !important;
     text-align: center !important;
@@ -1209,90 +1207,7 @@ body.checkout-page {
     .milestone-icon { width: 26px; height: 26px; font-size: 9px; }
 }
 
-/* ==================== NEW UPSELL CARD STYLES ==================== */
-.product-price-row {
-    margin-top: 5px;
-    margin-bottom: 12px;
-}
 
-.product-price-row .current {
-    font-size: 1.3rem;
-    font-weight: 800;
-    color: var(--accent-primary);
-}
-
-.product-add-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 15px;
-}
-
-.upsell-qty-stepper {
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.upsell-qty-btn {
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: transparent;
-    color: #fff;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.upsell-qty-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--accent-primary);
-}
-
-.upsell-qty-val {
-    flex: 1;
-    width: 40px;
-    background: transparent !important;
-    border: none !important;
-    color: #fff !important;
-    text-align: center;
-    font-weight: 700;
-    font-size: 0.9rem;
-    padding: 0 !important;
-}
-
-.upsell-qty-val::-webkit-inner-spin-button,
-.upsell-qty-val::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.upsell-add-btn {
-    background: var(--accent-primary);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 10px;
-    font-family: var(--font-display);
-    font-weight: 800;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.upsell-add-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 11, 85, 0.3);
-}
 
 .sticky-savings-summary {
     font-family: var(--font-body);

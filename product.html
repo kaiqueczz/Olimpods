@@ -8,604 +8,9 @@
     <link rel="icon" href="assets/logo-ignite.png" type="image/png">
     <link rel="stylesheet" href="styles.css?v=5.0">
     <style>
-        /* Specific styles for product page - ABSOLUTE BLINDAGEM */
-        * { box-sizing: border-box; }
-        html, body { 
-            overflow-x: hidden !important; 
-            width: 100% !important; 
-            max-width: 100% !important;
-            margin: 0;
-            padding: 0;
-            position: relative;
-        }
-
-        .product-detail-section {
-            padding: 140px 0 80px;
-            overflow: hidden;
-        }
-
-        /* --- DESKTOP GRID & IMAGE FIX (V3.8) --- */
-        .product-grid-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: flex-start;
-            margin-top: 20px;
-        }
-
-        .product-visuals {
-            position: sticky;
-            top: 140px;
-            width: 100%;
-        }
-
-        .main-image-box {
-            background: var(--bg-product); /* Match exactly the pod background color */
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: var(--radius-lg);
-            padding: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 500px;
-            /* Remove glow/blur that exposes image edges */
-            box-shadow: 0 40px 80px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .main-image-box::after {
-            display: none; /* Removed radial glow to avoid matching issues */
-        }
-
-        .product-img-real {
-            max-width: 100%;
-            max-height: 500px;
-            width: auto;
-            object-fit: contain;
-            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.4));
-            transition: transform 0.6s var(--ease-smooth);
-            z-index: 2;
-        }
-
-        .main-image-box:hover .product-img-real {
-            transform: scale(1.05) rotate(-1deg);
-        }
-
-        .product-info-column {
-            padding-left: 20px;
-        }
-
-
-        /* --- MOBILE AUDIT FIXES (V3.8) --- */
-        @media (max-width: 992px) {
-            .product-detail-section { padding: 15px 0 40px !important; }
-            .product-grid-layout { display: block !important; margin: 0 !important; }
-            .product-visuals { width: 100% !important; margin: 0 !important; position: static !important; }
-            .main-image-box { 
-                min-height: 180px !important; 
-                max-height: 250px !important; 
-                margin-bottom: 5px !important;
-                padding: 0 !important; 
-                background: none !important; 
-                border: none !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-                box-shadow: none !important;
-                backdrop-filter: none !important;
-            }
-            .main-image-box::after { display: none; }
-            .product-img-real { 
-                max-height: 240px !important; 
-                width: auto !important; 
-                max-width: 90% !important; 
-                object-fit: contain !important; 
-                filter: none !important;
-            }
-
-            /* HIDE SEARCH COMPLETELY ON MOBILE PRODUCT PAGE */
-            .search-wrapper, .search-container { display: none !important; }
-
-            .p-name { font-size: 1.4rem !important; line-height: 1.2 !important; margin-bottom: 8px !important; }
-            .p-price { font-size: 1.5rem !important; margin-bottom: 15px !important; }
-
-            .action-buttons-group { flex-direction: column; gap: 10px; }
-
-            /* BUTTON TEXT VISIBILITY FIX */
-            .btn-buy-now, .btn-add-cart {
-                color: #ffffff !important;
-                font-size: 0.9rem !important;
-                font-weight: 700 !important;
-                text-transform: uppercase !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-                display: block !important;
-                width: 100% !important;
-                text-align: center !important;
-                height: 50px !important;
-            }
-
-            .breadcrumb { font-size: 0.8rem !important; margin-top: 10px !important; }
-        }
-
-        .p-price {
-            font-size: 2.5rem;
-            color: var(--accent-primary);
-            font-weight: 700;
-        }
-
-
-        .p-options-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 10px;
-        }
-
-        .p-option-label {
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin: 0;
-            display: block;
-        }
-
-        .p-selector-wrapper {
-            position: relative;
-            width: 100%;
-            border-radius: var(--radius-md);
-            background: #111118;
-            cursor: pointer;
-        }
-
-        /* Custom Flavor Selector */
-        .custom-select-trigger {
-            padding: 15px 45px 15px 15px;
-            border: 1px solid var(--border-subtle);
-            border-radius: inherit;
-            color: var(--text-primary);
-            font-size: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-        }
-
-        .custom-select-trigger:hover {
-            border-color: var(--accent-primary);
-        }
-
-        .custom-options {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: #111118;
-            border: 1px solid var(--accent-primary);
-            border-top: none;
-            border-radius: 0 0 var(--radius-md) var(--radius-md);
-            z-index: 100;
-            display: none;
-            max-height: 300px;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .custom-options.show {
-            display: block;
-        }
-
-        .custom-option {
-            padding: 12px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.2s;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .custom-option:last-child {
-            border-bottom: none;
-        }
-
-        .custom-option:hover {
-            background: rgba(255, 11, 85, 0.1);
-        }
-
-        .flavor-name {
-            font-weight: 500;
-        }
-
-        .flavor-desc {
-            font-size: 0.8rem;
-            font-style: italic;
-            opacity: 0.5;
-            margin-left: 15px;
-            text-align: right;
-        }
-
-        .p-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-top: 25px;
-        }
-
-        .action-buttons-group {
-            display: flex;
-            gap: 12px;
-            width: 100%;
-        }
-
-        .btn-buy-now {
-            flex: 1.5;
-            background: linear-gradient(135deg, var(--accent-primary), #FF0B55);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-            height: 54px;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 15px rgba(255, 11, 85, 0.3);
-        }
-
-        .btn-buy-now:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 11, 85, 0.5);
-            filter: brightness(1.1);
-        }
-
-        .btn-add-cart {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-primary);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s;
-            height: 54px;
-            font-size: 0.85rem;
-        }
-
-        .btn-add-cart:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--accent-primary);
-            color: var(--accent-primary);
-        }
-
-        .quantity-control {
-            display: flex;
-            align-items: center;
-            background: var(--bg-glass);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            width: fit-content;
-        }
-
-        .q-btn {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s;
-        }
-
-        .q-btn:hover {
-            background: var(--bg-glass-hover);
-        }
-
-        .q-val {
-            width: 50px; /* Slightly wider for input */
-            text-align: center;
-            font-weight: 600;
-            border-left: 1px solid var(--border-subtle);
-            border-right: 1px solid var(--border-subtle);
-            background: transparent;
-            color: #fff;
-            border-top: none;
-            border-bottom: none;
-            font-size: 1rem;
-            -moz-appearance: textfield; /* Remove arrows in Firefox */
-            appearance: none;
-        }
-
-        .q-val::-webkit-outer-spin-button,
-        .q-val::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            appearance: none;
-            margin: 0;
-        }
-
-        .q-val:focus {
-            outline: none;
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .quantity-control-wrapper {
-            margin-top: 10px;
-        }
-
-        .btn-buy {
-            flex: 1;
-            background: var(--accent-primary);
-            color: white;
-            border-radius: var(--radius-md);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s var(--ease-smooth);
-            box-shadow: 0 10px 30px rgba(255, 11, 85, 0.2);
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-
-        .btn-add-cart {
-            flex: 1;
-            background: transparent;
-            color: var(--text-primary);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s var(--ease-smooth);
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-buy:hover {
-            background: var(--accent-secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(255, 11, 85, 0.3);
-        }
-
-        .btn-add-cart:hover {
-            background: var(--bg-glass-hover);
-            border-color: var(--accent-primary);
-            color: var(--accent-primary);
-            transform: translateY(-2px);
-        }
-
-        .shipping-box {
-            margin-top: 20px;
-            border-top: 1px solid var(--border-subtle);
-            padding-top: 30px;
-        }
-
-        .shipping-input-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .shipping-input {
-            flex: 1;
-            background: var(--bg-glass);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            padding: 15px;
-            color: var(--text-primary);
-        }
-
-        .btn-shipping {
-            padding: 0 25px;
-            border: 1px solid var(--text-secondary);
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-shipping:hover {
-            background: white;
-            color: black;
-        }
-
-        .shipping-results {
-            margin-top: 20px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            padding: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0;
-        }
-
-        .shipping-results.active {
-            max-height: 600px;
-            padding: 20px;
-            opacity: 1;
-            margin-bottom: 20px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: var(--accent-primary) transparent;
-        }
-
-
-        .shipping-title {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            display: block;
-            font-weight: 500;
-        }
-
-        .shipping-option {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: background 0.3s;
-        }
-
-        .shipping-option:last-child {
-            border-bottom: none;
-        }
-
-        .shipping-option:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .opt-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .opt-name {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: var(--text-primary);
-        }
-
-        .opt-days {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .opt-price {
-            font-weight: 800;
-            color: var(--accent-primary);
-            font-size: 1rem;
-        }
-
-        .opt-price.free {
-            color: #ff0b55;
-        }
-
-        /* --- NEW CATALOG SECTIONS (V4.1) --- */
-        .p-catalog-section {
-            padding: 80px 0;
-            border-top: 1px solid var(--border-subtle);
-        }
-
-        .section-header-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255, 11, 85, 0.08);
-            border: 1px solid rgba(255, 11, 85, 0.15);
-            padding: 6px 14px;
-            border-radius: 50px;
-            color: var(--accent-primary);
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: none;
-            letter-spacing: 0.5px;
-            margin-bottom: 20px;
-        }
-
-
-        .catalog-title {
-            font-family: var(--font-display);
-            font-size: 1.28rem;
-            font-weight: 700;
-            margin-bottom: 30px;
-            letter-spacing: -0.5px;
-            color: #fff;
-        }
-
-
-        .brand-sub-divider {
-            margin-top: 50px;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .brand-sub-divider h3 {
-            font-size: 1rem;
-            font-weight: 700;
-            text-transform: none;
-            letter-spacing: 1.5px;
-            color: var(--accent-primary);
-            white-space: nowrap;
-            text-shadow: 0 0 10px rgba(255, 11, 85, 0.4);
-        }
-
-
-        .brand-sub-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent);
-        }
-
-        .p-grid-catalog {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 25px;
-        }
-
-        /* Mini Product Card */
-        .p-card-mini {
-            gap: 12px;
-        }
-
-        .p-card-mini:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-primary);
-            background: var(--bg-product);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-        }
-
-        .p-mini-img {
-            width: 100%;
-            height: 180px;
-            object-fit: contain;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
-            transition: transform 0.5s var(--ease-smooth);
-        }
-
-        .p-card-mini:hover .p-mini-img {
-            transform: scale(1.1);
-        }
-
-        .p-mini-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .p-mini-name {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: #eee;
-        }
-
-        .p-mini-price {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--accent-primary);
-        }
-
-        @media (max-width: 992px) {
-            .p-catalog-section { padding: 40px 0; }
-            .catalog-title { font-size: 1.8rem; }
-            .p-grid-catalog { grid-template-columns: repeat(2, 1fr); gap: 15px; }
-            .p-mini-img { height: 140px; }
-            .p-mini-price { font-size: 0.95rem; }
-            .p-mini-name { font-size: 0.85rem; }
-        }
+        /* Estabilização v27: Estilos críticos preservados */
+        .product-detail-section { padding: 120px 0 80px; min-height: 80vh; }
+        .loading-state { text-align: center; padding: 100px; font-size: 1.2rem; color: var(--accent-primary); }
     </style>
 
   <!-- Meta Pixel Code -->
@@ -963,240 +368,20 @@
     <script src="assets/shipping-logic.js?v=3.7"></script>
 
     <script>
-
-
-        function renderProduct(product) {
-            const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
-            const basePrice = parseFloat(product.price);
-            
-            // Verifica o carrinho para aplicar desconto cumulativo de 30 unidades
-            const cartItems = JSON.parse(localStorage.getItem('ignite_cart')) || [];
-            const totalItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-            const hasBulkDiscount = (saleType === 'wholesale' && totalItemsCount >= 30);
-
-            // Usa retail_price se existir no JSON, senão calcula 1.4x
-            let finalPrice;
-            if (saleType === 'retail') {
-                finalPrice = product.retail_price ? parseFloat(product.retail_price) : basePrice * 1.4;
+        /*
+          ==================================================
+          BLINDAGEM TÉCNICA (v27)
+          ==================================================
+        */
+        
+        // Inicialização robusta
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof loadProduct === 'function') {
+                loadProduct();
             } else {
-                finalPrice = hasBulkDiscount ? basePrice * 0.95 : basePrice;
+                console.error("Erro: loadProduct não definido. Verifique os scripts.");
             }
-
-            const priceDisplayHtml = hasBulkDiscount 
-                ? `<span style="text-decoration: line-through; color: #888; font-size: 1.5rem; margin-right: 15px;">R$ ${basePrice.toFixed(2).replace('.', ',')}</span> <span>R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>`
-                : `R$ ${finalPrice.toFixed(2).replace('.', ',')}`;
-
-            const content = `
-                <div class="breadcrumb">
-                  <a href="index.html">Página Inicial</a> / 
-                  <a href="index.html#produtos">${product.brand.charAt(0).toUpperCase() + product.brand.slice(1)}</a> / 
-                  <span>${product.name}</span>
-                </div>
-
-                <div class="product-grid-layout">
-                  <!-- Visuals -->
-                  <div class="product-visuals">
-                    <div class="main-image-box">
-                        <img src="${product.image || 'assets/logo-ignite.png'}" alt="${product.name}" class="product-img-real" id="mainImg">
-                    </div>
-                  </div>
-
-                  <!-- Info -->
-                  <div class="product-info-column">
-            if (sInput) {
-                sInput.addEventListener('input', (e) => {
-                    let val = e.target.value.replace(/\D/g, "");
-                    let masked = "";
-                    let i = 0;
-                    const pattern = "00000-000";
-                    for (let char of pattern) {
-                        if (i >= val.length) break;
-                        if (char === "0") {
-                            masked += val[i];
-                            i++;
-                        } else {
-                            masked += char;
-                        }
-                    }
-                    e.target.value = masked;
-                });
-            }
-
-            if (window.updateCartBadge) window.updateCartBadge();
-        }
-
-        function simulateShipping() {
-            const cepInput = document.getElementById('shippingInput');
-            if (!cepInput) return;
-            const cep = cepInput.value.replace(/\D/g, "");
-            const resultsBox = document.getElementById('shipping-results');
-
-            if (cep.length !== 8) {
-                if (window.lastCepSimulated) { 
-                     // Only show alert if it was a manual click or valid CEP previously
-                }
-                return;
-            }
-
-            const qtyInput = document.getElementById('qtyVal');
-            const qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
-            
-            // Core calculation from logic file
-            const options = ShippingCalculator.calculate(cep, qty);
-            
-            if (!options || options.length === 0) {
-                resultsBox.innerHTML = '<p style="padding:15px; color:#c0c0c0; text-align:center; font-size:0.9rem;">CEP não encontrado para cálculo.</p>';
-                return;
-            }
-
-            const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
-            // Free Shipping Logic: Wholesale >= 50 units (Standard PAC)
-            const isFreeShipping = (saleType === 'wholesale' && qty >= 50);
-
-            const orderMap = { 'JADLOG': 1, 'LOGGI': 2, 'SEDEX': 3, 'PAC': 4 };
-            options.sort((a, b) => (orderMap[a.id] || 99) - (orderMap[b.id] || 99));
-
-            let html = `
-                <div class="shipping-results-header" style="margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; display:flex; flex-direction:column; gap:4px;">
-                    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                        <span class="shipping-title" style="font-weight:700; color:#fff; font-size:1.1rem; letter-spacing: -0.02em;">Simulação de frete</span>
-                        <span style="color:var(--accent-primary); font-size:0.65rem; font-weight:800; padding:4px 10px; border:1px solid var(--accent-primary); border-radius:30px; text-transform:uppercase; letter-spacing:1px; background:rgba(255, 11, 85, 0.05); display:inline-block;">INTELLIGENT</span>
-                    </div>
-                    <span style="font-size:0.8rem; color:#888;">Simulado para ${cep.slice(0,5)}-${cep.slice(5)}</span>
-                </div>
-            `;
-
-
-            
-            options.forEach(opt => {
-                const isPac = opt.id === 'PAC';
-                const isCorreios = opt.carrier.toLowerCase().includes('correios');
-                const isRecommended = !isPac && !isCorreios;
-                
-                const currentPrice = isFreeShipping && isPac ? 0 : opt.price;
-                const displayPrice = currentPrice === 0 ? 'GRÁTIS' : `R$ ${currentPrice.toFixed(2).replace('.', ',')}`;
-                
-                html += `
-                <div class="shipping-option-card" style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); border-radius:12px; margin-bottom:10px; transition:all 0.3s ease; position:relative; overflow:hidden;">
-                    ${currentPrice === 0 ? '<div style="position:absolute; top:0; left:0; width:3px; height:100%; background:var(--accent-primary);"></div>' : ''}
-                    <div class="opt-meta" style="display:flex; flex-direction:column; gap:4px;">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <span class="opt-name" style="font-weight:700; color:#fff; font-size:1rem;">${opt.carrier}</span>
-                            <span class="opt-tag" style="background:rgba(255,255,255,0.1); color:#ccc; font-size:0.65rem; padding:2px 6px; border-radius:4px; font-weight:600; text-transform:uppercase;">${opt.type}</span>
-                            ${isRecommended ? '<span class="opt-tag" style="background:#ff0b55; color:#fff; font-size:0.65rem; padding:2px 8px; border-radius:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.02em;">Mais Indicado</span>' : ''}
-                        </div>
-                        <div style="display:flex; align-items:center; gap:12px; margin-top:2px;">
-                            <span class="opt-days" style="font-size:0.85rem; color:#aaa; display:flex; align-items:center; gap:4px;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.6;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 
-                                ${opt.deadlineDays}
-                            </span>
-                        </div>
-                    </div>
-                    <div style="text-align:right;">
-                        <span class="opt-price" style="font-weight:900; font-size:1.15rem; color:${currentPrice === 0 ? 'var(--accent-primary)' : '#fff'};">${displayPrice}</span>
-                        ${currentPrice === 0 ? '<div style="font-size:0.6rem; color:var(--accent-primary); font-weight:700; margin-top:2px;">OFERTA ATIVA</div>' : ''}
-                    </div>
-                </div>`;
-            });
-
-            resultsBox.innerHTML = html;
-            resultsBox.style.padding = '5px';
-            resultsBox.classList.add('active');
-            window.lastCepSimulated = cep;
-        }
-
-        function validateQty(input) {
-            let val = parseInt(input.value);
-            if (isNaN(val) || val < 1) return; // Allow typing
-            
-            // Real-time update if shipping was already simulated
-            if (window.lastCepSimulated) {
-                simulateShipping();
-            }
-        }
-
-        function updateQty(delta) {
-            const qtyVal = document.getElementById('qtyVal');
-            let current = parseInt(qtyVal.value) || 1;
-            current = Math.max(1, current + delta);
-            qtyVal.value = current;
-        }
-
-        function handleBuyNow(id, name, price, image) {
-            if (addToCart(id, name, price, image, false)) {
-                setTimeout(() => {
-                    window.location.href = 'checkout.html';
-                }, 300);
-            }
-        }
-
-        function addToCart(id, name, price, image, redirect = false) {
-            const qtyInput = document.getElementById('qtyVal');
-            const qty = parseInt(qtyInput.value) || 1;
-            const flavorValue = document.getElementById('flavorValue');
-            const flavor = flavorValue ? flavorValue.value : '';
-            const selector = document.getElementById('customFlavorSelect');
-            const addBtn = document.querySelector('.btn-add-cart');
-
-            if (!flavor) {
-                if (selector) {
-                    selector.classList.add('shake');
-                    setTimeout(() => selector.classList.remove('shake'), 400);
-                }
-                alert('Por favor, selecione um sabor antes de adicionar ao carrinho.');
-                return false;
-            }
-
-            // use global window.cart
-            if (!window.cart) window.cart = JSON.parse(localStorage.getItem('ignite_cart')) || [];
-
-            const finalPrice = parseFloat(price).toFixed(2);
-
-            const existing = window.cart.find(item => item.id === id && item.flavor === flavor);
-            if (existing) {
-                existing.quantity += qty;
-                existing.price = finalPrice;
-            } else {
-                window.cart.push({ id, name, price: finalPrice, image, quantity: qty, flavor: flavor });
-            }
-
-            // Success feedback
-            if (addBtn) {
-                const originalText = addBtn.textContent;
-                addBtn.textContent = '✓ ADICIONADO';
-                addBtn.style.backgroundColor = '#00ff88';
-                setTimeout(() => {
-                    addBtn.textContent = originalText;
-                    addBtn.style.backgroundColor = '';
-                }, 2000);
-            }
-
-            if (window.updateCartUI) {
-                window.updateCartUI();
-                window.toggleCartSidebar(true);
-            } else {
-                if (window.catalogHeadline) {
-                    window.catalogHeadline.textContent = 'CONTINUE COMPRANDO';
-                    window.catalogHeadline.classList.add('gradual-spacing');
-                    window.catalogHeadline.dataset.gsInit = ''; // Allow re-init
-                }
-                localStorage.setItem('ignite_cart', JSON.stringify(window.cart));
-                window.location.href = 'checkout.html';
-            }
-
-            // Meta Pixel: AddToCart
-            if (window.fbq) {
-                fbq('track', 'AddToCart', {
-                    content_name: name,
-                    content_ids: [id],
-                    content_type: 'product',
-                    value: parseFloat(price) * qty,
-                    currency: 'BRL'
-                });
-            }
-
-            return true;
-        }
+        });
     </script>
 
     <!-- Core Scripts Loader (v21) -->
@@ -1237,65 +422,66 @@
 
                     <!-- Right Column: Info & Actions -->
                     <div class="product-column-right">
-                        <div class="p-header">
-                            <div class="p-brand">${product.brand || 'Olimpo'}</div>
-                            <h1 class="p-name">${product.name}</h1>
-                            <div class="p-price-row">
-                                <span class="p-current">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
-                                ${!isRetail ? '<span class="p-wholesale-tag">Atacado</span>' : ''}
-                            </div>
-                        </div>
-
-                        <div class="p-options-area">
-                            ${product.flavors && product.flavors.length > 0 ? `
-                                <div class="custom-select-wrapper" id="flavorSelectWrapper">
-                                    <label class="p-option-label">Escolha o Sabor</label>
-                                    <div class="custom-select-trigger" id="flavorTrigger">
-                                        <span id="flavorDisplay">Selecione um sabor</span>
-                                        <div class="arrow"></div>
-                                    </div>
-                                    <div class="custom-options" id="flavorOptions">
-                                        ${product.flavors.map(f => {
-                                            const parts = f.split(' – ');
-                                            const name = parts[0];
-                                            const desc = parts[1] ? ` – ${parts[1]}` : '';
-                                            return `
-                                                <div class="custom-option" data-value="${f}">
-                                                    <span class="flavor-name">${name}</span>
-                                                    ${desc ? `<span class="flavor-desc">${desc}</span>` : ''}
-                                                </div>
-                                            `;
-                                        }).join('')}
-                                    </div>
-                                    <input type="hidden" id="selectedFlavor" value="">
-                                </div>
-                            ` : ''}
-
-                            <div class="p-actions-stack">
-                                <button class="btn-buy-now" onclick="handlePremiumBuyNow('${product.id}', '${product.name}', ${finalPrice}, '${product.image || ''}')">
-                                    Comprar Agora
-                                </button>
-                                <button class="btn-add-cart" onclick="addToCartPremium('${product.id}', '${product.name}', ${finalPrice}, '${product.image || ''}')">
-                                    Adicionar ao Carrinho
-                                </button>
-                                
-                                <div class="q-wrapper-premium">
-                                    <span class="q-label">Quantidade:</span>
-                                    <div class="q-stepper-premium">
-                                        <button type="button" class="q-btn-p" onclick="adjQty(-1)">−</button>
-                                        <input type="number" class="q-val-p" id="qtyPremium" value="1" min="1" readonly>
-                                        <button type="button" class="q-btn-p" onclick="adjQty(1)">+</button>
-                                    </div>
+                        <div class="p-main-info-card">
+                            <div class="p-header">
+                                <div class="p-brand">${product.brand || 'Olimpo'}</div>
+                                <h1 class="p-name">${product.name}</h1>
+                                <div class="p-price-row">
+                                    <span class="p-current">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+                                    ${!isRetail ? '<span class="p-wholesale-tag">OFERTA ATACADO</span>' : ''}
                                 </div>
                             </div>
 
-                            <div class="shipping-box" style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05);">
-                                <label class="p-option-label">Simular Frete</label>
-                                <div style="display: flex; gap: 10px;">
-                                    <input type="text" id="cepp" placeholder="00000-000" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 10px; flex: 1;">
-                                    <button onclick="simShip()" style="background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 700;">OK</button>
+                            <div class="p-options-area">
+                                ${product.flavors && product.flavors.length > 0 ? `
+                                    <div class="custom-select-wrapper" id="flavorSelectWrapper">
+                                        <label class="p-option-label">SELECIONE A VARIAÇÃO</label>
+                                        <div class="custom-select-trigger" id="flavorTrigger">
+                                            <span id="flavorDisplay">Escolha o Sabor</span>
+                                            <div class="arrow"></div>
+                                        </div>
+                                        <div class="custom-options" id="flavorOptions">
+                                            ${product.flavors.map(f => {
+                                                const parts = f.split(' – ');
+                                                const name = parts[0];
+                                                const desc = parts[1] ? ` – ${parts[1]}` : '';
+                                                return `
+                                                    <div class="custom-option" data-value="${f}">
+                                                        <span class="flavor-name">${name}</span>
+                                                        ${desc ? `<span class="flavor-desc">${desc}</span>` : ''}
+                                                    </div>
+                                                `;
+                                            }).join('')}
+                                        </div>
+                                        <input type="hidden" id="selectedFlavor" value="">
+                                    </div>
+                                ` : ''}
+
+                                <div class="p-actions-stack">
+                                    <button class="btn-buy-now" onclick="handlePremiumBuyNow('${product.id}', '${product.name}', ${finalPrice}, '${product.image || ''}')">
+                                        Comprar Agora
+                                    </button>
+                                    <button class="btn-add-cart" onclick="addToCartPremium('${product.id}', '${product.name}', ${finalPrice}, '${product.image || ''}')">
+                                        Adicionar ao Carrinho
+                                    </button>
+                                    
+                                    <div class="q-wrapper-premium">
+                                        <span class="q-label">Quantidade:</span>
+                                        <div class="q-stepper-premium">
+                                            <button type="button" class="q-btn-p" onclick="adjQty(-1)">−</button>
+                                            <input type="number" class="q-val-p" id="qtyPremium" value="1" min="1" readonly>
+                                            <button type="button" class="q-btn-p" onclick="adjQty(1)">+</button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div id="shipRes" style="margin-top: 15px;"></div>
+                                <div class="shipping-box-premium">
+                                    <label class="p-option-label">CÁLCULO DE ENVIO</label>
+                                    <div class="shipping-input-group">
+                                        <input type="text" id="cepp" placeholder="00000-000">
+                                        <button onclick="simShip()">CALCULAR</button>
+                                    </div>
+                                    <div id="shipRes"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1402,6 +588,32 @@
             }, 800);
         };
 
+        window.adjustCarouselQty = (cardId, delta) => {
+            const input = document.getElementById(`${cardId}-qty`);
+            if (input) {
+                let val = parseInt(input.value) + delta;
+                if (val < 1) val = 1;
+                input.value = val;
+            }
+        };
+
+        window.addCarouselToCart = (id, name, price, img, qtyId) => {
+            const qty = parseInt(document.getElementById(qtyId).value) || 10;
+            if (!window.cart) window.cart = JSON.parse(localStorage.getItem('ignite_cart')) || [];
+            
+            // Check if product exists to increment qty
+            const existing = window.cart.find(item => item.id === id && !item.flavor);
+            if (existing) {
+                existing.quantity += qty;
+            } else {
+                window.cart.push({ id, name, price, image: img, quantity: qty, flavor: 'Mix Variado', brand: 'Olimpo' });
+            }
+
+            localStorage.setItem('ignite_cart', JSON.stringify(window.cart));
+            if (window.updateCartUI) window.updateCartUI();
+            if (window.toggleCartSidebar) window.toggleCartSidebar(true);
+        };
+
         function renderFullCatalog(allProducts) {
             const container = document.getElementById('segmented-products-area');
             if (!container) return;
@@ -1412,36 +624,44 @@
                 if (brandProducts.length === 0) return;
                 const segment = document.createElement('div');
                 segment.className = 'brand-segment-section';
-                const cId = `product-carousel-${brand}`;
-                const nId = `next-p-${brand}`;
-                const pId = `prev-p-${brand}`;
+                const cId = `carousel-card-${brand}`;
                 segment.innerHTML = `
                     <div class="brand-header-pill" style="margin-top: 40px;">
                         <h3>${brand.toUpperCase()}</h3>
                     </div>
                     <div class="upsell-products-wrapper" style="position: relative;">
-                        <button class="carousel-nav-btn prev" id="${pId}" aria-label="Anterior" style="position: absolute; left: -50px; top: 50%; transform: translateY(-50%); z-index: 10;">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                        </button>
-                        <div class="upsell-carousel" id="${cId}" style="display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 20px; padding: 20px 0; scroll-snap-type: x mandatory; -ms-overflow-style: none; scrollbar-width: none;">
-                            ${brandProducts.map(p => `
-                                <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'" style="flex: 0 0 calc(33.333% - 14px); min-width: 250px; scroll-snap-align: center;">
-                                    <div class="product-image" style="height: 200px;">
-                                        <img src="${p.image || 'assets/logo-ignite.png'}" alt="${p.name}" class="product-img-real" style="padding: 10px;">
-                                    </div>
-                                    <div class="product-info" style="padding: 15px;">
-                                        <div class="product-brand" style="font-size: 0.65rem;">${p.brand || brand}</div>
-                                        <div class="product-name" style="font-size: 0.9rem;">${p.name}</div>
-                                        <div class="product-price-row">
-                                            <span class="current" style="font-size: 1.1rem; color: var(--accent-primary); font-weight: 800;">R$ ${parseFloat(p.price).toFixed(2).replace('.', ',')}</span>
+                        <div class="upsell-carousel" id="${cId}">
+                            ${brandProducts.map((p, idx) => {
+                                const cardId = `carousel-item-${brand}-${p.id || idx}`;
+                                let imgSrc = p.image || 'assets/logo-ignite.png';
+                                if (imgSrc && !imgSrc.includes('/') && !imgSrc.startsWith('http')) imgSrc = 'Images Pods/' + imgSrc;
+                                
+                                return `
+                                    <div class="product-card" onclick="if(!event.target.closest('.product-add-controls')) window.location.href='product.html?id=${p.id}'" style="flex: 0 0 calc(33.333% - 14px); min-width: 250px;">
+                                        <div class="product-image">
+                                            <img src="${imgSrc}" alt="${p.name}" class="product-img-real">
+                                        </div>
+                                        <div class="product-info">
+                                            <div class="product-brand">${p.brand || brand}</div>
+                                            <div class="product-name">${p.name}</div>
+                                            <div class="product-price-row">
+                                                <span class="current">R$ ${parseFloat(p.price).toFixed(2).replace('.', ',')}</span>
+                                            </div>
+                                            <div class="product-add-controls">
+                                                <div class="upsell-qty-stepper">
+                                                    <button type="button" class="upsell-qty-btn" onclick="adjustCarouselQty('${cardId}', -1)">−</button>
+                                                    <input type="number" class="upsell-qty-val" id="${cardId}-qty" value="10" min="1">
+                                                    <button type="button" class="upsell-qty-btn" onclick="adjustCarouselQty('${cardId}', 1)">+</button>
+                                                </div>
+                                                <button type="button" class="upsell-add-btn" onclick="addCarouselToCart('${p.id}', '${p.name}', ${p.price}, '${p.image}', '${cardId}-qty')">
+                                                    Adicionar
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            `).join('')}
+                                `;
+                            }).join('')}
                         </div>
-                        <button class="carousel-nav-btn next" id="${nId}" aria-label="Próximo" style="position: absolute; right: -50px; top: 50%; transform: translateY(-50%); z-index: 10;">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </button>
                     </div>
                 `;
                 container.appendChild(segment);
