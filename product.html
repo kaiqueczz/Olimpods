@@ -1330,18 +1330,147 @@
                 if (pc) pc.innerHTML = '<div class="container"><p style="text-align:center; padding: 100px 0;">Produto não encontrado.</p></div>';
             }
         }
+    <!-- Core Scripts Loader (v21) -->
+    <script src="assets/products-data.js?v=2.1"></script>
+    <script src="script.js?v=5.0"></script>
 
-        function renderFavoritesCarousel(allProducts) {
-            const container = document.getElementById('favoritesContent');
-            if (!container) return;
-            
-            // Render the main title and the new Dual-Pill rewards system
-            container.innerHTML = `
+    <script>
+        // Inline logic executes after data is available
+        async function loadProduct() {
+            const params = new URLSearchParams(window.location.search);
+            const productId = params.get('id');
+
+            // Handle Buy Now logic
+            window.handleBuyNow = function(id, name, price, image) {
+                addToCart(id, name, price, image, false);
+                window.location.href = 'checkout.html';
+            };
+
+            let allProducts = (typeof PRODUCTS_DATA !== 'undefined') ? PRODUCTS_DATA : [];
+            try {
+                const response = await fetch('products.json?v=' + Date.now());
+                if (response.ok) {
+                    allProducts = await response.json();
+                }
+            } catch (err) {
+                console.warn("Fallback to PRODUCTS_DATA active.");
+            }
+
+            renderFullCatalog(allProducts);
+
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) {
+                document.getElementById('segmented-products-area').innerHTML = '<div style="padding: 100px; text-align:center;"><h2>Produto não encontrado</h2><a href="index.html" class="btn-primary">Voltar para Home</a></div>';
+                return;
+            }
+
+            const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
+            const price = parseFloat(product.price);
+            const isRetail = saleType === 'retail';
+            const finalPrice = isRetail ? (parseFloat(product.retail_price) || price * 1.4) : price;
+
+            const content = `
+                <div class="product-grid-layout">
+                  <div class="product-visuals">
+                    <div class="main-image-box">
+                      <img src="${product.image || 'assets/logo-ignite.png'}" alt="${product.name}" class="product-img-real">
+                    </div>
+                  </div>
+
+                  <div class="product-info-column">
+                    <div class="product-header">
+                      <div class="p-brand">${product.brand || 'Ignite'}</div>
+                      <h1 class="p-title">${product.name}</h1>
+                      <div class="p-price-row">
+                        <span class="p-current">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+                        ${isRetail ? '' : '<span class="p-wholesale-tag">Preço de Atacado</span>'}
+                      </div>
+                    </div>
+
+                    <div class="p-options">
+                      ${product.flavors && product.flavors.length > 0 ? `
+                        <div class="p-option-item">
+                          <label class="p-option-label">Escolha o Sabor</label>
+                          <div class="custom-select" id="customFlavorSelect">
+                            <div class="select-trigger" id="selectTrigger">
+                              <span id="selectedValue">Selecione um sabor</span>
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="select-options" id="selectOptions">
+                              ${product.flavors.map(f => `<div class="select-option" data-value="${f}">${f}</div>`).join('')}
+                            </div>
+                          </div>
+                          <input type="hidden" id="flavorValue" value="">
+                        </div>
+                      ` : ''}
+
+                      <div class="p-action-group">
+                        <button class="btn-buy-now" onclick="handleBuyNow('${product.id}', '${product.name}', '${finalPrice}', '${product.image || ''}')">Comprar Agora</button>
+                        <button class="btn-add-cart" onclick="addToCart('${product.id}', '${product.name}', '${finalPrice}', '${product.image || ''}', false)">Adicionar ao Carrinho</button>
+                      </div>
+
+                      <div class="quantity-control-wrapper">
+                        <div class="quantity-control">
+                          <button class="q-btn" onclick="updateQty(-1)">-</button>
+                          <input type="number" class="q-val" id="qtyVal" value="1" min="1" step="1" oninput="validateQty(this)">
+                          <button class="q-btn" onclick="updateQty(1)">+</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="shipping-box">
+                      <label class="p-option-label">Simular Frete</label>
+                      <div class="shipping-input-group">
+                        <input type="text" class="shipping-input" id="shippingInput" placeholder="Ex.: 00000-000" maxlength="9">
+                        <button class="btn-shipping" onclick="simulateShipping()">OK</button>
+                      </div>
+                      <div id="shipping-results" class="shipping-results">
+                         <!-- Results injected here -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            `;
+            document.getElementById('productContent').innerHTML = content;
+
+            // Meta Pixel: ViewContent
+            if (window.fbq) {
+                fbq('track', 'ViewContent', {
+                    content_name: product.name,
+                    content_category: product.brand,
+                    content_ids: [product.id],
+                    content_type: 'product',
+                    value: parseFloat(finalPrice),
+                    currency: 'BRL'
+                });
+            }
+
+            // Flavor Select Interactions
+            const trigger = document.getElementById('selectTrigger');
+            const options = document.getElementById('selectOptions');
+            const hiddenInput = document.getElementById('flavorValue');
+            const displayValue = document.getElementById('selectedValue');
+
+            if (trigger && options) {
+                trigger.onclick = (e) => {
+                    e.stopPropagation();
+                    options.classList.toggle('active');
+                };
+                options.querySelectorAll('.select-option').forEach(opt => {
+                    opt.onclick = () => {
+                        const val = opt.getAttribute('data-value');
+                        displayValue.textContent = val;
+                        hiddenInput.value = val;
+                        options.classList.remove('active');
+                    };
+                });
+                document.addEventListener('click', () => options.classList.remove('active'));
+            }
+
+            // Rewards Integration
+            const rewardsHtml = `
                 <div class="olimpo-grid-stack">
-                    <!-- Nível 1: Título -->
                     <h2 class="gradual-spacing" data-text="CONTINUE COMPRANDO">CONTINUE COMPRANDO</h2>
-                    
-                    <!-- Nível 2: Pílulas Dual (Esquerda Maior / Direita Menor) -->
                     <div class="reward-pill-container" id="rewardPillContainerSummary">
                         <div class="reward-pill">
                             <span class="reward-pill-msg" id="rewardMsgSummary">Carregando recompensas...</span>
@@ -1351,11 +1480,8 @@
                             <span class="economy-val" id="savingsValueSummary">R$ 0,00</span>
                         </div>
                     </div>
-
-                    <!-- Nível 3: Barra de Progresso Ultra-Fina -->
-                    <div class="main-page-rewards reveal" data-delay="1" style="width: 100%; display: block !important; opacity: 1; visibility: visible;">
+                    <div class="main-page-rewards reveal" style="width: 100%; display: block !important;">
                         <div class="promo-bar-wrapper main-page" style="margin: 0 auto; width: 100%; max-width: 520px;">
-
                             <div class="promo-bar-track">
                                 <div class="promo-bar-fill" id="mainProgressFill">
                                     <div class="promo-bar-energy"></div>
@@ -1369,30 +1495,29 @@
                         </div>
                     </div>
                 </div>
-
-
             `;
+            const rContainer = document.getElementById('favoritesContent');
+            if (rContainer) rContainer.innerHTML = rewardsHtml;
+
             if (window.initGradualSpacing) window.initGradualSpacing();
-              function renderFullCatalog(allProducts) {
+            if (typeof updateRewardsUI === 'function') updateRewardsUI();
+        }
+
+        function renderFullCatalog(allProducts) {
             const container = document.getElementById('segmented-products-area');
             if (!container) return;
             const saleType = localStorage.getItem('ignite_sale_type') || 'wholesale';
-            
-            // Clear but preserve space for segments
             container.innerHTML = '';
             
             const brands = ["ignite", "elfbar", "blacksheep"];
             brands.forEach(brand => {
                 const brandProducts = allProducts.filter(p => (p.brand || '').toLowerCase() === brand);
                 if (brandProducts.length === 0) return;
-
                 const segment = document.createElement('div');
                 segment.className = 'brand-segment-section';
-                
                 const cId = `product-carousel-${brand}`;
                 const nId = `next-p-${brand}`;
                 const pId = `prev-p-${brand}`;
-
                 segment.innerHTML = `
                     <div class="brand-header-pill" style="margin-top: 40px;">
                         <h3>${brand.toUpperCase()}</h3>
@@ -1403,9 +1528,7 @@
                         </button>
                         <div class="upsell-carousel" id="${cId}" style="display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 20px; padding: 20px 0; scroll-snap-type: x mandatory; -ms-overflow-style: none; scrollbar-width: none;">
                             ${brandProducts.map(p => {
-                                const price = parseFloat(p.price);
-                                const isRetail = saleType === 'retail';
-                                const finalPrice = isRetail ? (parseFloat(p.retail_price) || price * 1.4) : price;
+                                const finalP = (saleType === 'retail') ? (p.retail_price || p.price * 1.4) : p.price;
                                 return `
                                     <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'" style="flex: 0 0 calc(33.333% - 14px); min-width: 250px; scroll-snap-align: center;">
                                         <div class="product-image" style="height: 200px;">
@@ -1415,7 +1538,7 @@
                                             <div class="product-brand" style="font-size: 0.65rem;">${p.brand || brand}</div>
                                             <div class="product-name" style="font-size: 0.9rem;">${p.name}</div>
                                             <div class="product-price-row">
-                                                <span class="current" style="font-size: 1.1rem; color: var(--accent-primary); font-weight: 800;">R$ ${finalPrice.toFixed(2).replace('.', ',')}</span>
+                                                <span class="current" style="font-size: 1.1rem; color: var(--accent-primary); font-weight: 800;">R$ ${parseFloat(finalP).toFixed(2).replace('.', ',')}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -1428,8 +1551,6 @@
                     </div>
                 `;
                 container.appendChild(segment);
-
-                // Individual Nav for this Brand Carousel
                 const trk = document.getElementById(cId);
                 const bP = document.getElementById(pId);
                 const bN = document.getElementById(nId);
@@ -1450,15 +1571,11 @@
             });
         }
 
-
+        // Initialize
         loadProduct();
     </script>
 
 
-
-
-    <script src="assets/products-data.js?v=2.1"></script>
-    <script src="script.js?v=5.0"></script>
 
 
 </body>
